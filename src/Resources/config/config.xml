@@ -36,7 +36,6 @@
             <name>apiSignature</name>
             <label lang="de-DE">API Signatur (wenn aktiviert in Partnerportal, optional)</label>
             <label lang="en-GB">API Signature (if activated in partner portal, optional)</label>
-            <required>1</required>
             <helpText lang="de-DE">Die API Signatur sichert die Datenübertragung gegen Datenmanipulation von Dritten ab. Sie können die API-Signatur im easyCredit Partnerportal aktivieren.</helpText>
             <helpText lang="en-GB">The API signature secures the data transfer against data manipulation by third parties. You can activate the API signature in the easyCredit merchant portal.</helpText>
         </input-field>
