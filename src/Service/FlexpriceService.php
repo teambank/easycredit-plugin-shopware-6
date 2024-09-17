@@ -45,7 +45,7 @@ class FlexpriceService {
         $webshopInfo = $this->settingsService
             ->getSettings($salesChannelContext->getSalesChannel()->getId())
             ->getWebshopInfo();
-        return is_array($webshopInfo) && isset($webshopInfo['flexprice']) && $webshopInfo['flexprice'] === true;
+        return \is_array($webshopInfo) && isset($webshopInfo['flexprice']) && $webshopInfo['flexprice'] === true;
     }
 
     protected function getFlexpriceRule(Context $context)
