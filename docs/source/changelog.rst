@@ -1,6 +1,11 @@
 Changelog
 =========
 
+2.2.4
+-----
+
+* Integration von Ausnahmemöglichkeiten von Zins-Flex via RuleBuilder
+
 2.2.3
 ------
 

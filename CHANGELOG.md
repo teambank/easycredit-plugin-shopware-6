@@ -1,3 +1,7 @@
+# 2.2.4
+
+* Integration von Ausnahmemöglichkeiten von Zins-Flex via RuleBuilder
+
 # 2.2.3
 
 * das JavaScript-Build wird nun bei Aufruf von `./bin/build-storefront.sh` nicht mehr doppelt erstellt
