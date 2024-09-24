@@ -170,7 +170,6 @@ export const fillCheckout = async (page) => {
 
     /* Confirm Page */
     await page.locator("easycredit-checkout-label").click();
-    await page.getByRole("button", { name: "Weiter zum Ratenkauf" }).click();
-    await page.getByText("Akzeptieren", { exact: true }).click();
+    await page.getByRole("button", { name: "Weiter zu easyCredit-Ratenkauf" }).click();
   });
 };
