@@ -129,6 +129,7 @@ class PaymentController extends StorefrontController
                     ->set('express', false);
 
                 $cart = $this->cartService->getCart($newContext->getToken(), $newContext);
+                $this->storage->set('cartToken', $cart->getToken());
                 $checkout->finalizeExpress($this->quoteHelper->getQuote($cart, $newContext));
             }
 
