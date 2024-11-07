@@ -48,7 +48,7 @@ export const goThroughPaymentPage = async (page, express: boolean = false) => {
     }
 
     await page.locator("tbk-vorwahldropdown .tel-wrapper").click();
-    await page.locator('tbk-vorwahldropdown').locator("p").filter({ hasText: "+49" }).click();
+    await page.locator('tbk-vorwahldropdown').locator('li').filter({ hasText: '+49' }).getByRole('paragraph').click();
     await page.locator('#mobilfunknummer').getByRole('textbox').fill('1703404848');
     await page.locator('app-ratenkauf-iban-input-dumb').getByRole('textbox').fill("DE12500105170648489890");
 

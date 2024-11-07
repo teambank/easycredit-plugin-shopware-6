@@ -145,7 +145,7 @@ test.describe("go through express checkout @express", () => {
 
     await page
       .locator("a")
-      .filter({ hasText: "Jetzt in Raten zahlen" })
+      .filter({ hasText: "Jetzt direkt in Raten zahlen" })
       .click();
     await page.getByText("Akzeptieren", { exact: true }).click();
 
@@ -161,7 +161,7 @@ test.describe("address change should invalidate payment @express", () => {
     await test.step("Start express checkout", async () => {
       await page
         .locator("a")
-        .filter({ hasText: "Jetzt in Raten zahlen" })
+        .filter({ hasText: "Jetzt direkt in Raten zahlen" })
         .click();
       await page.getByText("Akzeptieren", { exact: true }).click();
     });
@@ -179,7 +179,7 @@ test.describe("amount change should invalidate payment @express", () => {
     await test.step("Start express checkout", async () => {
       await page
         .locator("a")
-        .filter({ hasText: "Jetzt in Raten zahlen" })
+        .filter({ hasText: "Jetzt direkt in Raten zahlen" })
         .click();
       await page.getByText("Akzeptieren", { exact: true }).click();
     });
