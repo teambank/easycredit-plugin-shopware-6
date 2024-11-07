@@ -1,3 +1,9 @@
+# 2.2.5
+
+* behebt ein Problem bei der Zahlungsintialisierung i.V.m. Rabatten
+* der Zahlungsvorgang ist nun immer an einen bestimmten `cartToken` gebunden (behebt ein Problem mit Drittanbieter-Erweiterungen)
+* valide Zugangsdaten werden beim Testen automatisch gespeichert, um die Kennung synchronisieren zu können
+
 # 2.2.4
 
 * Integration von Ausnahmemöglichkeiten von Zins-Flex via RuleBuilder
