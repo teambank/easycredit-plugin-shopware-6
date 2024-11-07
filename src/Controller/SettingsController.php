@@ -42,9 +42,16 @@ class SettingsController extends AbstractController
         $credentialsValid = $this->apiCredentialTestService->testApiCredentials($webshopId, $apiPassword, $apiSignature);
 
         if ($credentialsValid) {
+            $this->settings->updateSettings([
+                'webshopId' => $webshopId,
+                'apiPassword' => $apiPassword,
+                'apiSignature' => $apiSignature
+            ]);
+
             $webshopInfo = $this->integrationFactory
                 ->createCheckout(null, false)
                 ->getWebshopDetails();
+
             $this->settings->updateSettings(['webshopInfo' => $webshopInfo]);
         }
 
