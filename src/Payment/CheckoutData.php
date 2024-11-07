@@ -46,6 +46,11 @@ class CheckoutData extends Struct
      */
     protected $isPrefixValid;
 
+   /**
+     * @var boolean
+     */
+    protected $disableFlexprice;
+
     public function getPaymentMethodId(): string
     {
         return $this->paymentMethodId;
@@ -79,5 +84,10 @@ class CheckoutData extends Struct
     public function isPrefixValid(): bool
     {
         return $this->isPrefixValid;
+    }
+
+    public function getDisableFlexprice(): bool
+    {
+        return $this->disableFlexprice;
     }
 }
