@@ -75,7 +75,7 @@ class Validator implements CartValidatorInterface
             return;
         }
 
-        if ($salesChannelContext->getToken() !== $this->storage->get('contextToken')) { // skip on wrong saleschannel
+        if ($cart->getToken() !== $this->storage->get('cartToken')) {
             return;
         }
 

@@ -105,7 +105,7 @@ class Redirector implements EventSubscriberInterface
         $salesChannelContext = $event->getSalesChannelContext();
 
         $this->storage->set('init', false);
-        $this->storage->set('contextToken',$salesChannelContext->getToken());
+        $this->storage->set('cartToken', $event->getPage()->getCart()->getToken());
 
         $this->paymentHelper->startCheckout($salesChannelContext);
     }

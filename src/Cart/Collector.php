@@ -59,7 +59,9 @@ class Collector implements CartDataCollectorInterface
         if (!$this->requestStack->getCurrentRequest()) {
             return; // do not run in CLI
         }
-
+        if ($cart->getToken() !== $this->storage->get('cartToken')) {
+            return;
+        }
         if (!$price = $this->getInterestPrice()) {
             return;
         }
