@@ -103,7 +103,7 @@ class Payment
         return false;
     }
 
-    private function getSalesChannelPaymentMethods(
+    public function getSalesChannelPaymentMethods(
         SalesChannelEntity $salesChannelEntity,
         Context $context
     ): ?PaymentMethodCollection {
@@ -122,7 +122,7 @@ class Payment
 
     public function startCheckout ($salesChannelContext) {
         $checkout = $this->integrationFactory->createCheckout($salesChannelContext);
-        $cart = $this->cartService->getCart($salesChannelContext->getToken(), $salesChannelContext);
+        $cart = $this->cartService->getCart($salesChannelContext->getToken(), $salesChannelContext, false);
         $quote = $this->quoteHelper->getQuote($cart, $salesChannelContext);
         try {
             try {
