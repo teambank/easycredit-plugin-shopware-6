@@ -90,9 +90,18 @@ class PaymentController extends StorefrontController
             ->set('express', true);
 
         try {
+            $paymentMethodId = $this->paymentHelper->getPaymentMethodId($salesChannelContext->getContext());
+
             $this->contextSwitchRoute->switchContext(new RequestDataBag([
-                SalesChannelContextService::PAYMENT_METHOD_ID => $this->paymentHelper->getPaymentMethodId($salesChannelContext->getContext())
+                SalesChannelContextService::PAYMENT_METHOD_ID => $paymentMethodId
             ]), $salesChannelContext);
+
+            $salesChannelContext->assign([
+                'paymentMethod' => $this->paymentHelper->getSalesChannelPaymentMethods($salesChannelContext->getSalesChannel(), $salesChannelContext->getContext())
+                    ->filter(fn ($method) => $method->getId() === $paymentMethodId)
+                    ->first()
+            ]);
+
             $this->paymentHelper->startCheckout($salesChannelContext);
         } catch (ConstraintViolationException $violations) {
             $errors = [];
