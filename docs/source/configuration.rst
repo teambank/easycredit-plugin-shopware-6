@@ -92,3 +92,25 @@ Verkaufskanal Einstellungen
 Achten Sie weiterhin darauf, dass die Zahlungsart "easyCredit-Ratenkauf" auch im Verkaufskanal als Zahlungsart zugewiesen ist.
 
 .. image:: ./_static/config-payment-country.png
+
+Zins-Flexibilisierung: Ausnahmen definieren
+-----------------------------------------------
+
+Die Zins-Flexibilisierung bietet dem Händler die Möglichkeit seinen Kunden einen geringeren Zinssatz für die Finanzierung über easyCredit-Ratenkauf anzubieten. Der Zinssatz muss durch eine entsprechende Vereinbarung individuell mit easyCredit-Ratenkauf vereinbart werden. Mit der Ausnahme-Funktionalität können eines oder mehrere Produkte aus der Zins-Flexibilisierung ausgenommen werden. Somit kann der Händler die Reduzierung des Zinssatzes für bestimmte Produkte oder Produkgruppen bewerben ohne andere Produkte ebenfalls zu subventionieren.
+
+.. note:: Die Ausnahme-Funktion ist ab der Version 2.2.4 integriert.
+
+Defintion von Ausnahmen über den Rule-Builder
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Die Ausnahmen von der Zins-Flexibilisierung können über den Rule-Builder definiert werden. Um die Funktionalität zu aktivieren, muss die Kennung mittels Klick auf "Zugangsdaten testen & Kennung synchronsieren" synchronisiert werden.
+
+.. image:: ./_static/config-flexprice-sync.png
+
+.. warning:: Für die Nutzung der Funktion ist eine Vereinbarung mit easyCredit-Ratenkauf notwendig. Bitte kontaktieren Sie uns, wenn Sie die Funktion nutzen möchten.
+
+Ist die Kennung synchronisiert und das Merkmal für die Zins-Flexibilisierung freigeschaltet, erscheint im RuleBuilder ein neuer Regel-Typ "easyCredit: Zins-Flex Ausnahme". Über diesen Regel-Typ können flexible Ausnahmen für Produkte definiert werden. Für die Verarbeitung auf Produktebene werden die Produkte als Warenkorb-Positionen behandelt. Sollen zum Beispiel alle Produkte aus der Kategorie "Food" ausgeschlossen werden, so kann die Regel "Position in Kategorie" verwendet werden.
+
+.. image:: ./_static/config-flexprice-rulebuilder.png
+
+.. image:: ./_static/config-flexprice-rulebuilder-rule.png
