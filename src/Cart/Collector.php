@@ -75,7 +75,7 @@ class Collector implements CartDataCollectorInterface
         if ($this->storage->get('interest_amount') === null) {
             return null;
         }
-        $this->storage->set('debug','adding interest line item: '.(float)$this->storage->get('interest_amount'));
+        $this->storage->set('debug','adding interest line item: '. (float) $this->storage->get('interest_amount'));
 
         return new CalculatedPrice(
             (float) $this->storage->get('interest_amount'),
