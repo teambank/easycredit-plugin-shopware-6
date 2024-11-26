@@ -20,6 +20,7 @@ use Shopware\Storefront\Page\GenericPageLoadedEvent;
 use Shopware\Storefront\Page\Search\SearchPageLoadedEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Netzkollektiv\EasyCredit\Service\FlexpriceService;
+use Netzkollektiv\EasyCredit\Service\PaymentAvailability;
 
 use Shopware\Core\Framework\Struct\ArrayEntity;
 
@@ -33,16 +34,20 @@ class Marketing implements EventSubscriberInterface
 
     private FlexpriceService $flexpriceService;
 
+    private PaymentAvailability $paymentAvailabilityService;
+
     public function __construct(
         SettingsServiceInterface $settingsService,
         CartService $cartService,
         PaymentHelper $paymentHelper,
-        FlexpriceService $flexpriceService
+        FlexpriceService $flexpriceService,
+        PaymentAvailability $paymentAvailabilityService
     ) {
         $this->settings = $settingsService;
         $this->cartService = $cartService;
         $this->paymentHelper = $paymentHelper;
         $this->flexpriceService = $flexpriceService;
+        $this->paymentAvailabilityService = $paymentAvailabilityService;
     }
 
     public static function getSubscribedEvents(): array
@@ -71,7 +76,7 @@ class Marketing implements EventSubscriberInterface
             return;
         }
 
-        $this->addVariables($event->getPage(), [
+        $this->addVariables($event, [
             'widgetSelector' => $settings->getWidgetSelectorProductDetail(),
             'disableFlexprice' => $this->flexpriceService->shouldDisableFlexpriceForProduct($context, $product),
             'amount' => (\count($product->getCalculatedPrices()) > 0 ) ? $product->getCalculatedPrices()->last()->getUnitPrice() : $product->getCalculatedPrice()->getUnitPrice()
@@ -93,7 +98,7 @@ class Marketing implements EventSubscriberInterface
 
         $cart = $this->cartService->getCart($context->getToken(), $context);
 
-        $this->addVariables($event->getPage(), [
+        $this->addVariables($event, [
             'widgetSelector' => $settings->getWidgetSelectorCart(),
             'amount' => $cart->getPrice()->getTotalPrice(),
         ]);
@@ -114,7 +119,7 @@ class Marketing implements EventSubscriberInterface
 
         $cart = $this->cartService->getCart($context->getToken(), $context);
 
-        $this->addVariables($event->getPage(), [
+        $this->addVariables($event, [
             'widgetSelector' => $settings->getWidgetSelectorOffCanvasCart(),
             'amount' => $cart->getPrice()->getTotalPrice(),
         ]);
@@ -134,7 +139,7 @@ class Marketing implements EventSubscriberInterface
             $modalIsOpen = 'false';
         }
 
-        $this->addVariables($event->getPage(), [
+        $this->addVariables($event, [
             'apiKey' => $settings->getWebshopId(),
             'modal' => $settings->getModalEnabled(),
             'modalIsOpen' => $modalIsOpen,
@@ -159,7 +164,7 @@ class Marketing implements EventSubscriberInterface
             return;
         }
 
-        $this->addVariables($event->getPage(), [
+        $this->addVariables($event, [
             'apiKey' => $settings->getWebshopId(),
             'widgetEnabled' => $settings->getWidgetEnabled(),
             'widgetSelector' => $settings->getWidgetSelectorProductListing(),
@@ -178,7 +183,7 @@ class Marketing implements EventSubscriberInterface
             return;
         }
 
-        $this->addVariables($event->getPage(), [
+        $this->addVariables($event, [
             'card' => $settings->getCardSearchEnabled(),
             'cardSettingsPosition' => $settings->getCardSettingsPosition(),
             'cardSettingsMedia' => $settings->getCardSettingsMedia(),
@@ -200,12 +205,16 @@ class Marketing implements EventSubscriberInterface
         return $settings;
     }
 
-    protected function addVariables($page, $variables) {
-        $extension = $page->getExtension('easycredit');
+    protected function addVariables($event, $variables) {
+        if (!$this->paymentAvailabilityService->isAvailable($event->getSalesChannelContext())) {
+            return;
+        }
+
+        $extension = $event->getPage()->getExtension('easycredit');
         if ($extension === null) {
             $extension = new ArrayEntity();
         }
         $extension->assign($variables);
-        $page->addExtension('easycredit', $extension);
+        $event->getPage()->addExtension('easycredit', $extension);
     }
 }

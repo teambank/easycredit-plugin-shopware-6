@@ -91,7 +91,7 @@ class Payment
             return false;
         }
 
-        $paymentMethods = $this->getSalesChannelPaymentMethods($salesChannelContext->getSalesChannel(), $context);
+        $paymentMethods = $this->getSalesChannelPaymentMethods($salesChannelContext);
         if (!$paymentMethods) {
             return false;
         }
@@ -103,15 +103,18 @@ class Payment
         return false;
     }
 
-    public function getSalesChannelPaymentMethods(
-        SalesChannelEntity $salesChannelEntity,
-        Context $context
-    ): ?PaymentMethodCollection {
-        $salesChannelId = $salesChannelEntity->getId();
+    public function getPaymentMethod(SalesChannelContext $salesChannelContext) {
+        return $this->getSalesChannelPaymentMethods($salesChannelContext)
+            ->get($this->getPaymentMethodId($salesChannelContext->getContext()));
+    }
+
+    private function getSalesChannelPaymentMethods(SalesChannelContext $salesChannelContext): ?PaymentMethodCollection {
+        $salesChannelId = $salesChannelContext->getSalesChannel()->getId();
         $criteria = new Criteria([$salesChannelId]);
         $criteria->addAssociation('paymentMethods');
         /** @var SalesChannelEntity|null $result */
-        $result = $this->salesChannelRepository->search($criteria, $context)->get($salesChannelId);
+        $result = $this->salesChannelRepository->search($criteria, $salesChannelContext->getContext())
+            ->get($salesChannelId);
 
         if (!$result) {
             return null;

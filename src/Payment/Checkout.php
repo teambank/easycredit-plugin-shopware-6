@@ -18,6 +18,7 @@ use Netzkollektiv\EasyCredit\Cart\InterestError;
 use Netzkollektiv\EasyCredit\Service\FlexpriceService;
 use Shopware\Core\Framework\DataAbstractionLayer\Exception\InconsistentCriteriaIdsException;
 use Shopware\Storefront\Page\Checkout\Confirm\CheckoutConfirmPageLoadedEvent;
+use Shopware\Core\Content\Product\State;
 use Symfony\Component\Cache\Adapter\TagAwareAdapterInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Psr\Log\LoggerInterface;
@@ -82,7 +83,9 @@ class Checkout implements EventSubscriberInterface
         $context = $event->getContext();
         $cart = $event->getPage()->getCart();
 
-        if (!$this->paymentHelper->isPaymentMethodInSalesChannel($salesChannelContext)) {
+        $paymentMethodId = $this->paymentHelper->getPaymentMethodId($salesChannelContext->getContext());
+
+        if (!$event->getPage()->getPaymentMethods()->get($paymentMethodId)) {
             return;
         }
 
@@ -97,9 +100,6 @@ class Checkout implements EventSubscriberInterface
                 $this->storage->clear();
             }
         }
-
-        $paymentMethodId = $this->paymentHelper->getPaymentMethodId($salesChannelContext->getContext());
-        $isSelected = $paymentMethodId === $salesChannelContext->getPaymentMethod()->getId();
 
         try {
             $settings = $this->settings->getSettings($salesChannelContext->getSalesChannel()->getId());
@@ -119,6 +119,7 @@ class Checkout implements EventSubscriberInterface
             return;
         }
 
+        $isSelected = $paymentMethodId === $salesChannelContext->getPaymentMethod()->getId();
         if ($isSelected && !$this->storage->get('payment_plan')) {
             if ($error === null) {
                 try {

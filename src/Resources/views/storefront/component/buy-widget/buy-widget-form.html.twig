@@ -4,24 +4,19 @@
     {{ parent() }}
 
     {% block buy_widget_buy_button_container_easycredit %}
-        {% set isProductDetail = cmsPage.type is same as 'product_detail' %}
+        {# @var easycredit #}
+        {% set easycredit = page.extensions.easycredit %}
 
-        {% if buyable and product.calculatedCheapestPrice.totalPrice > 0 %}
+        {% if buyable and product.calculatedCheapestPrice.totalPrice > 0 and easyCreditAvailable(context, product) and easycredit.expressProductEnabled %}
 
             {% block buy_widget_buy_button_container_easycredit_express %}
-                {# @var easycredit #}
-                {% set easycredit = page.extensions.easycredit %}
-
-                {% if easycredit.expressProductEnabled %}
-
-                    {% set price = product.calculatedPrice %}
-                    {% if product.calculatedPrices.count > 0 %}
-                        {% set price = product.calculatedPrices.last %}
-                    {% endif %}
-                    <div class="form-row mt-3 justify-content-end d-flex">
-                        {% sw_include '@EasyCreditRatenkauf/storefront/component/express-button.html.twig' with {amount: price.unitPrice} %}
-                    </div>
+                {% set price = product.calculatedPrice %}
+                {% if product.calculatedPrices.count > 0 %}
+                    {% set price = product.calculatedPrices.last %}
                 {% endif %}
+                <div class="form-row mt-3 justify-content-end d-flex">
+                    {% sw_include '@EasyCreditRatenkauf/storefront/component/express-button.html.twig' with {amount: price.unitPrice} %}
+                </div>
             {% endblock %}
 
         {% endif %}

@@ -9,7 +9,7 @@
         {% set easycredit = page.extensions.easycredit %}
 
         {% set isProductDetail = cmsPage.type is same as 'product_detail' %}
-        {%if not isProductDetail %}
+        {% if easyCreditAvailable(context, product) and not isProductDetail %}
 
         {% set price = product.calculatedPrice %}
         {% if product.calculatedPrices.count > 0 %}

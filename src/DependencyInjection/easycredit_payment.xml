@@ -116,6 +116,7 @@
             <argument type="service" id="Shopware\Core\Checkout\Cart\SalesChannel\CartService"/>
             <argument type="service" id="Netzkollektiv\EasyCredit\Helper\Payment"/>
             <argument type="service" id="Netzkollektiv\EasyCredit\Service\FlexpriceService"/>
+            <argument type="service" id="Netzkollektiv\EasyCredit\Service\PaymentAvailability"/>
 
             <tag name="kernel.event_subscriber"/>
         </service>
@@ -250,17 +251,34 @@
             <argument type="service" id="Netzkollektiv\EasyCredit\Api\IntegrationFactory"/>
             <argument type="service" id="monolog.logger.easycredit"/>
         </service>
-        <service id="Netzkollektiv\EasyCredit\Service\FlexpriceService">
+        <service id="Netzkollektiv\EasyCredit\Service\RuleEvaluator">
             <argument type="service" id="rule.repository"/>
             <argument type="service" id="Netzkollektiv\EasyCredit\Setting\Service\SettingsService"/>
             <argument type="service" id="Shopware\Core\Checkout\Cart\SalesChannel\CartService" />
         </service>
+        <service id="Netzkollektiv\EasyCredit\Service\FlexpriceService">
+            <argument type="service" id="rule.repository"/>
+            <argument type="service" id="Netzkollektiv\EasyCredit\Setting\Service\SettingsService"/>
+            <argument type="service" id="Netzkollektiv\EasyCredit\Service\RuleEvaluator" />
+        </service>
         <service id="Netzkollektiv\EasyCredit\Subscriber\CheckoutValidationSubscriber">
-            <tag name="kernel.event_subscriber"/>
-
             <argument type="service" id="request_stack"/>
             <argument type="service" id="Shopware\Core\Checkout\Payment\Cart\PaymentHandler\PaymentHandlerRegistry"/>
             <argument type="service" id="Netzkollektiv\EasyCredit\Api\IntegrationFactory"/>
+
+            <tag name="kernel.event_subscriber"/>
+        </service>
+        <service id="Netzkollektiv\EasyCredit\Service\PaymentAvailability">
+            <argument type="service" id="rule.repository"/>
+            <argument type="service" id="Shopware\Core\Checkout\Cart\SalesChannel\CartService" />
+            <argument type="service" id="Netzkollektiv\EasyCredit\Setting\Service\SettingsService"/>
+            <argument type="service" id="Netzkollektiv\EasyCredit\Helper\Payment" />
+            <argument type="service" id="Netzkollektiv\EasyCredit\Service\RuleEvaluator" />
+        </service>
+        <service id="Netzkollektiv\EasyCredit\Twig\TwigExtensions" public="true">
+            <argument type="service" id="Netzkollektiv\EasyCredit\Service\PaymentAvailability"/>
+
+            <tag name="twig.extension"/>
         </service>
     </services>
 </container>

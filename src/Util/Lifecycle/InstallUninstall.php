@@ -18,7 +18,11 @@ use Shopware\Core\Framework\Plugin\Context\UpdateContext;
 use Shopware\Core\Framework\Plugin\Context\InstallContext;
 use Shopware\Core\Framework\Plugin\Context\UninstallContext;
 use Shopware\Core\System\SystemConfig\SystemConfigService;
+use Shopware\Core\Framework\Rule\Rule;
+use Shopware\Core\Content\Product\State;
+use Shopware\Core\Framework\Rule\Container\MatchAllLineItemsRule;
 use Shopware\Core\Checkout\Customer\Rule\BillingCountryRule;
+use Shopware\Core\Checkout\Cart\Rule\LineItemProductStatesRule;
 use Shopware\Core\Framework\Rule\Container\AndRule;
 use Shopware\Core\System\Currency\Rule\CurrencyRule;
 use Shopware\Core\System\Country\CountryDefinition;
@@ -149,16 +153,30 @@ class InstallUninstall
                             [
                                 'type' => (new BillingCountryRule())->getName(),
                                 'value' => [
-                                    'operator' => BillingCountryRule::OPERATOR_EQ,
+                                    'operator' => Rule::OPERATOR_EQ,
                                     'countryIds' => $this->getCountryIds(['DE'], $context),
                                 ],
                             ],
                             [
                                 'type' => (new CurrencyRule())->getName(),
                                 'value' => [
-                                    'operator' => CurrencyRule::OPERATOR_EQ,
+                                    'operator' => Rule::OPERATOR_EQ,
                                     'currencyIds' => $this->getCurrencyIds(['EUR'], $context),
                                 ],
+                            ],
+                            [   'type' => (new MatchAllLineItemsRule())->getName(),
+                                'value' => [
+                                    'type' => 'product'
+                                ],
+                                'children' => [
+                                    [
+                                        'type' => (new LineItemProductStatesRule())->getName(),
+                                        'value' => [
+                                            'operator' => Rule::OPERATOR_EQ,
+                                            'productState' => State::IS_PHYSICAL,
+                                        ]
+                                    ],
+                                ]
                             ]
                         ],
                     ],
