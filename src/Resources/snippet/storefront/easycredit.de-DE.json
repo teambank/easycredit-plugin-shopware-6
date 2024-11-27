@@ -10,8 +10,8 @@
         "EASYCREDIT_INIT_ERROR": "%name%"
     },
     "error": {
-        "EASYCREDIT_INSTALLMENTS_MUST_BE_RECALCULATED": "easyCredit-Ratenkauf: Ihre Bestellung hat sich verändert, bitte führen Sie die Ratenberechnung erneut durch.",
-        "EASYCREDIT_INIT_ERROR": "easyCredit-Ratenkauf: Bitte korrigieren Sie Ihre Bestellung und klicken Sie 'Raten neu berechnen'",
+        "EASYCREDIT_INSTALLMENTS_MUST_BE_RECALCULATED": "easyCredit: Ihre Bestellung hat sich verändert, bitte führen Sie die Ratenberechnung erneut durch.",
+        "EASYCREDIT_INIT_ERROR": "easyCredit: Bitte korrigieren Sie Ihre Bestellung und klicken Sie 'Raten neu berechnen'",
         "EASYCREDIT_TRANSATION_NOT_APRROVED": "Um die Bestellung mit easyCredit abzuschliessen zu können, ist eine Vorab-Autorisierung erforderlich."
     }
 }

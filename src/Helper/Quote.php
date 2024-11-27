@@ -15,7 +15,7 @@ use Netzkollektiv\EasyCredit\Api\QuoteInvalidException;
 use Netzkollektiv\EasyCredit\Api\QuoteBuilder;
 use Netzkollektiv\EasyCredit\Api\OrderBuilder;
 use Shopware\Core\Framework\DataAbstractionLayer\Entity;
-use Teambank\RatenkaufByEasyCreditApiV3\Model\Transaction;
+use Teambank\EasyCreditApiV3\Model\Transaction;
 
 class Quote
 {

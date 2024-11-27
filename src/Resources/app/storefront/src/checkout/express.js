@@ -1,55 +1,92 @@
-import Plugin from 'src/plugin-system/plugin.class'
-import { getCsrfToken, createHiddenField } from '../util.js'
+import Plugin from "src/plugin-system/plugin.class";
+import { getCsrfToken, createHiddenField } from "../util.js";
 
 export default class EasyCreditRatenkaufExpressCheckout extends Plugin {
-    init() {
-        this.el.addEventListener('submit', async () => {
+  init() {
+    this.el.addEventListener("submit", async (e) => {
+      const easyCreditParams = this.buildAdditionalParams(e.detail);
 
-            var form
-            if (form = await this.replicateBuyForm()) {
-                form.submit()
-                return
-            }
+      const buyForm = document.getElementById(
+        "productDetailPageBuyProductForm"
+      );
 
-            if (
-                document.querySelector('.is-ctl-checkout.is-act-cartpage') ||
-                this.el.closest('.cart-offcanvas')
-            ) {
-                window.location.href = '/easycredit/express'
-                return
-            }
+      if (buyForm) {
+        let additional = {};
 
-            alert('Der easycredit-Ratenkauf konnte nicht gestartet werden.')
-        })
-    }
-
-    async replicateBuyForm () {
-        let buyForm = document.getElementById('productDetailPageBuyProductForm')
-        if (!buyForm) {
-            return false
-        }
-        var form = document.createElement('form')
-        form.setAttribute('action', buyForm.getAttribute('action'))
-        form.setAttribute('method','post')
-        form.style.display = 'none'
-        
-        var formData = new FormData(buyForm)
-        formData.set('redirectTo', 'frontend.easycredit.express')
-        formData.set('easycredit-express', '1')
-
-        for (var key of formData.keys()) {
-            let field = document.createElement('input')
-            field.setAttribute('name', key)
-            field.setAttribute('value', formData.get(key))
-            form.append(field)
-        }
-
-        let token = await getCsrfToken()
+        const token = await getCsrfToken();
         if (token) {
-          form.append(createHiddenField('_csrf_token', token))
+          additional["_csrf_token"] = token;
         }
 
-        document.querySelector('body').append(form)
-        return form
+        additional["redirectTo"] = "frontend.easycredit.express";
+        additional["redirectParameters"] = JSON.stringify(easyCreditParams);
+
+        var replicatedForm;
+        if ((replicatedForm = await this.replicateForm(buyForm, additional))) {
+          replicatedForm.submit();
+          return;
+        }
+      }
+
+      if (
+        document.querySelector(".is-ctl-checkout.is-act-cartpage") ||
+        this.el.closest(".cart-offcanvas")
+      ) {
+        const params = new URLSearchParams(easyCreditParams).toString();
+        window.location.href = "/easycredit/express" + "?" + params;
+        return;
+      }
+
+      window.alert(
+        "Die Express-Zahlung mit easyCredit konnte nicht gestartet werden."
+      );
+      console.error(
+        "easyCredit payment could not be started. Please check the integration."
+      );
+    });
+  }
+
+  buildAdditionalParams = (detail) => {
+    let additional = {};
+    detail.express = "1";
+    for (let [key, value] of Object.entries(detail)) {
+      additional["easycredit[" + key + "]"] = value;
     }
+    return additional;
+  };
+
+  replicateForm(buyForm, additionalData) {
+    if (!(buyForm instanceof HTMLFormElement)) {
+      return false;
+    }
+
+    const action = buyForm.getAttribute("action");
+    const method = buyForm.getAttribute("method");
+
+    if (!action || !method) {
+      return false;
+    }
+
+    const form = document.createElement("form");
+    form.setAttribute("action", action);
+    form.setAttribute("method", method);
+    form.style.display = "none";
+
+    const formData = new FormData(buyForm);
+    for (const [key, value] of Object.entries(additionalData)) {
+      formData.set(key, value);
+    }
+
+    for (const key of formData.keys()) {
+      const field = document.createElement("input");
+      field.setAttribute("type", "hidden");
+      field.setAttribute("name", key);
+      field.setAttribute("value", formData.get(key));
+      form.appendChild(field);
+    }
+
+    document.body.appendChild(form);
+
+    return form;
+  }
 }

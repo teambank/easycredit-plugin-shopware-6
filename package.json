@@ -10,6 +10,7 @@
     "docs": "yarn docs:build:html; yarn docs:deploy"
   },
   "dependencies": {
-    "@playwright/test": "1.44.1"
+    "@playwright/test": "1.44.1",
+    "@types/node": "^22.0.0"
   }
 }

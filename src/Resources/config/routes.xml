@@ -15,7 +15,7 @@
             </list>
         </default>
     </route>
-    <route path="/easycredit/return" id="frontend.easycredit.return" controller="Netzkollektiv\EasyCredit\Controller\PaymentController::return" methods="GET">
+    <route path="/easycredit/return" id="frontend.easycredit.return" controller="Netzkollektiv\EasyCredit\Controller\PaymentController::returnAction" methods="GET">
         <default key="_routeScope">
             <list>
                 <string>storefront</string>

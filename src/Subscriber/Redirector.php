@@ -19,8 +19,9 @@ use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Psr\Log\LoggerInterface;
-use Teambank\RatenkaufByEasyCreditApiV3\Integration\ValidationException;
-use Teambank\RatenkaufByEasyCreditApiV3\ApiException;
+use Teambank\EasyCreditApiV3\Integration\ValidationException;
+use Teambank\EasyCreditApiV3\ApiException;
+use Netzkollektiv\EasyCredit\Service\CheckoutService;
 
 class Redirector implements EventSubscriberInterface
 {
@@ -44,6 +45,8 @@ class Redirector implements EventSubscriberInterface
      */
     private PaymentHelper $paymentHelper;
 
+    private CheckoutService $checkoutService;
+
     private Storage $storage;
 
     public function __construct(
@@ -51,12 +54,14 @@ class Redirector implements EventSubscriberInterface
         RequestStack $requestStack,
         UrlGeneratorInterface $router,
         PaymentHelper $paymentHelper,
+        CheckoutService $checkoutService,
         Storage $storage
     ) {
         $this->container = $container;
         $this->request = $requestStack->getCurrentRequest();
         $this->router = $router;
         $this->paymentHelper = $paymentHelper;
+        $this->checkoutService = $checkoutService;
         $this->storage = $storage;
     }
 
@@ -107,11 +112,11 @@ class Redirector implements EventSubscriberInterface
         $this->storage->set('init', false);
         $this->storage->set('cartToken', $event->getPage()->getCart()->getToken());
 
-        $this->paymentHelper->startCheckout($salesChannelContext);
+        $this->checkoutService->startCheckout($salesChannelContext);
     }
 
     public function onKernelResponse(ResponseEvent $event): void
-    {       
+    {
         if (!$this->request->hasSession()) {
             return; // do not run in CLI & API
         }

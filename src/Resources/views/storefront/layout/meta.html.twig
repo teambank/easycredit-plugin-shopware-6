@@ -3,20 +3,27 @@
 {% block layout_head_meta_tags_general %}
     {{ parent() }}
 
-    {% if page.extensions.easycredit.apiKey %}
-    <meta name="easycredit-api-key" content="{{page.extensions.easycredit.apiKey}}" />
+    {# @var easycredit #}
+    {% set easycredit = page.extensions.easycredit %}
+
+    {% if easycredit.apiKey %}
+    <meta name="easycredit-api-key" content="{{ easycredit.apiKey }}" />
     {% endif %}
 
-    {% if page.extensions.easycredit.widgetSelector %}
-    <meta name="easycredit-widget-selector" content="{{page.extensions.easycredit.widgetSelector}}" />
+    {% if easycredit.widgetSelector %}
+    <meta name="easycredit-widget-selector" content="{{ easycredit.widgetSelector }}" />
     {% endif %}
 
-    {% if page.extensions.easycredit.amount %}
-    <meta name="easycredit-amount" content="{{page.extensions.easycredit.amount}}" />
+    {% if easycredit.amount %}
+    <meta name="easycredit-amount" content="{{ easycredit.amount }}" />
     {% endif %}
 
-    {% if page.extensions.easycredit.disableFlexprice %}
-    <meta name="easycredit-disable-flexprice" content="{{page.extensions.easycredit.disableFlexprice}}" />
+    {% if easycredit.disableFlexprice %}
+    <meta name="easycredit-disable-flexprice" content="{{ easycredit.disableFlexprice }}" />
+    {% endif %}
+
+    {% if easycredit.paymentTypes %}
+    <meta name="easycredit-payment-types" content="{{ easycredit.paymentTypes |join(',') }}" />
     {% endif %}
 
 {% endblock %}

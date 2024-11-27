@@ -17,6 +17,7 @@
         {% endif %}
         <easycredit-widget 
             webshop-id="{{ easycredit.apiKey }}" 
+            payment-types="{{ easycredit.paymentTypes |join(',') }}"
             amount="{{ price.unitPrice }}"
             extended="true"
         ></easycredit-widget>

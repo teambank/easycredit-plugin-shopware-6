@@ -1,24 +1,24 @@
 {
     "easycredit": {
-        "header": "easyCredit-Ratenkauf",
+        "header": "easyCredit",
         "general": {
-            "mainMenuItemGeneral": "easyCredit-Ratenkauf",
-            "descriptionTextModule": "Einstellungen für easyCredit-Ratenkauf"
+            "mainMenuItemGeneral": "easyCredit",
+            "descriptionTextModule": "Einstellungen für easyCredit"
         },
         "settingForm": {
             "save": "Speichern",
             "test": "API Zugangsdaten testen & Kennung synchronisieren",
-            "titleSaveSuccess": "easyCredit-Ratenkauf Einstellungen",
+            "titleSaveSuccess": "easyCredit Einstellungen",
             "titleTestSuccess": "API Zugangsdaten",
             "titleTestError": "API Zugangsdaten Fehler",
-            "titleSaveError": "easyCredit-Ratenkauf Einstellungen Fehler",
-            "messageSaveSuccess": "Die easyCredit-Ratenkauf Einstellungen wurden erfolgreich gespeichert.",
+            "titleSaveError": "easyCredit Einstellungen Fehler",
+            "messageSaveSuccess": "Die Einstellungen für easyCredit wurden erfolgreich gespeichert.",
             "messageTestSuccess": "Die API Zugangsdaten wurden erfolgreich validiert.",
             "messageTestError": "Die API Zugangsdaten konnten nicht validiert werden."
         },
         "rule": {
-            "cartAmountRule": "Gesamtsumme, exkl. Zinsen (kompatibel mit easyCredit-Ratenkauf)",
-            "cartPositionPrice": "Summe, exkl. Zinsen (kompatibel mit easyCredit-Ratenkauf)",
+            "cartAmountRule": "Gesamtsumme, exkl. Zinsen (kompatibel mit easyCredit)",
+            "cartPositionPrice": "Summe, exkl. Zinsen (kompatibel mit easyCredit)",
             "flexPriceType": "easyCredit: Zinsflex-Ausnahme"
         }
     }

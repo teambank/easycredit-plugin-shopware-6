@@ -7,14 +7,14 @@
 
 namespace Netzkollektiv\EasyCredit\Api\Quote;
 
-use Teambank\RatenkaufByEasyCreditApiV3\Model\ArticleNumberItem;
+use Teambank\EasyCreditApiV3\Model\ArticleNumberItem;
 use Netzkollektiv\EasyCredit\Helper\MetaDataProvider;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
 use Shopware\Core\Content\Seo\SeoUrlPlaceholderHandlerInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Teambank\RatenkaufByEasyCreditApiV3\Integration;
-use Teambank\RatenkaufByEasyCreditApiV3\Model\ShoppingCartInformationItem;
+use Teambank\EasyCreditApiV3\Integration;
+use Teambank\EasyCreditApiV3\Model\ShoppingCartInformationItem;
 
 class ItemBuilder
 {
@@ -90,7 +90,7 @@ class ItemBuilder
             $skus[] = new ArticleNumberItem([
                 'numberType' => $type,
                 'number' => $sku
-            ]);           
+            ]);
         }
         return $skus;
     }
@@ -103,7 +103,7 @@ class ItemBuilder
             'productName' => $item->getLabel(),
             'productUrl' => $this->seoUrlReplacer->replace(
                 $this->seoUrlReplacer->generate('frontend.detail.page', ['productId' => $item->getReferencedId()]),
-                $context->getSalesChannel()->getDomains()->first()->getUrl(), 
+                $context->getSalesChannel()->getDomains()->first()->getUrl(),
                 $context
             ),
             'productImageUrl' => $item->getCover() ? $item->getCover()->getUrl() : null,
@@ -112,6 +112,6 @@ class ItemBuilder
             'manufacturer' => $this->getManufacturer(),
             'productCategory' => $this->getCategory(),
             'articleNumber' => $this->getSkus()
-        ]);      
+        ]);
     }
 }

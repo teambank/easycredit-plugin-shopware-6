@@ -107,8 +107,14 @@ class Validator implements CartValidatorInterface
             return;
         }
 
+        if ($this->storage->get('payment_type') !== $quote->getPaymentType()) {
+            $this->storage->clear();
+
+            return;
+        }
+
         if ($this->storage->get('interest_amount') === null) {
-            $this->logger->debug('InterestError: interest amount not set'); 
+            $this->logger->debug('InterestError: interest amount not set');
             $errors->add(new InterestError());
 
             return;

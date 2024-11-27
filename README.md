@@ -1,4 +1,7 @@
-# easyCredit-Ratenkauf Plugin for Shopware 6 - Installment Payment Plugin
+# easyCredit-Rechnung & Ratenkauf Plugin for Shopware 6 - Installment & Bill Payment Plugin
+
+[![Quality Tests (e2e, static analysis, code style)](https://github.com/teambank/easycredit-plugin-shopware-6/actions/workflows/test.yml/badge.svg)](https://github.com/teambank/easycredit-plugin-shopware-6/actions/workflows/test.yml)
+
 
 easyCredit-Ratenkauf is the easiest and fastest installment payment solution of Germany. Join today to get the simplest way of partial payment for your POS and E-Commerce. easyCredit-Ratenkauf gives you the opportunity to offer installments as an additional payment method in your German WooCommerce store.
 
@@ -19,7 +22,7 @@ The plugin can be installed from the Shopware plugin directory. If you want to i
 
 ```
 cd custom/plugins
-git clone git@github.com:teambank/ratenkaufbyeasycredit-plugin-shopware-6.git EasyCreditRatenkauf
+git clone git@github.com:teambank/easycredit-plugin-shopware-6.git EasyCreditRatenkauf
 
 ./bin/console plugin:refresh
 ./bin/console plugin:install EasyCreditRatenkauf
@@ -32,6 +35,7 @@ git clone git@github.com:teambank/ratenkaufbyeasycredit-plugin-shopware-6.git Ea
 
 This extension aims to be as compatible as possible with current, future versions of Shopware 6. This version is tested with:
 
+* 6.6.x
 * 6.5.x
 * 6.4.x
 

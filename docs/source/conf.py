@@ -107,7 +107,7 @@ html_css_files = [
 # html_sidebars = {}
 
 html_show_sourcelink = False
-html_logo = '_static/50_ratenkauf_Logo_1240x824_easyCredit.png'
+html_logo = '_static/easycredit-logo.svg'
 html_favicon = '_static/favicon.ico'
 
 # -- Options for HTMLHelp output ---------------------------------------------
@@ -157,7 +157,7 @@ latex_elements = {
 }
 latex_show_urls = 'footnote'
 
-latex_logo = '_static/50_ratenkauf_Logo_1240x824_easyCredit.png'
+latex_logo = '_static/easycredit-logo.svg'
 
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title,

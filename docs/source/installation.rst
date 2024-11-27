@@ -4,7 +4,7 @@
 Installation
 ============
 
-Die Extension für easyCredit-Ratenkauf kann in der Administration unter :menuselection:`Erweiterungen --> Meine Erweiterungen` entweder über den direkten Download aus dem *Shopware Community Store* oder über den Datei-Upload des bereitgestellten Archives über *Erweiterung hochladen* installiert werden.
+Die Extension für easyCredit-Rechnung und Ratenkauf kann in der Administration unter :menuselection:`Erweiterungen --> Meine Erweiterungen` entweder über den direkten Download aus dem *Shopware Community Store* oder über den Datei-Upload des bereitgestellten Archives über *Erweiterung hochladen* installiert werden.
 Alternativ ist auch die Installation über die Kommandozeile möglich.
 
 Shopware Community Store

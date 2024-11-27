@@ -8,7 +8,7 @@
     {# @var easycredit #}
     {% set easycredit = page.extensions.easycredit %}
 
-    {% if easycredit and easycredit.paymentMethodId is same as(payment.id) %}
+    {% if easycredit and payment.id in easycredit.paymentMethodIds %}
     <div id="easycredit-payment-form">
         <label for="easycredit-agreement">
             <input type="checkbox" id="easycredit-agreement" />
@@ -25,7 +25,7 @@
     {# @var easycredit #}
     {% set easycredit = page.extensions.easycredit %}
 
-    {% if easycredit and easycredit.paymentMethodId is same as(payment.id) %}
+    {% if easycredit and payment.id in easycredit.paymentMethodIds %}
     <div class="easycredit-description">
         <span class="easycredit-method-title">{{ payment.translated.name }}</span>
         <a href="https://www.easycredit-ratenkauf.de/kunden.htm" onclick="javascript:window.open('https://www.easycredit-ratenkauf.de/kunden.htm','whatiseasycredit','toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=yes, resizable=yes, ,left=0, top=0, width=800, height=600'); return false;" class="easycredit-tooltip">{{ "easycredit.whatis"|trans }} {{ payment.translated.name }}?</a>

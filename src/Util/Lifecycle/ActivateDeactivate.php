@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /*
  * (c) NETZKOLLEKTIV GmbH <kontakt@netzkollektiv.com>
  * For the full copyright and license information, please view the LICENSE
@@ -51,16 +53,19 @@ class ActivateDeactivate
 
     private function setPaymentMethodsIsActive(bool $active, Context $context): void
     {
-        $paymentMethodId = $this->paymentHelper->getPaymentMethodId($context);
+        $paymentMethods = $this->paymentHelper->getPaymentMethods($context);
 
-        if ($paymentMethodId === null) {
+        if ($paymentMethods->count() === 0) {
             return;
         }
 
-        $updateData[] = [
-            'id' => $paymentMethodId,
-            'active' => $active,
-        ];
+        $updateData = [];
+        foreach ($this->paymentHelper->getPaymentMethods($context) as $method) {
+            $updateData[] = [
+                'id' => $method->get('id'),
+                'active' => $active,
+            ];
+        }
 
         $this->paymentRepository->update($updateData, $context);
     }
@@ -92,7 +97,7 @@ class ActivateDeactivate
             return;
         }
 
-        $ids = \array_map(static fn($id) => ['id' => $id], $customFieldIds->getIds());
+        $ids = \array_map(static fn ($id) => ['id' => $id], $customFieldIds->getIds());
         $this->customFieldRepository->delete($ids, $context);
     }
 

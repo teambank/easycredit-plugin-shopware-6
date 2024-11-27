@@ -8,6 +8,7 @@
 use PhpCsFixer\Fixer\Alias\MbStrFunctionsFixer;
 use PhpCsFixer\Fixer\Comment\HeaderCommentFixer;
 use PhpCsFixer\Fixer\FunctionNotation\NativeFunctionInvocationFixer;
+use PhpCsFixer\Fixer\Whitespace\NoTrailingWhitespaceFixer;
 use Symplify\EasyCodingStandard\Config\ECSConfig;
 use Symplify\EasyCodingStandard\ValueObject\Option;
 
@@ -20,7 +21,7 @@ file that was distributed with this source code.', 'separate' => 'bottom', 'loca
         'scope' => 'namespaced',
     ]);
     $ecsConfig->rule(MbStrFunctionsFixer::class);
-
+    $ecsConfig->rule(NoTrailingWhitespaceFixer::class);
     $parameters = $ecsConfig->parameters();
 
     $parameters->set(Option::CACHE_DIRECTORY, __DIR__ . '/var/cache/cs_fixer');

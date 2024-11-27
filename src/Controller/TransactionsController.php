@@ -13,9 +13,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Netzkollektiv\EasyCredit\Api\IntegrationFactory;
-use Teambank\RatenkaufByEasyCreditApiV3\ApiException;
-use Teambank\RatenkaufByEasyCreditApiV3\Model\CaptureRequest;
-use Teambank\RatenkaufByEasyCreditApiV3\Model\RefundRequest;
+use Teambank\EasyCreditApiV3\ApiException;
+use Teambank\EasyCreditApiV3\Model\CaptureRequest;
+use Teambank\EasyCreditApiV3\Model\RefundRequest;
 
 class TransactionsController extends AbstractController
 {

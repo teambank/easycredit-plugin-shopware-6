@@ -3,7 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-easyCredit-Ratenkauf für Shopware 6.x
+easyCredit-Rechnung & Ratenkauf für Shopware 6.x
 =========================================================
 
 .. toctree::

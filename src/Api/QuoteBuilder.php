@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /*
  * (c) NETZKOLLEKTIV GmbH <kontakt@netzkollektiv.com>
  * For the full copyright and license information, please view the LICENSE
@@ -7,10 +9,9 @@
 
 namespace Netzkollektiv\EasyCredit\Api;
 
-use Teambank\RatenkaufByEasyCreditApiV3\Model\RedirectLinks;
-use Teambank\RatenkaufByEasyCreditApiV3\Model\OrderDetails;
-use Teambank\RatenkaufByEasyCreditApiV3\Model\CustomerRelationship;
-use Netzkollektiv\EasyCredit\Helper\MetaDataProvider;
+use Teambank\EasyCreditApiV3\Model\RedirectLinks;
+use Teambank\EasyCreditApiV3\Model\OrderDetails;
+use Teambank\EasyCreditApiV3\Model\CustomerRelationship;
 use Netzkollektiv\EasyCredit\Api\Storage;
 use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
@@ -22,67 +23,64 @@ use Netzkollektiv\EasyCredit\Api\Quote\ItemBuilder;
 use Netzkollektiv\EasyCredit\Api\Quote\CustomerBuilder;
 use Netzkollektiv\EasyCredit\Cart\Processor;
 use Netzkollektiv\EasyCredit\Service\FlexpriceService;
-
-use Teambank\RatenkaufByEasyCreditApiV3\Integration;
-use Teambank\RatenkaufByEasyCreditApiV3\Model\Transaction;
-use Teambank\RatenkaufByEasyCreditApiV3\Model\ShippingAddress;
-use Teambank\RatenkaufByEasyCreditApiV3\Model\InvoiceAddress;
+use Netzkollektiv\EasyCredit\Helper\Payment as PaymentHelper;
+use Netzkollektiv\EasyCredit\Payment\Handler\BillPaymentHandler;
+use Netzkollektiv\EasyCredit\Payment\Handler\InstallmentPaymentHandler;
+use Netzkollektiv\EasyCredit\Payment\Handler\AbstractHandler;
+use Teambank\EasyCreditApiV3\Integration;
+use Teambank\EasyCreditApiV3\Model\Transaction;
+use Teambank\EasyCreditApiV3\Model\ShippingAddress;
+use Teambank\EasyCreditApiV3\Model\InvoiceAddress;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class QuoteBuilder
 {
-    /**
-     * @var Cart
-     */
-    protected $cart;
+    protected Cart $cart;
 
-    /**
-     * @var SalesChannelContext
-     */
-    protected $salesChannelContext;
+    private SalesChannelContext $salesChannelContext;
 
-    /**
-     * @var CustomerEntity
-     */
-    protected $customer;
+    private ?CustomerEntity $customer;
 
-    protected $settings;
+    private UrlGeneratorInterface $router;
 
-    /**
-     * @var Storage
-     */
-    protected $storage;
+    private RequestStack $requestStack;
 
-    protected $metaDataProvider;
+    private SettingsServiceInterface $settings;
 
-    protected $router; 
+    private Storage $storage;
 
-    protected $flexpriceService;
+    private PaymentHelper $paymentHelper;
 
-    protected $addressBuilder;
+    private FlexpriceService $flexpriceService;
 
-    protected $itemBuilder;
+    protected AddressBuilder $addressBuilder;
 
-    protected $customerBuilder;
+    private ItemBuilder $itemBuilder;
 
-    protected $systemBuilder; 
+    private CustomerBuilder $customerBuilder;
+
+    private SystemBuilder $systemBuilder;
 
     public function __construct(
-        MetaDataProvider $metaDataProvider,
+        UrlGeneratorInterface $router,
+        RequestStack $requestStack,
         SettingsServiceInterface $settingsService,
         Storage $storage,
-        UrlGeneratorInterface $router,
         FlexpriceService $flexpriceService,
+        PaymentHelper $paymentHelper,
         AddressBuilder $addressBuilder,
         ItemBuilder $itemBuilder,
         CustomerBuilder $customerBuilder,
         SystemBuilder $systemBuilder
     ) {
-        $this->metaDataProvider = $metaDataProvider;
+        $this->router = $router;
+        $this->requestStack = $requestStack;
         $this->settings = $settingsService;
         $this->storage = $storage;
-        $this->router = $router;
         $this->flexpriceService = $flexpriceService;
+        $this->paymentHelper = $paymentHelper;
+
         $this->addressBuilder = $addressBuilder;
         $this->itemBuilder = $itemBuilder;
         $this->customerBuilder = $customerBuilder;
@@ -93,8 +91,8 @@ class QuoteBuilder
     {
         if ($this->cart instanceof Cart) {
             return $this->cart->getToken();
-	}
-	return null;
+        }
+        return null;
     }
 
     public function getShippingMethod(): ?string
@@ -106,23 +104,43 @@ class QuoteBuilder
         $shippingMethod = $delivery->getShippingMethod()->getName();
 
         if ($this->getIsClickAndCollect()) {
-            $shippingMethod = '[Selbstabholung] '.$shippingMethod;
+            $shippingMethod = '[Selbstabholung] ' . $shippingMethod;
         }
         return $shippingMethod;
     }
 
-    public function getIsClickAndCollect(): Bool {
+    public function getIsClickAndCollect(): Bool
+    {
         $delivery = $this->cart->getDeliveries()->first();
         if ($delivery === null) {
             return false;
         }
-        
-        return $delivery->getShippingMethod()->getId() 
+
+        return $delivery->getShippingMethod()->getId()
             === $this->settings->getSettings($this->salesChannelContext->getSalesChannel()->getId())->getClickAndCollectShippingMethod();
     }
 
-    public function getDuration(): ?string {
+    public function getDuration(): ?string
+    {
         return $this->storage->get('duration');
+    }
+
+    public function getPaymentType()
+    {
+        $method = $this->salesChannelContext->getPaymentMethod();
+
+        $request = $this->requestStack->getCurrentRequest();
+        if ($request->get('easycredit') && isset($request->get('easycredit')['paymentType'])) {
+            $method = $this->paymentHelper->getPaymentMethodByPaymentType(
+                $request->get('easycredit')['paymentType'],
+                $this->salesChannelContext->getContext()
+            );
+        }
+
+        $paymentHandler = $this->paymentHelper->getHandlerByPaymentMethod($method);
+        if ($paymentHandler instanceof AbstractHandler) {
+            return $paymentHandler->getPaymentType() . '_PAYMENT';
+        }
     }
 
     public function getGrandTotal(): float
@@ -155,10 +173,6 @@ class QuoteBuilder
 
     public function getCustomer()
     {
-        /*if ($this->customer->getActiveBillingAddress() === null) {
-            throw new QuoteInvalidException();
-        }*/
-
         if (!$this->customer) {
             return null;
         }
@@ -169,7 +183,8 @@ class QuoteBuilder
         );
     }
 
-    public function getSystem() {
+    public function getSystem()
+    {
         return $this->systemBuilder->build();
     }
 
@@ -201,7 +216,8 @@ class QuoteBuilder
         return $_items;
     }
 
-    protected function getRedirectLinks() {
+    protected function getRedirectLinks()
+    {
         return new RedirectLinks([
             'urlSuccess' => $this->router->generate('frontend.easycredit.return', [], UrlGeneratorInterface::ABSOLUTE_URL),
             'urlCancellation' => $this->router->generate('frontend.easycredit.cancel', [], UrlGeneratorInterface::ABSOLUTE_URL),
@@ -209,11 +225,13 @@ class QuoteBuilder
         ]);
     }
 
-    protected function isExpress() {
+    protected function isExpress()
+    {
         return $this->storage->get('express');
     }
 
-    public function build($cart, SalesChannelContext $salesChannelContext): Transaction {
+    public function build($cart, SalesChannelContext $salesChannelContext): Transaction
+    {
         $this->cart = $cart;
         $this->salesChannelContext = $salesChannelContext;
         $this->customer = $salesChannelContext->getCustomer();
@@ -228,7 +246,9 @@ class QuoteBuilder
         }
 
         return new Transaction([
-            'financingTerm' => $this->getDuration(),
+            'paymentType' => $this->getPaymentType(),
+            'paymentSwitchPossible' => \count($this->paymentHelper->getActivePaymentMethods($salesChannelContext)) > 1, // Switch between installment & bill payment should be possible if both methods are enabled
+            'financingTerm' => (int) $this->getDuration(),
             'orderDetails' => new OrderDetails([
                 'orderValue' => $this->getGrandTotal(),
                 'orderId' => $this->getId(),
@@ -244,7 +264,7 @@ class QuoteBuilder
                 'customerSince' => ($this->customer && $this->customer->getCreatedAt() instanceof \DateTimeImmutable) ? $this->customer->getCreatedAt()->format('Y-m-d') : null,
                 'orderDoneWithLogin' => $this->customer && !$this->customer->getGuest(),
                 'numberOfOrders' => ($this->customer) ? $this->customer->getOrderCount() : 0,
-                'logisticsServiceProvider' => $this->getShippingMethod()      
+                'logisticsServiceProvider' => $this->getShippingMethod()
             ]),
             'redirectLinks' => $this->getRedirectLinks()
         ]);

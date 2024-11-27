@@ -2,11 +2,11 @@
 Voraussetzungen
 ================
 
-Zu Nutzung von **easyCredit-Ratenkauf für Shopware** benötigen Sie:
+Zur Nutzung von **easyCredit-Rechnung und Ratenkauf für Shopware 6** benötigen Sie:
 
 * eine funktionierende **Shopware 6.x** Installation
-* valide API-Zugangsdaten zu *easyCredit-Ratenkauf*
-* die aktuelle Version der Shopware 6.x Extension für easyCredit-Ratenkauf (siehe https://www.easycredit-ratenkauf.de/system/shopware/)
+* valide API-Zugangsdaten von *easyCredit*
+* die aktuelle Version der Shopware 6.x Extension für easyCredit (siehe https://www.easycredit-ratenkauf.de/system/shopware/)
 
 Versionskompatibilität
 ----------------------
@@ -25,10 +25,10 @@ nicht mehr aktiv getestet
 * 6.1.x (letzte getestete Plugin-Version v0.9.5)
 * 6.0.x (letzte getestete Plugin-Version v0.9.0)
 
-Zugangsdaten für "easyCredit-Ratenkauf"
+Zugangsdaten für "easyCredit"
 ------------------------------------------
 
-Um easyCredit-Ratenkauf nutzen zu können, benötigen Sie gültige API-Zugangsdaten.
+Um easyCredit nutzen zu können, benötigen Sie gültige API-Zugangsdaten.
 
 Die Zugangsdaten bestehen aus einer Webshop-Id und einem API-Kennwort. Sie erhalten eine Produktivkennung und eine Testkennung:
 
@@ -42,7 +42,7 @@ Die Produktivkennung ist erst nach Überprüfung und Freischaltung nutzbar. Die 
 Sie haben noch keine Zugangsdaten?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Um easyCredit-Ratenkauf nutzen zu können, benötigen Sie gültige API-Zugangsdaten.
+Um easyCredit nutzen zu können, benötigen Sie gültige API-Zugangsdaten.
 
 Nehmen Sie einfach Kontakt mit uns auf unter:
 

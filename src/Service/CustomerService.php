@@ -25,7 +25,7 @@ use Shopware\Core\Content\Newsletter\Exception\SalesChannelDomainNotFoundExcepti
 use Shopware\Core\System\SalesChannel\Context\SalesChannelContextServiceInterface;
 use Shopware\Core\System\SalesChannel\Context\SalesChannelContextServiceParameters;
 
-use Teambank\RatenkaufByEasyCreditApiV3\Model\TransactionInformation as EasyCreditTransaction;
+use Teambank\EasyCreditApiV3\Model\TransactionInformation as EasyCreditTransaction;
 use Netzkollektiv\EasyCredit\Helper\Payment as PaymentHelper;
 
 
@@ -140,7 +140,7 @@ class CustomerService {
         }
 
         $newContext = $this->contextService->get(
-            /** @phpstan-ignore-next-line */ 
+            /** @phpstan-ignore-next-line */
             new SalesChannelContextServiceParameters(
                 $context->getSalesChannel()->getId(),
                 $newToken,

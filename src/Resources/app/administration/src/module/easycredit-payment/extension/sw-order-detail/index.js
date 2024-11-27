@@ -1,9 +1,9 @@
 import template from './sw-order-detail.html.twig';
+import { isEasyCreditMethod }  from '../../../easycredit/paymentHelper';
 
 const { Component, Context } = Shopware;
 const Criteria = Shopware.Data.Criteria;
 
-const easycreditFormattedHandlerIdentifier = 'handler_netzkollektiv_handler';
 
 Component.override('sw-order-detail', {
     template,
@@ -65,7 +65,7 @@ Component.override('sw-order-detail', {
             const paymentMethodRepository = this.repositoryFactory.create('payment_method');
             paymentMethodRepository.get(paymentMethodId, Context.api).then(
                 (paymentMethod) => {
-                    this.isEasyCreditPayment = paymentMethod.formattedHandlerIdentifier === easycreditFormattedHandlerIdentifier
+                    this.isEasyCreditPayment = isEasyCreditMethod(paymentMethod)
                 }
             );
         }

@@ -6,23 +6,24 @@
     {# @var easycredit #}
     {% set easycredit = page.extensions.easycredit %}
 
-    {% if easycredit and easycredit.paymentMethodId is same as(payment.id) %}
-
+    {% if easycredit and payment.id in easycredit.paymentMethodIds %}
         {% if not payment.media %}
-            <easycredit-checkout-label></easycredit-checkout-label>
+            <easycredit-checkout-label 
+                label="{{payment.name}}"
+                payment-type="{{ easyCreditPaymentType(payment, context) }}"
+            ></easycredit-checkout-label>
         {% else %}
             {{ parent() }}
         {% endif %}
 
         <easycredit-checkout
-          amount="{{ easycredit.grandTotal }}"
-          webshop-id="{{ easycredit.webshopId }}"
-          is-active="{{ easycredit.isSelected ? 'true' : 'false' }}"
-          askForPrefix="{{ easycredit.isPrefixValid ? 'false' : 'true' }}"
-          {% if easycredit.error %}alert="{{easycredit.error}}"{% endif %}
-          {% if easycredit.paymentPlan %}payment-plan="{{ easycredit.paymentPlan | e }}"{% endif %}
-          {% if easycredit.disableFlexprice %}disable-flexprice="true"{% endif %}
-
+            payment-type="{{ easyCreditPaymentType(payment, context) }}"
+            amount="{{ easycredit.grandTotal }}"
+            webshop-id="{{ easycredit.webshopId }}"
+            is-active="{{ easycredit.selectedPaymentMethod is same as (payment.id) ? 'true' : 'false' }}"
+            {% if easycredit.paymentPlan %}payment-plan="{{ easycredit.paymentPlan | e }}"{% endif %}
+            {% if easycredit.error %}alert="{{easycredit.error}}"{% endif %}
+            {% if easycredit.disableFlexprice %}disable-flexprice="true"{% endif %}
         ></easycredit-checkout>
 
     {% else %}

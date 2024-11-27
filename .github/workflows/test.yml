@@ -119,7 +119,11 @@ jobs:
           php bin/console system:config:set EasyCreditRatenkauf.config.apiSignature ${{ secrets.EASYCREDITAPISIGNATURE }}
           php bin/console system:config:set EasyCreditRatenkauf.config.debug 1
 
-          mysql -u root -proot shopware -e 'INSERT IGNORE INTO sales_channel_payment_method SELECT s.id, p.id FROM payment_method p INNER JOIN sales_channel s WHERE handler_identifier = "Netzkollektiv\\EasyCredit\\Payment\\Handler";'
+          # add payment methods to sales channel
+          mysql -u root -proot shopware -e 'INSERT IGNORE INTO sales_channel_payment_method SELECT s.id, p.id FROM payment_method p INNER JOIN sales_channel s WHERE handler_identifier LIKE "Netzkollektiv%";'
+
+          # only productNumber should be searchable for e2e tests
+          mysql -u root -proot shopware -e "update product_search_config_field set searchable = 0 WHERE field != 'productNumber';"
 
           php bin/console cache:clear
       - name: Install Dependencies
@@ -139,9 +143,10 @@ jobs:
           mkdir $LOG_DIR
           cp -r $SW_DIR/var/log/* $LOG_DIR/
           for i in $LOG_DIR/*; do
-            echo "<a href=\"$i\">$i</a><br />" >> $LOG_DIR/index.html
+            f=$(basename $i)
+            echo "<a href=\"$(basename $f)\">$f</a><br />" >> $LOG_DIR/index.html
           done;
-      - name: Deploy
+      - name: Deploy Report
         if: always()
         uses: cloudflare/wrangler-action@v3
         with:

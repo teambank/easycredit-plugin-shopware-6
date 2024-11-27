@@ -5,7 +5,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Netzkollektiv\EasyCredit\Payment;
+namespace Netzkollektiv\EasyCredit\Payment\Handler;
 
 use Monolog\Logger;
 
@@ -17,7 +17,7 @@ use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
-use Teambank\RatenkaufByEasyCreditApiV3 as ApiV3;
+use Teambank\EasyCreditApiV3 as ApiV3;
 
 use Netzkollektiv\EasyCredit\Api\IntegrationFactory;
 use Netzkollektiv\EasyCredit\Api\Storage;
@@ -26,7 +26,7 @@ use Netzkollektiv\EasyCredit\Util\Lifecycle\ActivateDeactivate;
 use Netzkollektiv\EasyCredit\EasyCreditRatenkauf;
 use Netzkollektiv\EasyCredit\Payment\StateHandler;
 
-class Handler implements SynchronousPaymentHandlerInterface
+abstract class AbstractHandler implements SynchronousPaymentHandlerInterface
 {
     private $orderTransactionRepo;
 
@@ -136,4 +136,6 @@ class Handler implements SynchronousPaymentHandlerInterface
         ];
         $this->orderTransactionRepo->update([$data], $context);
     }
+
+    abstract public function getPaymentType();
 }

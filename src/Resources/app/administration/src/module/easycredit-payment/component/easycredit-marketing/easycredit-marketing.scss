@@ -1,20 +1,42 @@
+$font-size-base: 14px;
+$font-size-sm: $font-size-base * 0.85;
+$font-size-md: $font-size-base * 1.075;
+$font-size-lg: $font-size-base * 1.15;
+$font-size-h2: $font-size-base * 1.725;
+$font-size-h3: $font-size-base * 1.15;
+$line-height: 1.55;
+$line-height-heading: 1.3;
+
+$color-shopware-brand-vivid-500: #189eff;
+$color-shopware-brand-vivid-500-hover: #118cff;
+$color-neutrals-gray-300: #d1d9e0;
+$color-neutrals-generic-black: #000;
+$color-typestyle-paragraph-default: #52667A;
+
+$color-ec-gray: #E5EAEE;
+$color-darkblue: #002C5A;
+
+.badge {
+    margin-right: 7.5px;
+    padding: 1px 5px 2px;
+    background-color: $color-shopware-brand-vivid-500;
+    border-radius: 10px;
+    font-size: $font-size-sm;
+    font-weight: 600;
+    color: #fff;
+}
+.badge + h2 {
+    margin-top: 5px;
+}
+
 .easycredit-marketing {
-    $font-size-base: 14px;
-    $font-size-md: $font-size-base * 1.075;
-    $font-size-lg: $font-size-base * 1.15;
-    $font-size-h3: $font-size-base * 1.15;
-    $line-height: 1.55;
-
-    $color-shopware-brand-vivid-500: #189eff;
-    $color-neutrals-gray-300: #d1d9e0;
-    $color-neutrals-generic-black: #000;
-    $color-typestyle-paragraph-default: #52667A;
-
-    $color-ec-gray: #E5EAEE;
-    $color-darkblue: #002C5A;
-
     font-size: $font-size-base;
     line-height: $line-height;
+
+    --grid-column-gap: 48px;
+    --grid-column-gap-m: 36px;
+    --grid-template-columns: 3fr 2fr;
+    --grid-template-columns-50-50: 1fr 1fr;
 
     :last-child {
         margin-bottom: 0;
@@ -74,8 +96,22 @@
 
     &__grid {
         display: grid;
-        grid-template-columns: 3fr 2fr;
-        grid-column-gap: 48px;
+        grid-template-columns: var(--grid-template-columns);
+        grid-column-gap: var(--grid-column-gap);
+
+        &:has(.intro-2024) {
+            @media (max-width: 991px) {
+                display: block;
+            }
+        }
+
+        &.grid-50-50 {
+            grid-template-columns: var(--grid-template-columns-50-50);
+        }
+
+        &:has(.easycredit-marketing__image + .easycredit-marketing__content) {
+            grid-column-gap: var(--grid-column-gap-m);
+        }
     }
     &__tab-content {
         .easycredit-marketing__grid {
@@ -84,12 +120,13 @@
     }
 
     &__content {
-        h3 {
+        h3 {
             margin-bottom: .5em;
     
             font-size: $font-size-h3 !important;
             line-height: $line-height;
-            font-weight: bold !important;
+            font-weight: 600 !important;
+            color: $color-darkblue;
         }
         .sw-inherit-wrapper + h3 {
             margin-top: 1em;
@@ -164,6 +201,43 @@
                 float: right;
             }
         }
+
+        .sw-button {
+            margin-bottom: 10px;
+
+            .sw-icon {
+                width: 10px;
+
+                &.icon--regular-flow {
+                    width: 15px;
+                }
+            }
+
+            &--context {
+                color: $color-shopware-brand-vivid-500;
+
+                .sw-icon {
+                    color: $color-shopware-brand-vivid-500;
+                }
+            }
+
+            &:not(:last-child) {
+                margin-right: 10px;
+            }
+
+            &.mt-button {
+                &.sw-button--primary {
+                    &:hover {
+                        background-color: $color-shopware-brand-vivid-500-hover;
+                    }
+                }
+            }
+            &.mt-external-link {
+                &:hover {
+                    background-color: transparent;
+                }
+            }
+        }
     }
 
     &__image {
@@ -189,12 +263,33 @@
             }
         }
 
+        &.fill {
+            position: relative;
+            background-color: $color-ec-gray;
+
+            img {
+                position: absolute;
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                object-position: center;
+                border-radius: 15px;
+            }
+        }
+
         img {
             display: block;
             width: 100%;
             background-color: transparent;
             border-radius: 7px;
             box-shadow: 0 4px 20px 0 rgba(0,0,0,.25);
+        }
+
+        &.aspect-2-3 {
+            aspect-ratio: 2/3;
+        }
+        &.aspect-36-2 {
+            aspect-ratio: 3.6/2;
         }
     }
     .express,
@@ -288,6 +383,39 @@
             }
         }
     }
+    &.intro-2024 {
+        --grid-column-gap: 24px;
+
+        h2 {
+            margin-bottom: 15px;
+
+            font-size: $font-size-h2;
+            line-height: $line-height-heading;
+            font-weight: 600;
+            color: $color-darkblue;
+        }
+
+        p {
+            margin-bottom: 25px;
+        }
+
+        ul {
+            li {
+                margin-bottom: 8px;
+
+                a {
+                    font-weight: 600;
+                    text-decoration: none;
+                }
+            }
+        }
+        a {
+            &.not-decorated {
+                font-weight: 600;
+                text-decoration: none;
+            }
+        }
+    }
     &.clickandcollect {
         margin-bottom: 1em;
 
@@ -302,6 +430,39 @@
                     box-shadow: none;
                 }
             }
+        }
+    }
+}
+
+.sw-alert {
+    .badge {
+        position: relative;
+        top: -1.5px;
+    }
+
+    .sw-icon {
+        margin-top: -1.5px;
+    }
+}
+
+.sw-card {
+    &.dimmed {
+        > .sw-card__content {
+            background-color: transparent;
+        }
+    }
+
+    &:has(.sw-card .intro-2024) {
+        --grid-column-gap: 24px;
+        --grid-template-columns: 3.5fr 2fr;
+
+        border-radius: 0;
+        box-shadow: none;
+
+        > .sw-card__content {
+            padding: 0;
+            background: transparent;
+            border-radius: 0;
         }
     }
 }

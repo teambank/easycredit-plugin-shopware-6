@@ -5,14 +5,21 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-        <service id="Netzkollektiv\EasyCredit\Payment\Handler">
+        <service id="Netzkollektiv\EasyCredit\Payment\Handler\AbstractHandler" abstract="true">
             <argument type="service" id="order_transaction.repository"/>
             <argument type="service" id="Netzkollektiv\EasyCredit\Helper\OrderDataProvider"/>
-            <argument type="service" id="Netzkollektiv\EasyCredit\Payment\StateHandler" />
+            <argument type="service" id="Netzkollektiv\EasyCredit\Payment\StateHandler"/>
             <argument type="service" id="Netzkollektiv\EasyCredit\Api\IntegrationFactory"/>
             <argument type="service" id="Netzkollektiv\EasyCredit\Api\Storage"/>
             <argument type="service" id="monolog.logger.easycredit"/>
+        </service>
 
+        <service id="Netzkollektiv\EasyCredit\Payment\Handler\InstallmentPaymentHandler"
+            parent="Netzkollektiv\EasyCredit\Payment\Handler\AbstractHandler">
+            <tag name="shopware.payment.method.sync"/>
+        </service>
+        <service id="Netzkollektiv\EasyCredit\Payment\Handler\BillPaymentHandler"
+            parent="Netzkollektiv\EasyCredit\Payment\Handler\AbstractHandler">
             <tag name="shopware.payment.method.sync"/>
         </service>
 
@@ -42,6 +49,14 @@
             <argument type="service" id="Shopware\Core\Checkout\Cart\SalesChannel\CartService" />
         </service>
 
+        <service id="Netzkollektiv\EasyCredit\Service\CheckoutService">
+            <argument type="service" id="Netzkollektiv\EasyCredit\Api\IntegrationFactory"/>
+            <argument type="service" id="Shopware\Core\Checkout\Cart\SalesChannel\CartService"/>
+            <argument type="service" id="Netzkollektiv\EasyCredit\Helper\Quote"/>
+            <argument type="service" id="Netzkollektiv\EasyCredit\Api\Storage"/>
+            <argument type="service" id="monolog.logger.easycredit"/>
+        </service>
+
         <service id="Netzkollektiv\EasyCredit\Controller\PaymentController" public="true">
             <argument type="service" id="Netzkollektiv\EasyCredit\Api\IntegrationFactory"/>
             <argument type="service" id="Shopware\Core\Checkout\Cart\SalesChannel\CartService" />
@@ -50,6 +65,7 @@
             <argument type="service" id="Netzkollektiv\EasyCredit\Api\Storage" />
             <argument type="service" id="Netzkollektiv\EasyCredit\Helper\Payment" />
             <argument type="service" id="Netzkollektiv\EasyCredit\Service\CustomerService" />
+            <argument type="service" id="Netzkollektiv\EasyCredit\Service\CheckoutService"/>
             <argument type="service" id="Shopware\Core\System\SalesChannel\SalesChannel\ContextSwitchRoute" />
             <argument type="service" id="order_transaction.repository"/>
 
@@ -93,6 +109,7 @@
             <argument type="service" id="request_stack"/>
             <argument type="service" id="router"/>
             <argument type="service" id="Netzkollektiv\EasyCredit\Helper\Payment" />
+            <argument type="service" id="Netzkollektiv\EasyCredit\Service\CheckoutService"/>
             <argument type="service" id="Netzkollektiv\EasyCredit\Api\Storage"/>
 
             <tag name="kernel.event_subscriber"/>
@@ -123,11 +140,7 @@
         <service id="Netzkollektiv\EasyCredit\Helper\Payment">
             <argument type="service" id="payment_method.repository"/>
             <argument type="service" id="sales_channel.repository"/>
-            <argument type="service" id="Netzkollektiv\EasyCredit\Api\IntegrationFactory"/>
-            <argument type="service" id="Shopware\Core\Checkout\Cart\SalesChannel\CartService"/>
-            <argument type="service" id="Netzkollektiv\EasyCredit\Helper\Quote"/>
-            <argument type="service" id="Netzkollektiv\EasyCredit\Api\Storage"/>
-            <argument type="service" id="monolog.logger.easycredit"/>
+            <argument type="service" id="Shopware\Core\Checkout\Payment\Cart\PaymentHandler\PaymentHandlerRegistry"/>
         </service>
 
         <service id="Netzkollektiv\EasyCredit\Cart\Collector">
@@ -198,35 +211,39 @@
 
         <!-- EasyCredit Request Builder -->
         <service id="Netzkollektiv\EasyCredit\Api\QuoteBuilder">
-            <argument type="service" id="Netzkollektiv\EasyCredit\Helper\MetaDataProvider" />
+            <argument type="service" id="router"/>
+            <argument type="service" id="request_stack"/>
+
             <argument type="service" id="Netzkollektiv\EasyCredit\Setting\Service\SettingsService"/>            
             <argument type="service" id="Netzkollektiv\EasyCredit\Api\Storage"/>
-            <argument type="service" id="router"/>
             <argument type="service" id="Netzkollektiv\EasyCredit\Service\FlexpriceService" />
+            <argument type="service" id="Netzkollektiv\EasyCredit\Helper\Payment"/>
             <argument type="service" id="Netzkollektiv\EasyCredit\Api\Quote\AddressBuilder" />
             <argument type="service" id="Netzkollektiv\EasyCredit\Api\Quote\ItemBuilder" />
             <argument type="service" id="Netzkollektiv\EasyCredit\Api\Quote\CustomerBuilder" />
             <argument type="service" id="Netzkollektiv\EasyCredit\Api\SystemBuilder" />
         </service>
-        <service id="Netzkollektiv\EasyCredit\Api\OrderBuilder">
+        <!-- service id="Netzkollektiv\EasyCredit\Api\OrderBuilder">
             <argument type="service" id="Netzkollektiv\EasyCredit\Helper\MetaDataProvider" />
             <argument type="service" id="Netzkollektiv\EasyCredit\Setting\Service\SettingsService"/>            
             <argument type="service" id="Netzkollektiv\EasyCredit\Api\Storage"/>
-            <argument type="service" id="router"/>
             <argument type="service" id="Netzkollektiv\EasyCredit\Service\FlexpriceService" />
+            <argument type="service" id="Netzkollektiv\EasyCredit\Helper\Payment"/>
             <argument type="service" id="Netzkollektiv\EasyCredit\Api\Quote\AddressBuilder" />
             <argument type="service" id="Netzkollektiv\EasyCredit\Api\Quote\ItemBuilder" />
             <argument type="service" id="Netzkollektiv\EasyCredit\Api\Quote\CustomerBuilder" />
             <argument type="service" id="Netzkollektiv\EasyCredit\Api\SystemBuilder" />
-        </service>
+        </service -->
+        <service id="Netzkollektiv\EasyCredit\Api\OrderBuilder" parent="Netzkollektiv\EasyCredit\Api\QuoteBuilder" />
+
         <service id="Netzkollektiv\EasyCredit\Api\Quote\ItemBuilder">
             <argument type="service" id="Netzkollektiv\EasyCredit\Helper\MetaDataProvider" />
             <argument type="service" id="Shopware\Core\Content\Seo\SeoUrlPlaceholderHandlerInterface" />
         </service>
         <service id="Netzkollektiv\EasyCredit\Api\Quote\CustomerBuilder">
-            <argument type="service" id="Teambank\RatenkaufByEasyCreditApiV3\Integration\Util\PrefixConverter" />
+            <argument type="service" id="Teambank\EasyCreditApiV3\Integration\Util\PrefixConverter" />
         </service>
-        <service id="Teambank\RatenkaufByEasyCreditApiV3\Integration\Util\PrefixConverter" />
+        <service id="Teambank\EasyCreditApiV3\Integration\Util\PrefixConverter" />
         <service id="Netzkollektiv\EasyCredit\Api\SystemBuilder">
             <argument type="service" id="Netzkollektiv\EasyCredit\Helper\MetaDataProvider" />
         </service>
@@ -259,8 +276,14 @@
             <tag name="kernel.event_subscriber"/>
 
             <argument type="service" id="request_stack"/>
-            <argument type="service" id="Shopware\Core\Checkout\Payment\Cart\PaymentHandler\PaymentHandlerRegistry"/>
+            <argument type="service" id="Netzkollektiv\EasyCredit\Helper\Payment" />
             <argument type="service" id="Netzkollektiv\EasyCredit\Api\IntegrationFactory"/>
+        </service>
+
+        <service id="Netzkollektiv\EasyCredit\Twig\TwigExtensions" public="true">
+            <argument type="service" id="Netzkollektiv\EasyCredit\Helper\Payment" />
+
+            <tag name="twig.extension"/>
         </service>
     </services>
 </container>

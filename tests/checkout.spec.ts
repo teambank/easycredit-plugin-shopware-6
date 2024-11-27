@@ -1,90 +1,23 @@
 import { test, expect } from '@playwright/test';
-import { scaleDown, takeScreenshot } from "./utils";
+import { scaleDown, takeScreenshot, delay, greaterOrEqualsThan } from "./utils";
 import {
   goToProduct,
+  addCurrentProductToCart,
+  fillCheckout,
+  selectAndProceed,
+  startExpress,
   goThroughPaymentPage,
+  confirmOrder,
   checkAddressInvalidation,
   checkAmountInvalidation,
-  confirmOrder,
-  fillCheckout
 } from "./common";
+import { PaymentTypes } from "./types";
 
 test.beforeEach(scaleDown);
 test.afterEach(takeScreenshot);
 
-test.beforeAll(async ({ request}, testInfo) => {
-  var headers = {
-    'Content-Type': 'application/json',
-    Accept: 'application/json'
-  }
-
-  var response = await request.post('/api/oauth/token', {
-    headers: headers,
-    data: {
-      "client_id": "administration",
-      "grant_type": "password",
-      "scopes": "write",
-      "username": "admin",
-      "password": "shopware"
-    }
-  });
-  const authorization = await response.json()
-  headers['Authorization'] = 'Bearer ' + authorization.access_token;
-
-  response = await request.get('/api/sales-channel', {
-    headers: headers
-  })
-  const salesChannel = await response.json().then((data) => {
-    return data.data.find(e => e.name === 'Storefront')
-  })
-
-  response = await request.get('/api/tax', {
-    headers: headers
-  })
-  const taxId = await response.json().then((data) => {
-    return data.data.find(e => e.taxRate === 19).id
-  })
-
-  var response = await request.post('/api/product', {
-    headers: headers,
-    data: {
-      "name": "Product",
-      "productNumber": "123456",
-      "stock": 99999,
-      "taxId": taxId,
-      "price": [
-        {
-          "currencyId": salesChannel.currencyId,
-          "gross": 201,
-          "net": 200,
-          "linked": false
-        }
-      ],
-      "visibilities": [{
-        "salesChannelId": salesChannel.id,
-        "visibility": 30
-      }],
-      "categories": [
-        {
-        "displayNestedProducts": true,
-        "type": "page",
-        "productAssignmentType": "product",
-        "name": "Home",
-        "navigationSalesChannels": [{
-          "id": salesChannel.id
-        }]
-        }
-      ]
-    }
-  })
-
-  response = await request.get('/api/product', {
-    headers: headers
-  })
-})
-
-test.describe("go through standard checkout @checkout", () => {
-  test("checkout", async ({ page }) => {
+test.describe("go through standard @installment", () => {
+  test("standardCheckoutInstallment", async ({ page }) => {
     await goToProduct(page);
 
     await page
@@ -96,13 +29,22 @@ test.describe("go through standard checkout @checkout", () => {
 
     await fillCheckout(page);
 
-    await goThroughPaymentPage(page);
-    await confirmOrder(page);
+    /* Confirm Page */
+    await selectAndProceed({ page, paymentType: PaymentTypes.INSTALLMENT });
+
+    await goThroughPaymentPage({
+      page: page,
+      paymentType: PaymentTypes.INSTALLMENT,
+    });
+    await confirmOrder({
+      page: page,
+      paymentType: PaymentTypes.INSTALLMENT,
+    });
   });
 });
 
-test.describe("address change should invalidate payment @checkout", () => {
-  test("checkoutAddressChange", async ({ page }) => {
+test.describe("go through standard @bill", () => {
+  test("standardCheckoutBill", async ({ page }) => {
     await goToProduct(page);
 
     await page
@@ -110,17 +52,111 @@ test.describe("address change should invalidate payment @checkout", () => {
       .first()
       .click();
     await page.locator(".offcanvas .begin-checkout");
-    await expect(page.locator(".offcanvas").getByRole("link", { name: /Product/ }).first()).toBeVisible();
+    await expect(
+      page
+        .locator(".offcanvas")
+        .getByRole("link", { name: /Product/ })
+        .first()
+    ).toBeVisible();
 
     await fillCheckout(page);
 
-    await goThroughPaymentPage(page);
+    /* Confirm Page */
+    await selectAndProceed({ page, paymentType: PaymentTypes.BILL });
 
-    await checkAddressInvalidation(page);
+    await goThroughPaymentPage({
+      page: page,
+      paymentType: PaymentTypes.BILL,
+    });
+    await confirmOrder({
+      page: page,
+      paymentType: PaymentTypes.BILL,
+    });
   });
 });
 
-test.describe("amount change should invalidate payment @checkout", () => {
+test.describe("go through @express @installment", () => {
+  test("expressCheckout", async ({ page }) => {
+    await goToProduct(page);
+
+    await startExpress({ page, paymentType: PaymentTypes.INSTALLMENT });
+
+    await goThroughPaymentPage({
+      page: page,
+      paymentType: PaymentTypes.INSTALLMENT,
+      express: true,
+    });
+    await confirmOrder({
+      page: page,
+      paymentType: PaymentTypes.INSTALLMENT,
+    });
+  });
+});
+
+test.describe("go through @express @bill", () => {
+  test("expressCheckout", async ({ page }) => {
+    await goToProduct(page);
+
+    await startExpress({page, paymentType: PaymentTypes.BILL});
+
+    await goThroughPaymentPage({
+      page: page,
+      paymentType: PaymentTypes.BILL,
+      express: true,
+    });
+    await confirmOrder({
+      page: page,
+      paymentType: PaymentTypes.BILL,
+    });
+  });
+});
+
+test.describe("company should not be able to pay @bill @installment", () => {
+  test("companyBlocked", async ({ page }) => {
+    await goToProduct(page);
+    await addCurrentProductToCart(page);
+
+    await page.goto("checkout/confirm");
+    await fillCheckout(page);    
+
+    await page.waitForURL("**/checkout/confirm");
+
+    await page.getByText("Change shipping address").click();
+    await page
+      .locator(".address-editor-modal")
+      .getByText("Edit address")
+      .first()
+      .click();
+
+    await page.getByRole("textbox", { name: "Company" }).fill("Testfirma");
+
+    await delay(1000);
+
+    if (greaterOrEqualsThan("6.4.7")) {
+      await page
+        .locator("#shipping-address-create-edit")
+        .getByText("Save address")
+        .click();
+    } else {
+      await page
+        .locator("#address-create-edit")
+        .getByText("Save address")
+        .click();
+    }
+
+    /* Confirm Page */
+    for (let paymentType of [PaymentTypes.BILL, PaymentTypes.INSTALLMENT]) {
+      await selectAndProceed({page, paymentType})
+      await expect(
+        await page.locator(`easycredit-checkout[payment-type=${paymentType}]`)
+      ).toContainText(
+        "Die Zahlung mit easyCredit ist nur für Privatpersonen möglich."
+      );
+    }
+  });
+});
+
+test.describe("amount change should invalidate payment @installment", () => {
   test("checkoutAmountChange", async ({ page }) => {
     await goToProduct(page);
 
@@ -129,28 +165,53 @@ test.describe("amount change should invalidate payment @checkout", () => {
       .first()
       .click();
     await page.locator(".offcanvas .begin-checkout");
-    await expect(page.locator(".offcanvas").getByRole("link", { name: /Product/ }).first()).toBeVisible();
+    await expect(
+      page
+        .locator(".offcanvas")
+        .getByRole("link", { name: /Product/ })
+        .first()
+    ).toBeVisible();
 
     await fillCheckout(page);
 
-    await goThroughPaymentPage(page);
+    /* Confirm Page */
+    await selectAndProceed({ page, paymentType: PaymentTypes.INSTALLMENT });
+
+    await goThroughPaymentPage({
+      page: page,
+      paymentType: PaymentTypes.INSTALLMENT,
+    });
 
     await checkAmountInvalidation(page);
   });
 });
 
-test.describe("go through express checkout @express", () => {
-  test("expressCheckout", async ({ page }) => {
+test.describe("address change should invalidate payment @installment", () => {
+  test("checkoutAddressChange", async ({ page }) => {
     await goToProduct(page);
 
     await page
-      .locator("a")
-      .filter({ hasText: "Jetzt direkt in Raten zahlen" })
+      .getByRole("button", { name: "Add to shopping cart" })
+      .first()
       .click();
-    await page.getByText("Akzeptieren", { exact: true }).click();
+    await page.locator(".offcanvas .begin-checkout");
+    await expect(
+      page
+        .locator(".offcanvas")
+        .getByRole("link", { name: /Product/ })
+        .first()
+    ).toBeVisible();
 
-    await goThroughPaymentPage(page, true);
-    await confirmOrder(page);
+    await fillCheckout(page);
+
+    await selectAndProceed({ page, paymentType: PaymentTypes.INSTALLMENT });
+
+    await goThroughPaymentPage({
+      page: page,
+      paymentType: PaymentTypes.INSTALLMENT,
+    });
+
+    await checkAddressInvalidation(page);
   });
 });
 
@@ -158,15 +219,13 @@ test.describe("address change should invalidate payment @express", () => {
   test("expressCheckoutAddressChange", async ({ page }) => {
     await goToProduct(page);
 
-    await test.step("Start express checkout", async () => {
-      await page
-        .locator("a")
-        .filter({ hasText: "Jetzt direkt in Raten zahlen" })
-        .click();
-      await page.getByText("Akzeptieren", { exact: true }).click();
-    });
+    await startExpress({ page, paymentType: PaymentTypes.INSTALLMENT });
 
-    await goThroughPaymentPage(page, true);
+    await goThroughPaymentPage({
+      page: page,
+      paymentType: PaymentTypes.INSTALLMENT,
+      express: true
+    });
 
     await checkAddressInvalidation(page);
   });
@@ -176,16 +235,56 @@ test.describe("amount change should invalidate payment @express", () => {
   test("expressCheckoutAmountChange", async ({ page }) => {
     await goToProduct(page);
 
-    await test.step("Start express checkout", async () => {
-      await page
-        .locator("a")
-        .filter({ hasText: "Jetzt direkt in Raten zahlen" })
-        .click();
-      await page.getByText("Akzeptieren", { exact: true }).click();
+    await startExpress({ page, paymentType: PaymentTypes.INSTALLMENT });
+
+    await goThroughPaymentPage({
+      page: page,
+      paymentType: PaymentTypes.INSTALLMENT,
+      express: true,
     });
 
-    await goThroughPaymentPage(page, true);
-
     await checkAmountInvalidation(page);
+  });
+});
+
+test.describe("product below amount constraint should not be buyable @bill @installment", () => {
+  test("productBelowAmountConstraints", async ({ page }) => {
+    await test.step(`Go to product (sku: below50)`, async () => {
+      await page.goto('/Below-50/below50');
+    });
+    await addCurrentProductToCart(page);
+
+    await page.goto("checkout/confirm");
+    await fillCheckout(page);
+
+    /* Confirm Page */
+    for (let paymentType of [PaymentTypes.BILL, PaymentTypes.INSTALLMENT]) {
+      await page
+        .locator(`easycredit-checkout-label[payment-type=${paymentType}]`)
+        .click();
+      await expect(
+        await page.locator(`easycredit-checkout[payment-type=${paymentType}]`)
+      ).toContainText("liegt außerhalb der zulässigen Beträge");
+    }
+  });
+});
+
+test.describe("product above amount constraint should not be buyable @bill @installment", () => {
+  test("productAboveAmountConstraints", async ({ page }) => {
+    await goToProduct(page, "above10000");
+    await addCurrentProductToCart(page);
+
+    await page.goto("checkout/confirm");
+    await fillCheckout(page);
+
+    /* Confirm Page */
+    for (let paymentType of [PaymentTypes.BILL, PaymentTypes.INSTALLMENT]) {
+      await page
+        .locator(`easycredit-checkout-label[payment-type=${paymentType}]`)
+        .click();
+      await expect(
+        await page.locator(`easycredit-checkout[payment-type=${paymentType}]`)
+      ).toContainText("liegt außerhalb der zulässigen Beträge");
+    }
   });
 });

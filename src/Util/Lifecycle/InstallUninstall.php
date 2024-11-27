@@ -25,9 +25,11 @@ use Shopware\Core\System\Country\CountryDefinition;
 use Shopware\Core\System\Currency\CurrencyDefinition;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Netzkollektiv\EasyCredit\Helper\Payment as PaymentHelper;
-use Netzkollektiv\EasyCredit\Payment\Handler;
+use Netzkollektiv\EasyCredit\Payment\Handler\BillPaymentHandler;
+use Netzkollektiv\EasyCredit\Payment\Handler\InstallmentPaymentHandler;
 use Netzkollektiv\EasyCredit\Setting\Service\SettingsService;
 use Netzkollektiv\EasyCredit\Setting\SettingStruct;
+use Netzkollektiv\EasyCredit\Migration\Migration171257360AddBillPaymentHandler;
 
 class InstallUninstall
 {
@@ -82,6 +84,7 @@ class InstallUninstall
     public function update(UpdateContext $lifecycleContext): void
     {
         $this->addDefaultConfiguration($lifecycleContext);
+        $this->addPaymentMethods($lifecycleContext->getContext());
         $this->fixLegacyScriptLocation($lifecycleContext->getCurrentShopwareVersion());
     }
 
@@ -120,28 +123,13 @@ class InstallUninstall
         $this->systemConfigRepository->delete($ids, $context);
     }
 
-    private function addPaymentMethods(Context $context): void
-    {
-        $pluginId = $this->pluginIdProvider->getPluginIdByBaseClass($this->className, $context);
-
-        $data = [
-            'handlerIdentifier' => Handler::class,
-            'technicalName' => 'easycredit_ratenkauf',
-            'name' => 'easyCredit-Ratenkauf',
-            'position' => -100,
-            'pluginId' => $pluginId,
-            'translations' => [
-                'de-DE' => [
-                    'description' => 'easyCredit-Ratenkauf - Einfach. Fair. In Raten zahlen.',
-                ],
-                'en-GB' => [
-                    'description' => 'easyCredit-Ratenkauf - Easy. Fair. Pay by installments.',
-                ],
-            ],
+    private function getAvailabilityRule ($name, $context) {
+        return [
             'availabilityRule' => [
-                'name' => 'easyCredit-Ratenkauf - nur verfügbar in DE, bei Zahlung in EUR',
+                'name' => $name.' - nur verfügbar in DE, bei Zahlung in EUR',
                 'priority' => 1,
-                'description' => 'Diese Verfügbarkeitsregel wurde automatisch bei Installation von easyCredit-Ratenkauf erstellt. Sie kann beliebig angepasst werden und wird bei Updates nicht überschrieben.',
+                'description' => 'Diese Verfügbarkeitsregel wurde automatisch bei Installation von ' . $name . ' erstellt. 
+                    Sie kann beliebig angepasst werden und wird bei Updates nicht überschrieben.',
                 'conditions' => [
                     [
                         'type' => (new AndRule())->getName(),
@@ -161,20 +149,71 @@ class InstallUninstall
                                 ],
                             ]
                         ],
+                    ]
+                ]
+            ]
+        ];
+    }
+
+    private function addPaymentMethods(Context $context): void
+    {
+        $pluginId = $this->pluginIdProvider->getPluginIdByBaseClass($this->className, $context);
+
+        $data = [
+            [
+                'handlerIdentifier' => InstallmentPaymentHandler::class,
+                'name' => 'easyCredit-Ratenkauf',
+                'technicalName' => 'easycredit_ratenkauf',
+                'position' => -100,
+                'pluginId' => $pluginId,
+                'translations' => [
+                    'de-DE' => [
+                        'description' => 'easyCredit-Ratenkauf - Einfach. Fair. In Raten zahlen.',
+                    ],
+                    'en-GB' => [
+                        'description' => 'easyCredit-Ratenkauf - Easy. Fair. Pay by installments.',
                     ],
                 ],
+            ],
+            [
+                'handlerIdentifier' => BillPaymentHandler::class,
+                'name' => 'easyCredit-Rechnung',
+                'technicalName' => 'easycredit_rechnung',
+                'position' => -100,
+                'pluginId' => $pluginId,
+                'translations' => [
+                    'de-DE' => [
+                        'description' => 'easyCredit-Rechnung - jetzt kaufen, in 30 Tagen bezahlen',
+                    ],
+                    'en-GB' => [
+                        'description' => 'easyCredit-Rechnung - buy now, pay in 30 days',
+                    ],
+                ]
             ]
         ];
 
-        $criteria = (new Criteria())
-            ->addFilter(new EqualsFilter('handlerIdentifier', Handler::class));
+        foreach ($data as &$method) {
+            $method = \array_merge($method, $this->getAvailabilityRule($method['name'], $context));
 
-        $paymentMethodId = $this->paymentMethodRepository->searchIds($criteria, $context)->firstId();
-        if ($paymentMethodId !== null) {
-            $data['id'] = $paymentMethodId;
-        }
+            $handlerIdentifiers = [
+                $method['handlerIdentifier']
+            ];
+            if ($method['handlerIdentifier'] === InstallmentPaymentHandler::class) {
+                $handlerIdentifiers[] = Migration171257360AddBillPaymentHandler::LEGACY_HANDLER_IDENTIFIER;
+            }
+            $criteria = (new Criteria())
+                ->addFilter(new EqualsAnyFilter('handlerIdentifier', $handlerIdentifiers));
 
-        $this->paymentMethodRepository->upsert([$data], $context);
+            if (isset($data[0]['id'])) { // if installment exists, but billPayment does not, this must be an update => leave billPayment inactive
+                $method['active'] = false;
+            }
+
+            $paymentMethodId = $this->paymentMethodRepository->searchIds($criteria, $context)->firstId();
+            if ($paymentMethodId !== null) {
+                $method['id'] = $paymentMethodId;
+            }
+            $this->paymentMethodRepository->upsert([$method], $context);
+		}
     }
 
     protected function fixLegacyScriptLocation($swVersion) {

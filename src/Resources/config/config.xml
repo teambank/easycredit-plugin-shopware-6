@@ -3,8 +3,6 @@
         xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/shopware/platform/master/src/Core/System/SystemConfig/Schema/config.xsd">
 
     <card>
-        <title lang="de-DE">Intro</title>
-        <title lang="en-GB">Intro</title>
         <name>intro</name>
 
         <component name="easycredit-intro">
@@ -22,8 +20,8 @@
             <label lang="de-DE">Webshop-ID</label>
             <label lang="en-GB">Webshop-ID</label>
             <required>1</required>
-            <helpText lang="de-DE">Die Webshop-ID, die das Plugin dazu verwendet sich mit der easyCredit-Ratenkauf API zu authentifizieren.</helpText>
-            <helpText lang="en-GB">The Webshop-ID being used to authenticate with easyCredit-Ratenkauf API.</helpText>
+            <helpText lang="de-DE">Die Webshop-ID, die das Plugin dazu verwendet sich mit der easyCredit API zu authentifizieren.</helpText>
+            <helpText lang="en-GB">The Webshop-ID being used to authenticate with easyCredit API.</helpText>
             <placeholder>1.de.1234.1</placeholder>
         </input-field>
         <input-field>
@@ -31,16 +29,16 @@
             <label lang="de-DE">API Passwort</label>
             <label lang="en-GB">API Password</label>
             <required>1</required>
-            <helpText lang="de-DE">Das API Passwort, welchen das Plugin dazu verwendet sich mit der easyCredit-Ratenkauf API zu authentifizieren.</helpText>
-            <helpText lang="en-GB">The API Key is being used to authenticate with easyCredit-Ratenkauf API.</helpText>
+            <helpText lang="de-DE">Das API Passwort, welchen das Plugin dazu verwendet sich mit der easyCredit API zu authentifizieren.</helpText>
+            <helpText lang="en-GB">The API Key is being used to authenticate with easyCredit API.</helpText>
         </input-field>
         <input-field>
             <name>apiSignature</name>
             <label lang="de-DE">API Signatur (wenn aktiviert in Partnerportal, optional)</label>
             <label lang="en-GB">API Signature (if activated in partner portal, optional)</label>
             <required>1</required>
-            <helpText lang="de-DE">Die API Signatur sichert die Datenübertragung gegen Datenmanipulation von Dritten ab. Sie können die API-Signatur im easyCredit-Ratenkauf Partnerportal aktivieren.</helpText>
-            <helpText lang="en-GB">The API signature secures the data transfer against data manipulation by third parties. You can activate the API signature in the easyCredit-Ratenkauf merchant portal.</helpText>
+            <helpText lang="de-DE">Die API Signatur sichert die Datenübertragung gegen Datenmanipulation von Dritten ab. Sie können die API-Signatur im easyCredit Partnerportal aktivieren.</helpText>
+            <helpText lang="en-GB">The API signature secures the data transfer against data manipulation by third parties. You can activate the API signature in the easyCredit merchant portal.</helpText>
         </input-field>
 
         <component name="easycredit-test-credentials-button">
@@ -73,7 +71,7 @@
             <label lang="de-DE">Zahlungsstatus</label>
             <label lang="en-GB">Payment Status</label>
             <helpText lang="de-DE">Legt den Zahlungs fest, den eine Bestellung nach Aufgabe durch den Kunden hat. Der Status ist auf die in den Statusübergängen für eine neue Bestellung definierten möglichen Werte beschränkt.</helpText>
-            <helpText lang="en-GB">Define the payment status of orders paid with easyCredit-Ratenkauf. The status is restricted by the defined Shopware transitions available for a new order.</helpText>
+            <helpText lang="en-GB">Define the payment status of orders paid with easyCredit. The status is restricted by the defined Shopware transitions available for a new order.</helpText>
         </component>
         <component name="easycredit-order-status-select">
             <name>orderStatus</name>
@@ -81,7 +79,7 @@
             <label lang="de-DE">Bestellstatus</label>
             <label lang="en-GB">Order Status</label>
             <helpText lang="de-DE">Legt den Bestellstatus fest, den eine Bestellung nach Aufgabe durch den Kunden hat. Der Status ist auf die in den Statusübergängen für eine neue Bestellung definierten möglichen Werte beschränkt.</helpText>
-            <helpText lang="en-GB">Define the order status of orders paid with easyCredit-Ratenkauf. The status is restricted by the defined Shopware transitions available for a new order.</helpText>
+            <helpText lang="en-GB">Define the order status of orders paid with easyCredit. The status is restricted by the defined Shopware transitions available for a new order.</helpText>
        </component>
     </card>
 

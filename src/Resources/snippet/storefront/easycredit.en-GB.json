@@ -6,12 +6,12 @@
         "interest-line-item" : "Interest for installments payment"
     },
     "checkout": {
-        "EASYCREDIT_INSTALLMENTS_MUST_BE_RECALCULATED": "To pay with easyCredit-Ratenkauf click \"Go to Installments payment\" after selecting the payment method.",
+        "EASYCREDIT_INSTALLMENTS_MUST_BE_RECALCULATED": "To pay with easyCredit click \"Go to Installments payment\" after selecting the payment method.",
         "EASYCREDIT_INIT_ERROR": "%name%"
     },
     "error": {
-        "EASYCREDIT_INSTALLMENTS_MUST_BE_RECALCULATED": "easyCredit-Ratenkauf: Your order was changed, please recalculate installments.",
-        "EASYCREDIT_INIT_ERROR": "easyCredit-Ratenkauf: Please correct your order and click 'Recalculate installments'",
+        "EASYCREDIT_INSTALLMENTS_MUST_BE_RECALCULATED": "easyCredit: Your order was changed, please recalculate installments.",
+        "EASYCREDIT_INIT_ERROR": "easyCredit: Please correct your order and click 'Recalculate installments'",
         "EASYCREDIT_TRANSATION_NOT_APRROVED": "Pre-authorisation is required to complete the order with easyCredit."
     }
 }

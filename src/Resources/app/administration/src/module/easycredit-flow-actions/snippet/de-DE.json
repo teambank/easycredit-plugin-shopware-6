@@ -1,20 +1,20 @@
 {
     "easycredit": {
         "flow-actions": {
-            "capture": "easyCredit-Ratenkauf: Lieferung melden",
-            "refund": "easyCredit-Ratenkauf: Rückabwicklung melden"
+            "capture": "easyCredit: Lieferung melden",
+            "refund": "easyCredit: Rückabwicklung melden"
         }
     },
     "easycredit-capture-action": {
-        "titleCreateTag": "easyCredit-Ratenkauf: Lieferung melden",
+        "titleCreateTag": "easyCredit: Lieferung melden",
         "buttonAddAction": "Hinzufügen",
         "buttonSaveAction": "Speichern",
-        "description": "Diese Aktion meldet die Lieferung der Bestellung an easyCredit-Ratenkauf. Das Melden der Lieferung ist für die Auszahlung erforderlich. Der Transaktionsstatus der Zahlung ändert sich durch das Melden der Lieferung auf „In Abrechnung“ und später auf „Abgerechnet“."
+        "description": "Diese Aktion meldet die Lieferung der Bestellung an easyCredit. Das Melden der Lieferung ist für die Auszahlung erforderlich. Der Transaktionsstatus der Zahlung ändert sich durch das Melden der Lieferung auf „In Abrechnung“ und später auf „Abgerechnet“."
     },
     "easycredit-refund-action": {
-        "titleCreateTag": "easyCredit-Ratenkauf: Rückabwicklung melden",
+        "titleCreateTag": "easyCredit: Rückabwicklung melden",
         "buttonAddAction": "Hinzufügen",
         "buttonSaveAction": "Speichern",
-        "description": "Diese Aktion meldet die Rückabwicklung der Bestellung an easyCredit-Ratenkauf. Die Zahlungstransaktion wird durch diese Aktion widerrufen bzw. gutgeschrieben. Die Änderung ist  im Transaktionsmanager als „Rückerstattet“ ersichtlich."
+        "description": "Diese Aktion meldet die Rückabwicklung der Bestellung an easyCredit. Die Zahlungstransaktion wird durch diese Aktion widerrufen bzw. gutgeschrieben. Die Änderung ist  im Transaktionsmanager als „Rückerstattet“ ersichtlich."
     }
 }

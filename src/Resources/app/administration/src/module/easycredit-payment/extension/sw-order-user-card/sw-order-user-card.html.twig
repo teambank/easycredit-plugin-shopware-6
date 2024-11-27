@@ -1,7 +1,7 @@
 {% block sw_order_detail_base_order_overview_billing_address %}
     <div class="easycredit-no-edit" v-if="isEasyCreditPayment && isEditing">
     {% parent %}
-        <dd><strong>Die Rechnungs- und Versandadresse kann bei easyCredit-Ratenkauf nicht nachträglich verändert werden.</strong></dd>
+        <dd><strong>Die Rechnungs- und Versandadresse kann bei Bestellungen, die mit easyCredit bezahlt wurden, nicht nachträglich verändert werden.</strong></dd>
     </div>
     <template v-else>
         {% parent %}

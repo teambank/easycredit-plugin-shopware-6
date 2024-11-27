@@ -19,7 +19,7 @@
     {% set easycredit = page.extensions.easycredit %}
 
     {% if easycredit.expressCartEnabled %}
-        <div class="d-grid" style="margin: 10px 0;">
+        <div class="d-block" style="margin: 10px 0;">
             {% sw_include '@EasyCreditRatenkauf/storefront/component/express-button.html.twig' with {fullWidth: true} %}
         </div>
     {% endif %}

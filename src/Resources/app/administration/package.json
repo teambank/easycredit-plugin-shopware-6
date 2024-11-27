@@ -1,7 +1,7 @@
 {
     "name": "easycredit",
     "version": "1.0.0",
-    "description": "Administration for easyCredit-Ratenkauf",
+    "description": "Administration for easyCredit-Rechnung & Ratenkauf",
     "main": "index.js",
     "author": "NETZKOLLEKTIV GmbH",
     "license": "MIT"

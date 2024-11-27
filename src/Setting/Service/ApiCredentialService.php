@@ -8,9 +8,9 @@
 namespace Netzkollektiv\EasyCredit\Setting\Service;
 
 use Netzkollektiv\EasyCredit\Api\IntegrationFactory;
-use Teambank\RatenkaufByEasyCreditApiV3\ApiException;
-use Teambank\RatenkaufByEasyCreditApiV3\Integration\ApiCredentialsInvalidException;
-use Teambank\RatenkaufByEasyCreditApiV3\Integration\ApiCredentialsNotActiveException;
+use Teambank\EasyCreditApiV3\ApiException;
+use Teambank\EasyCreditApiV3\Integration\ApiCredentialsInvalidException;
+use Teambank\EasyCreditApiV3\Integration\ApiCredentialsNotActiveException;
 
 class ApiCredentialService implements ApiCredentialServiceInterface
 {

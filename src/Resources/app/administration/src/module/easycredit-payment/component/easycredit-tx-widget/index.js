@@ -1,9 +1,8 @@
 import template from './easycredit-tx-widget.html.twig';
 import './easycredit-tx-widget.scss';
+import { isEasyCreditMethod }  from '../../../easycredit/paymentHelper';
 
 const { Component, Context } = Shopware;
-
-const easycreditFormattedHandlerIdentifier = 'handler_netzkollektiv_handler';
 
 Component.register('easycredit-tx-widget', {
     template,
@@ -23,7 +22,7 @@ Component.register('easycredit-tx-widget', {
     computed: {
         isEasyCreditPayment () {
             let tx = this.order.transactions;
-            return tx.length == 1 && tx[0].paymentMethod.formattedHandlerIdentifier == easycreditFormattedHandlerIdentifier
+            return tx.length == 1 && isEasyCreditMethod(tx[0].paymentMethod)
         },
         transactionId() {
             return this.order.transactions[0].customFields.easycredit_transaction_id

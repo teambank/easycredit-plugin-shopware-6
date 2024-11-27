@@ -8,9 +8,9 @@
 namespace Netzkollektiv\EasyCredit\Service;
 
 use Netzkollektiv\EasyCredit\Api\IntegrationFactory;
-use Teambank\RatenkaufByEasyCreditApiV3\Model\CaptureRequest;
-use Teambank\RatenkaufByEasyCreditApiV3\Model\RefundRequest;
-use Teambank\RatenkaufByEasyCreditApiV3\Model\TransactionResponse;
+use Teambank\EasyCreditApiV3\Model\CaptureRequest;
+use Teambank\EasyCreditApiV3\Model\RefundRequest;
+use Teambank\EasyCreditApiV3\Model\TransactionResponse;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\Event\OrderStateMachineStateChangeEvent;
 

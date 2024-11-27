@@ -10,7 +10,7 @@ namespace Netzkollektiv\EasyCredit\Api;
 use GuzzleHttp\Client;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Netzkollektiv\EasyCredit\Setting\Service\SettingsServiceInterface;
-use Teambank\RatenkaufByEasyCreditApiV3 as Api;
+use Teambank\EasyCreditApiV3 as Api;
 
 use Psr\Log\LoggerInterface;
 use GuzzleHttp\HandlerStack;

@@ -18,12 +18,12 @@ class Migration1693824921AddDefaultFlowActions extends MigrationStep
 {
     const EVENTS = [
         [
-            'name' => 'easyCredit-Ratenkauf: Capture Transaction',
+            'name' => 'easyCredit: Capture Transaction',
             'event_name' => 'state_enter.order_delivery.state.shipped',
             'action_name' => 'action.easycredit.capture',
             'legacy_setting' => 'markShipped'
         ],[
-            'name' => 'easyCredit-Ratenkauf: Refund Transaction',
+            'name' => 'easyCredit: Refund Transaction',
             'event_name' => 'state_enter.order_delivery.state.returned',
             'action_name' => 'action.easycredit.refund',
             'legacy_setting' => 'markRefunded'
@@ -87,7 +87,7 @@ class Migration1693824921AddDefaultFlowActions extends MigrationStep
         }
 
         try {
-            $settingsValue = \json_decode($settingsValue, false, 512, JSON_THROW_ON_ERROR); 
+            $settingsValue = \json_decode($settingsValue, false, 512, JSON_THROW_ON_ERROR);
         }
         catch (\JsonException $exception) {
             return true;

@@ -7,11 +7,11 @@
 
 namespace Netzkollektiv\EasyCredit\Api\Quote;
 
-use Teambank\RatenkaufByEasyCreditApiV3\Model\Customer;
-use Teambank\RatenkaufByEasyCreditApiV3\Model\Contact;
+use Teambank\EasyCreditApiV3\Model\Customer;
+use Teambank\EasyCreditApiV3\Model\Contact;
 use Shopware\Core\Checkout\Customer\Aggregate\CustomerAddress\CustomerAddressEntity;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
-use Teambank\RatenkaufByEasyCreditApiV3\Integration\Util\PrefixConverter;
+use Teambank\EasyCreditApiV3\Integration\Util\PrefixConverter;
 
 class CustomerBuilder
 {

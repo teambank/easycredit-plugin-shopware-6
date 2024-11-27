@@ -6,20 +6,37 @@ import {
 } from "@playwright/test";
 import { seconds } from "./utils";
 
+let config: PlaywrightTestConfig = {
+  outputDir: "../test-results/" + process.env.VERSION + "/",
+  use: {
+    baseURL: process.env.BASE_URL ?? "http://localhost",
+    trace: "retain-on-failure",
+    locale: "de-DE",
+  },
+  retries: process.env.CI ? 2 : 0,
+  timeout: seconds(30),
+  reporter: [["list", { printSteps: true }], ["html"]],
+  globalSetup: require.resolve("./global.setup"),
+};
+
 let projects: Project[] = [
   { name: `backend-auth`, testMatch: /.*\.setup\.ts/ },
 ];
 
-[
-  "Desktop Chrome"
-  //"iPhone 14"
-].forEach((device) => {
+["Desktop Chrome"].forEach((device) => {
   projects.push({
     name: `checkout @${device}`,
     use: {
       ...devices[device],
     },
     testMatch: "checkout.spec.ts",
+  });
+  projects.push({
+    name: `frontend @${device}`,
+    use: {
+      ...devices[device],
+    },
+    testMatch: "frontend.spec.ts",
   });
 });
 
@@ -37,20 +54,6 @@ let projects: Project[] = [
   });
 });
 
-let config: PlaywrightTestConfig = {
-  outputDir: "../test-results/" + process.env.VERSION + "/",
-  use: {
-    baseURL: process.env.BASE_URL ?? "http://localhost",
-    trace: "retain-on-failure",
-    locale: "de-DE",
-  },
-  retries: process.env.CI ? 2 : 0,
-  timeout: seconds(30),
-  projects: projects,
-  reporter: [
-    ["list", { printSteps: true }],
-    ["html" ],
-  ],
-};
+config.projects = projects
 
 export default defineConfig(config);

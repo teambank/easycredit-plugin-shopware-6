@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /*
  * (c) NETZKOLLEKTIV GmbH <kontakt@netzkollektiv.com>
  * For the full copyright and license information, please view the LICENSE
@@ -44,7 +46,8 @@ class ExpressCheckoutCartHandler implements EventSubscriberInterface
         ];
     }
 
-    public function clearCart(ControllerArgumentsEvent $event) {
+    public function clearCart(ControllerArgumentsEvent $event)
+    {
         $controller = $event->getController();
         $arguments = $event->getArguments();
         $request = $event->getRequest();
@@ -54,24 +57,26 @@ class ExpressCheckoutCartHandler implements EventSubscriberInterface
         }
         $cart = $arguments[0] ?? null;
 
-        if (!$controller instanceof CartLineItemController ||
+        if (
+            !$controller instanceof CartLineItemController ||
             $cart === null ||
-            !$request->get('easycredit-express')
+            !$request->get('easycredit')
         ) {
             return;
         }
 
         $this->storage->clear();
         foreach ($cart->getLineItems() as $lineItem) {
-            $cart->getLineItems()->removeElement($lineItem);            
+            $cart->getLineItems()->removeElement($lineItem);
         }
     }
 
-    public function addErrorsToCart(CheckoutCartPageLoadedEvent $event) {
+    public function addErrorsToCart(CheckoutCartPageLoadedEvent $event)
+    {
 
         if ($errorMessage = $this->storage->get('error')) {
             $this->storage->set('error', null);
-            
+
             $error = new InitError($errorMessage);
             $event->getPage()->getCart()->getErrors()->add($error);
         }
@@ -84,8 +89,8 @@ class ExpressCheckoutCartHandler implements EventSubscriberInterface
         }
 
         $event->getDefinition()->set('additionalAddressLine1')
-                               ->set('additionalAddressLine2')
-                               ->set('phoneNumber');
+            ->set('additionalAddressLine2')
+            ->set('phoneNumber');
     }
 
     public function disableCustomerValidation(BuildValidationEvent $event): void
@@ -95,7 +100,7 @@ class ExpressCheckoutCartHandler implements EventSubscriberInterface
         }
 
         $event->getDefinition()->set('birthdayDay')
-                               ->set('birthdayMonth')
-                               ->set('birthdayYear');
+            ->set('birthdayMonth')
+            ->set('birthdayYear');
     }
 }

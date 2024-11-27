@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /*
  * (c) NETZKOLLEKTIV GmbH <kontakt@netzkollektiv.com>
  * For the full copyright and license information, please view the LICENSE
@@ -19,7 +21,7 @@ class Migration1715692138MigrateWidgetSettings extends MigrationStep
 
     public function update(Connection $connection): void
     {
-        // document.querySelectorAll in new widget implementation matches multiple elements 
+        // document.querySelectorAll in new widget implementation matches multiple elements
         // => change default selector to something more specific in order two show widget only once
         $connection->executeUpdate("
             UPDATE system_config Set configuration_value = JSON_SET(configuration_value, '$._value', '.checkout-aside-action:not(.d-grid)') WHERE 

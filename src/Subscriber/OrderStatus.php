@@ -12,9 +12,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Netzkollektiv\EasyCredit\Setting\Service\SettingsServiceInterface;
 use Netzkollektiv\EasyCredit\Service\TransactionService;
 use Netzkollektiv\EasyCredit\Compatibility\Capabilities;
-use Teambank\RatenkaufByEasyCreditApiV3\Model\CaptureRequest;
-use Teambank\RatenkaufByEasyCreditApiV3\Model\RefundRequest;
-use Teambank\RatenkaufByEasyCreditApiV3\Model\TransactionResponse;
+use Teambank\EasyCreditApiV3\Model\CaptureRequest;
+use Teambank\EasyCreditApiV3\Model\RefundRequest;
+use Teambank\EasyCreditApiV3\Model\TransactionResponse;
 
 class OrderStatus implements EventSubscriberInterface
 {

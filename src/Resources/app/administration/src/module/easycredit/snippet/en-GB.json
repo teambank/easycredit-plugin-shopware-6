@@ -1,24 +1,24 @@
 {
     "easycredit": {
-        "header": "easyCredit-Ratenkauf",
+        "header": "easyCredit",
         "general": {
-            "mainMenuItemGeneral": "easyCredit-Ratenkauf",
-            "descriptionTextModule": "Settings for easyCredit-Ratenkauf"
+            "mainMenuItemGeneral": "easyCredit",
+            "descriptionTextModule": "Settings for easyCredit"
         },
         "settingForm": {
             "save": "Save",
             "test": "Test API access data & synchronise ID",
-            "titleSaveSuccess": "easyCredit-Ratenkauf settings",
+            "titleSaveSuccess": "easyCredit settings",
             "titleTestSuccess": "API credentials",
             "titleTestError": "API credentials error",
-            "titleSaveError": "easyCredit-Ratenkauf settings error",
-            "messageSaveSuccess": "The easyCredit-Ratenkauf settings have been saved successfully.",
+            "titleSaveError": "easyCredit settings error",
+            "messageSaveSuccess": "The settings for easyCredit have been saved successfully.",
             "messageTestSuccess": "The API credentials have been successfully validated.",
             "messageTestError": "The API credentials could not be validated."
         },
         "rule": {
-            "cartAmountRule": "Grand total, excl. interest (compatible with easyCredit-Ratenkauf)",
-            "cartPositionPrice": "Total, excl. interest (compatible with easyCredit-Ratenkauf)",
+            "cartAmountRule": "Grand total, excl. interest (compatible with easyCredit)",
+            "cartPositionPrice": "Total, excl. interest (compatible with easyCredit)",
             "flexPriceType": "easyCredit: Flexprice-Exception"
         }
     }

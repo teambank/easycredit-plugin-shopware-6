@@ -58,6 +58,8 @@ export default class EasyCreditRatenkaufWidget extends Plugin {
         let widget = document.createElement('easycredit-widget')
         widget.setAttribute('webshop-id', this.getMeta('api-key'))
         widget.setAttribute('amount', amount)
+        widget.setAttribute('payment-types', this.getMeta('payment-types'))
+        
         if (this.getMeta('disable-flexprice')) {
             widget.setAttribute('disable-flexprice','true')
         } else {

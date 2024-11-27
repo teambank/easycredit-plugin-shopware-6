@@ -136,6 +136,11 @@ class Marketing implements EventSubscriberInterface
 
         $this->addVariables($event->getPage(), [
             'apiKey' => $settings->getWebshopId(),
+            'paymentTypes' =>$this->paymentHelper->getActivePaymentMethods($context)->map(function ($payment) {
+                return $this->paymentHelper
+                    ->getHandlerByPaymentMethod($payment)
+                    ->getPaymentType();
+            }),
             'modal' => $settings->getModalEnabled(),
             'modalIsOpen' => $modalIsOpen,
             'modalSettingsDelay' => $settings->getModalSettingsDelay(),
@@ -187,7 +192,7 @@ class Marketing implements EventSubscriberInterface
 
     protected function getSettings(SalesChannelContext $context)
     {
-        if (!$this->paymentHelper->isPaymentMethodInSalesChannel($context)) {
+        if (!$this->paymentHelper->isEasyCreditInSalesChannel($context)) {
             return false;
         }
 

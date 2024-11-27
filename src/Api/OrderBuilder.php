@@ -10,8 +10,8 @@ namespace Netzkollektiv\EasyCredit\Api;
 use Netzkollektiv\EasyCredit\Helper\MetaDataProvider;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
-use Teambank\RatenkaufByEasyCreditApiV3\Model\ShippingAddress;
-use Teambank\RatenkaufByEasyCreditApiV3\Model\InvoiceAddress;
+use Teambank\EasyCreditApiV3\Model\ShippingAddress;
+use Teambank\EasyCreditApiV3\Model\InvoiceAddress;
 
 class OrderBuilder extends QuoteBuilder
 {

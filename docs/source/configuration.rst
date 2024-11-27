@@ -6,12 +6,12 @@
 Konfiguration
 =============
 
-Nachdem Sie die Installation erfolgreich abgeschlossen haben, konfigurieren Sie das Plugin. Damit das Plugin als Zahlungsmethode angezeigt wird aktivieren Sie easyCredit-Ratenkauf als Zahlungsmethode für den deutschen Store.
+Nachdem Sie die Installation erfolgreich abgeschlossen haben, konfigurieren Sie das Plugin. Damit das Plugin als Zahlungsmethode angezeigt wird aktivieren Sie easyCredit-Ratenkauf und easyCredit-Rechnung als Zahlungsmethode für den deutschen Store.
 
 Konfigurations Menü öffnen
 --------------------------
 
-Zur Konfiguration öffnen Sie in der Administration den Bereich *Erweiterungen -> Meine Erweiterungen*. In der Liste der installierten Plugins sollte nun **easyCredit-Ratenkauf** enthalten sein.
+Zur Konfiguration öffnen Sie in der Administration den Bereich *Erweiterungen -> Meine Erweiterungen*. In der Liste der installierten Plugins sollte nun **easyCredit-Rechnung & Ratenkauf für Shopware 6** enthalten sein.
 In dieser Zeile klicken Sie einfach auf das Plugin um die Konfiguration zu öffnen.
 
 .. image:: ./_static/config-open.png
@@ -55,7 +55,7 @@ Um das Verhalten des Plugins und die API-Kommunikation zu analysieren, kann dies
 Zahlungs- und Bestellstatus
 ****************************
 
-Der Zahlungs- und Bestellstatus, den eine mit easyCredit-Ratenkauf getätigte Bestellung initial erhält, kann mit dieser Option eingestellt werden. Es werden hier nur die Status angezeigt, die für eine offene Bestellung entsprechend des Statusüberganges (*State Machine Transitions*) zur Verfügung stehen. Wird hier keine Auswahl getroffen oder "Offen" gewählt erfolgt keine Veränderung des Status.
+Der Zahlungs- und Bestellstatus, den eine mit easyCredit getätigte Bestellung initial erhält, kann mit dieser Option eingestellt werden. Es werden hier nur die Status angezeigt, die für eine offene Bestellung entsprechend des Statusüberganges (*State Machine Transitions*) zur Verfügung stehen. Wird hier keine Auswahl getroffen oder "Offen" gewählt erfolgt keine Veränderung des Status.
 
 Click & Collect
 ~~~~~~~~~~~~~~~~~~
@@ -77,8 +77,8 @@ Um easyCredit-Ratenkauf bei Ihren Kunden zu bewerben, blendet die Extension ein 
 Zahlungsart Einstellungen
 -------------------------
 
-Um die Zahlungsart **easyCredit-Ratenkauf** im Frontend anzuzeigen, muss die Zahlungsart aktiviert sein, und dem Land *Deutschland* zugewiesen werden. Navigieren Sie hierzu zu den Zahlungsart Einstellungen: :menuselection:`Shop -> Zahlungsarten -> easyCredit-Ratenkauf`
-Dort stellen Sie sicher, dass **easyCredit-Ratenkauf** aktiviert ist.
+Um die **easyCredit**-Zahlungsarten im Frontend anzuzeigen, muss die jeweilige Zahlungsart aktiviert sein, und dem Land *Deutschland* zugewiesen werden. Navigieren Sie hierzu zu den Zahlungsart Einstellungen: :menuselection:`Shop -> Zahlungsarten -> easyCredit-Ratenkauf` oder :menuselection:`Shop -> Zahlungsarten -> easyCredit-Rechnung`
+Stellen Sie dort sicher, dass die jeweilige Zahlungsart aktiviert ist.
 
 .. image:: ./_static/config-payment-active.png
 
@@ -89,7 +89,7 @@ Dort stellen Sie sicher, dass **easyCredit-Ratenkauf** aktiviert ist.
 Verkaufskanal Einstellungen
 ------------------------------
 
-Achten Sie weiterhin darauf, dass die Zahlungsart "easyCredit-Ratenkauf" auch im Verkaufskanal als Zahlungsart zugewiesen ist.
+Achten Sie weiterhin darauf, dass easyCredit auch im Verkaufskanal als Zahlungsart zugewiesen ist.
 
 .. image:: ./_static/config-payment-country.png
 

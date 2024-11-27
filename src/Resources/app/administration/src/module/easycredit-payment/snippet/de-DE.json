@@ -97,25 +97,44 @@
             }
         },
         "intro": {
-            "introLinks": {
-                "title": "Mit easyCredit-Ratenkauf starten",
-                "register": "Als Händler registrieren",
+            "introAlert": {
+                "new": "Neu",
+                "text": "Ab sofort können Sie easyCredit-Rechnung aktivieren.",
+                "activate": "Jetzt aktivieren"
+            },
+            "introText": {
+                "title": "Der einfachste Rechnungs- und Ratenkauf Deutschlands.",
+                "text": "Wir freuen uns, dass Sie sich für easyCredit entschieden haben, die perfekte Zahlungsmethode für den Handel in Onlineshops.",
                 "documentation": "Dokumentation",
-                "demoshop": "Demoshop mit easyCredit-Ratenkauf",
-                "support": "Support"
+                "demoshop": "Demoshop",
+                "register": "Als Händler registrieren"
+            },
+            "introLinks": {
+                "title": "Sie haben Fragen? Wir helfen gerne.",
+                "text": "Wir sind von Montag bis Freitag von 8:00 bis 18:00 Uhr für Sie erreichbar.",
+                "support": "Fragen & Antworten",
+                "call-us": "Rufen Sie uns an: 0911 5390-2726",
+                "contact-form": "Kontaktformular"
+            },
+            "introBill": {
+                "title": "easyCredit-Rechnung - die ideale Ergänzung zum Ratenkauf",
+                "text": "Sie können Ihren Kunden mit easyCredit neben dem klassischen Ratenkauf nun auch den Kauf auf Rechnung anbieten. Das Zahlungsziel liegt dabei 30 Tage in der Zukunft.",
+                "activate": "Jetzt aktivieren",
+                "unlock": "Jetzt freischalten lassen",
+                "learnMore": "Mehr erfahren"
             }
         },
         "clickAndCollect": {
-            "introText": "<p>Sie wollen Click&Collect für den easyCredit-Ratenkauf nutzen? Nichts einfacher als das! Um das Feature nutzen zu können, benötigen Sie eine ergänzende Zusatzvereinbarung zu Ihrem Factoringvertrag. Sprechen Sie dazu einfach Ihren Key-Account-Manager an oder fragen Sie diesen über unser <a href=\"https://www.easycredit-ratenkauf.de/click-und-collect/\" target=\"_blank\">Click&Collect-Formular</a> an.</p><p>Wichtig für Sie ist, dass Sie bei Nutzung von Click&Collect sicherstellen müssen, dass das gekaufte Produkt ausschließlich an den Vertragspartner übergeben wird. Die Verantwortung für die korrekte Übergabe liegt bei Ihnen als Händler.</p><p>Bitte stellen Sie im Folgenden die Versandart mit der Sie Click&Collect anbieten ein:</p>"
+            "introText": "<p>Sie wollen Click&Collect in Verbindung mit easyCredit nutzen? Nichts einfacher als das! Um das Feature nutzen zu können, benötigen Sie eine ergänzende Zusatzvereinbarung zu Ihrem Factoringvertrag. Sprechen Sie dazu einfach Ihren Key-Account-Manager an oder fragen Sie diesen über unser <a href=\"https://www.easycredit-ratenkauf.de/click-und-collect/\" target=\"_blank\">Click&Collect-Formular</a> an.</p><p>Wichtig für Sie ist, dass Sie bei Nutzung von Click&Collect sicherstellen müssen, dass das gekaufte Produkt ausschließlich an den Vertragspartner übergeben wird. Die Verantwortung für die korrekte Übergabe liegt bei Ihnen als Händler.</p><p>Bitte stellen Sie im Folgenden die Versandart mit der Sie Click&Collect anbieten ein:</p>"
         },
         "transactionHandling": {
             "capture": {
                 "label": "„Lieferung melden“ automatisch durchführen?",
-                "helpText": "Wenn diese Option gesetzt ist, wird die Lieferung bei Statuswechsel der Lieferung zu \"Versandt\" automatisch an easyCredit-Ratenkauf gemeldet."
+                "helpText": "Wenn diese Option gesetzt ist, wird die Lieferung bei Statuswechsel der Lieferung zu \"Versandt\" automatisch an easyCredit gemeldet."
             },
             "refund": {
                 "label": "Rückabwicklung automatisch durchführen?",
-                "helpText": "Wenn diese Option gesetzt ist, wird die Rückabwicklung bei Statuswechsel der Lieferung zu \"Retoure\" automatisch an easyCredit-Ratenkauf gemeldet."
+                "helpText": "Wenn diese Option gesetzt ist, wird die Rückabwicklung bei Statuswechsel der Lieferung zu \"Retoure\" automatisch an easyCredit gemeldet."
             },
             "note": "Um den Transaktionsstatus festzulegen stehen Ihnen im Flow Builder die Aktionen \"Lieferung melden\" und \"Rückabwicklung melden\" zur Verfügung. Die Aktionen können Sie flexibel konfigurieren und somit optimal an Ihre Bestellverarbeitung anpassen.",
             "goto": "zum"
@@ -123,7 +142,7 @@
         "marketing": {
             "overview": {
                 "title": "Übersicht",
-                "introText": "Wir stellen Ihnen eine Reihe von Marketing-Komponenten zur Verfügung, die Sie ganz einfach in Ihrem Onlineshop aktivieren können. So erzielen Sie eine optimale Präsentation der Finanzierung über easyCredit-Ratenkauf, für höhere Umsätze und zufriedene Kunden.",
+                "introText": "Wir stellen Ihnen eine Reihe von Marketing-Komponenten zur Verfügung, die Sie ganz einfach in Ihrem Onlineshop aktivieren können. So erzielen Sie eine optimale Präsentation der Bezahlung mit easyCredit, für höhere Umsätze und zufriedene Kunden.",
                 "introLinks": {
                     "title": "Hilfreiche Links",
                     "documentation": "Dokumentation",

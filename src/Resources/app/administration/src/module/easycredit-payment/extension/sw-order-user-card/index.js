@@ -1,10 +1,8 @@
 import template from './sw-order-user-card.html.twig';
 import './sw-order-user-card.scss';
+import { isEasyCreditMethod } from '../../../easycredit/paymentHelper';
 
-const { Component, Context } = Shopware;
-const Criteria = Shopware.Data.Criteria;
-
-const easycreditFormattedHandlerIdentifier = 'handler_netzkollektiv_handler';
+const { Component } = Shopware;
 
 Component.override('sw-order-user-card', {
     template,
@@ -12,7 +10,7 @@ Component.override('sw-order-user-card', {
     computed: {
         isEasyCreditPayment () {
             let tx = this.currentOrder.transactions;
-            return tx.length == 1 && tx[0].paymentMethod.formattedHandlerIdentifier == easycreditFormattedHandlerIdentifier
+            return tx.length == 1 && isEasyCreditMethod(tx[0].paymentMethod)
         }
     }
 });

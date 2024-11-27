@@ -1,20 +1,20 @@
 {
     "easycredit": {
         "flow-actions": {
-            "capture": "easyCredit-Ratenkauf: Capture transaction",
-            "refund": "easyCredit-Ratenkauf: Refund transaction"
+            "capture": "easyCredit: Capture transaction",
+            "refund": "easyCredit: Refund transaction"
         }
     },
     "easycredit-capture-action": {
-        "titleCreateTag": "easyCredit-Ratenkauf: Capture transaction",
+        "titleCreateTag": "easyCredit: Capture transaction",
         "buttonAddAction" : "Add",
         "buttonSaveAction" : "Save",
-        "description": "This action reports the delivery of the order to easyCredit-Ratenkauf. Reporting the delivery is required for the payout. Reporting the delivery changes the transaction status of the payment to „In settlement“ and later to „Settled“."
+        "description": "This action reports the delivery of the order to easyCredit. Reporting the delivery is required for the payout. Reporting the delivery changes the transaction status of the payment to „In settlement“ and later to „Settled“."
     },
     "easycredit-refund-action": {
-        "titleCreateTag": "easyCredit-Ratenkauf: Refund transaction",
+        "titleCreateTag": "easyCredit: Refund transaction",
         "buttonAddAction" : "Add",
         "buttonSaveAction" : "Save",
-        "description": "This action reports the refund of the order to easyCredit-Ratenkauf. The payment transaction is cancelled or reversed by this action. The change is visible in the transaction manager as „Refunded“."
+        "description": "This action reports the refund of the order to easyCredit. The payment transaction is cancelled or reversed by this action. The change is visible in the transaction manager as „Refunded“."
     }
 }
