@@ -1,6 +1,12 @@
 Changelog
 =========
 
+3.0.1
+-----
+
+* bei Rechnungskauf-Vorgängen wird keine Zinsposition mehr angezeigt
+* Integration von Änderungen aus v2.2.5
+
 2.2.5
 -----
 
