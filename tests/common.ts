@@ -116,11 +116,12 @@ export const goThroughPaymentPage = async ({
     await page.getByTestId("uc-deny-all-button").click();
 
     await expect(
-      page.getByText(
-        paymentType === PaymentTypes.INSTALLMENT
-          ? "Monatliche Wunschrate"
-          : "Ihre Bezahloptionen"
-      )
+      page.getByRole("heading", {
+        name:
+          paymentType === PaymentTypes.INSTALLMENT
+            ? "Monatliche Wunschrate"
+            : "Ihre Bezahloptionen",
+      })
     ).toBeVisible();
 
     await page.getByRole("button", { name: "Weiter zur Dateneingabe" }).click();
