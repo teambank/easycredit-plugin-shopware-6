@@ -119,7 +119,7 @@ export const goThroughPaymentPage = async ({
       page.getByText(
         paymentType === PaymentTypes.INSTALLMENT
           ? "Monatliche Wunschrate"
-          : "Rechnung"
+          : "Ihre Bezahloptionen"
       )
     ).toBeVisible();
 
@@ -156,7 +156,7 @@ export const goThroughPaymentPage = async ({
     );
 
     await delay(500);
-    await page.getByRole("button", { name: "Ratenwunsch übernehmen" }).click();
+    await page.getByRole("button", { name: "Zahlungswunsch übernehmen" }).click();
   });
 };
 
