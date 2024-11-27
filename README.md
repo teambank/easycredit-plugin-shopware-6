@@ -8,8 +8,9 @@ easyCredit-Ratenkauf is the easiest and fastest installment payment solution of 
 Traditional financing solutions are often connected with complicated application processes for customers. With easyCredit-Ratenkauf you can offer a simple, fully online and fast financing solution. Customers can use ‚easyCredit-Ratenkauf‘ in just a few steps: choose their purchases, calculate their preferred installments, enter their personal data, and pay. No paperwork, immediate approval, and complete flexibility throughout. Simple. Fair. Paying in installments with ‚easyCredit-Ratenkauf‘.
 
 # Getting started
-Are you interested in using easyCredit-Ratenkauf? Contact us now:
-* [sales.ratenkauf@easycredit.de](https://store.shopware.com/en/easyc36021249341f/ratenkauf-by-easycredit.html#)
+
+Are you interested in using easyCredit? Contact us now:
+* [sales.ratenkauf@easycredit.de](mailto:sales.ratenkauf@easycredit.de)
 * +49 (0)911 5390 2726
 
 or register at [easycredit-ratenkauf.de](https://www.easycredit-ratenkauf.de/registrierung.htm) and we will contact you.
@@ -48,4 +49,5 @@ If you still have any problems, please open a ticket or contact [ratenkauf@easyc
 The MIT License (MIT). Please see [License File](LICENSE) for more information.
 
 # Security
+
 If you have discovered a security vulnerability, please email [opensource@teambank.de](mailto:opensource@teambank.de).

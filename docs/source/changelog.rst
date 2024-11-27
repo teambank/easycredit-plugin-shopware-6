@@ -8,6 +8,11 @@ Changelog
 * der Zahlungsvorgang ist nun immer an einen bestimmten `cartToken` gebunden (behebt ein Problem mit Drittanbieter-Erweiterungen)
 * valide Zugangsdaten werden beim Testen automatisch gespeichert, um die Kennung synchronisieren zu können
 
+3.0.0
+-----
+
+* Integration von easyCredit-Rechnung
+
 2.2.4
 -----
 
