@@ -53,14 +53,14 @@ class ActivateDeactivate
 
     private function setPaymentMethodsIsActive(bool $active, Context $context): void
     {
-        $paymentMethods = $this->paymentHelper->getPaymentMethods($context);
+        $paymentMethods = $this->paymentHelper->getEasyCreditMethods($context);
 
         if ($paymentMethods->count() === 0) {
             return;
         }
 
         $updateData = [];
-        foreach ($this->paymentHelper->getPaymentMethods($context) as $method) {
+        foreach ($paymentMethods as $method) {
             $updateData[] = [
                 'id' => $method->get('id'),
                 'active' => $active,

@@ -30,7 +30,9 @@ class Payment
 
     private PaymentHandlerRegistry $paymentHandlerRegistry;
 
-    private array $paymentMethodIdCache = [];
+    private ?EntityCollection $easyCreditMethods = null;
+    private array $easyCreditHandlers = [];
+
 
     public function __construct(
         EntityRepository $paymentMethodRepository,
@@ -48,27 +50,15 @@ class Payment
             $paymentMethodId = $salesChannelContext->getPaymentMethod()->getId();
         }
 
-        return $this->getPaymentMethods($salesChannelContext->getContext())
+        return $this->getEasyCreditMethods($salesChannelContext->getContext())
             ->filterByProperty('id', $paymentMethodId)
             ->count() > 0;
-    }
-
-    public function getPaymentMethodByHandler($handlerClass, Context $context)
-    {
-        return $this->getPaymentMethods($context)
-            ->filterByProperty('handlerIdentifier', $handlerClass)->first();
-    }
-
-    public function getPaymentMethodById($paymentId, Context $context)
-    {
-        return $this->getPaymentMethods($context)
-            ->filterByProperty('id', $paymentId)->first();
     }
 
     public function getPaymentMethodByPaymentType($paymentType, Context $context)
     {
         $paymentType = \str_replace('_PAYMENT', '', $paymentType);
-        return $this->getPaymentMethods($context)
+        return $this->getEasyCreditMethods($context)
             ->filter(function (PaymentMethodEntity $paymentMethod) use ($paymentType) {
                 return $this->getHandlerByPaymentMethod($paymentMethod)->getPaymentType() === $paymentType;
             })->first();
@@ -76,36 +66,41 @@ class Payment
 
     public function getHandlerByPaymentMethod($paymentMethod)
     {
-        // prefer the newer getPaymentMethodHandler instead of getHandler (removed from v6.5)
-        return \method_exists($this->paymentHandlerRegistry, 'getPaymentMethodHandler') ?
-            $this->paymentHandlerRegistry->getPaymentMethodHandler($paymentMethod->get('id')) :
-            $this->paymentHandlerRegistry->getHandler($paymentMethod->getHandlerIdentifier());
+        if (!isset($this->easyCreditHandlers[$paymentMethod->getId()])) {
+            // prefer the newer getPaymentMethodHandler instead of getHandler (removed from v6.5)
+            $this->easyCreditHandlers[$paymentMethod->getId()] = \method_exists($this->paymentHandlerRegistry, 'getPaymentMethodHandler') ?
+                $this->paymentHandlerRegistry->getPaymentMethodHandler($paymentMethod->get('id')) :
+                $this->paymentHandlerRegistry->getHandler($paymentMethod->getHandlerIdentifier());
+        }
+        return $this->easyCreditHandlers[$paymentMethod->getId()];
     }
 
-    public function getPaymentMethods(Context $context): EntityCollection
+    public function getEasyCreditMethods(Context $context): EntityCollection
     {
-        $cacheId = \sha1(\json_encode($context));
-        if (!isset($this->paymentMethodIdCache[$cacheId])) {
+        if (!$this->easyCreditMethods) {
             $criteria = new Criteria();
             $criteria->addFilter(new EqualsAnyFilter('handlerIdentifier', [
                 InstallmentPaymentHandler::class,
                 BillPaymentHandler::class
             ]));
 
-            $this->paymentMethodIdCache[$cacheId] = $this->paymentMethodRepository->search($criteria, $context)->getEntities();
+            $this->easyCreditMethods = $this->paymentMethodRepository->search($criteria, $context)->getEntities();
         }
-        return $this->paymentMethodIdCache[$cacheId];
+        return $this->easyCreditMethods;
     }
 
     public function getActivePaymentMethods(SalesChannelContext $salesChannelContext)
     {
         $context = $salesChannelContext->getContext();
 
-        $paymentMethods = $this->getPaymentMethods($context)->filter(static function ($paymentMethod) {
+        $paymentMethods = $this->getEasyCreditMethods($salesChannelContext->getContext())->filter(static function ($paymentMethod) {
             return $paymentMethod->get('active');
         });
+        if (!$paymentMethods) {
+            return false;
+        }
 
-        return $this->getSalesChannelPaymentMethods($salesChannelContext->getSalesChannel(), $context)
+        return $this->getSalesChannelPaymentMethods($salesChannelContext)
             ->filter(static function (PaymentMethodEntity $struct) use ($paymentMethods) {
                 return \in_array($struct->get('id'), $paymentMethods->getIds());
             });
@@ -116,20 +111,33 @@ class Payment
         return $this->getActivePaymentMethods($salesChannelContext)->count() > 0;
     }
 
-    public function getSalesChannelPaymentMethods(
-        SalesChannelEntity $salesChannelEntity,
-        Context $context
-    ): ?PaymentMethodCollection {
-        $criteria = new Criteria([$salesChannelEntity->getId()]);
+    public function getCurrentPaymentMethod(SalesChannelContext $salesChannelContext) {
+        return $this->getActivePaymentMethods($salesChannelContext)
+            ->get($salesChannelContext->getPaymentMethod()->getId());
+    }
+
+    protected $salesChannelPaymentMethods = [];
+
+    private function getSalesChannelPaymentMethods(SalesChannelContext $salesChannelContext): ?PaymentMethodCollection {
+        if ($salesChannelContext->getSalesChannel()->getPaymentMethods()) {
+            return $salesChannelContext->getSalesChannel()->getPaymentMethods();
+        }
+        if (isset($this->salesChannelPaymentMethods[$salesChannelContext->getToken()])) {
+            return $this->salesChannelPaymentMethods[$salesChannelContext->getToken()];
+        }
+
+        $salesChannelId = $salesChannelContext->getSalesChannel()->getId();
+        $criteria = new Criteria([$salesChannelId]);
         $criteria->addAssociation('paymentMethods');
 
         /** @var SalesChannelEntity|null $result */
-        $result = $this->salesChannelRepository->search($criteria, $context)->get($salesChannelEntity->getId());
+        $result = $this->salesChannelRepository->search($criteria, $salesChannelContext->getContext())
+            ->get($salesChannelId);
 
         if (!$result) {
             return null;
         }
-
+        $this->salesChannelPaymentMethods[$salesChannelContext->getToken()] = $result->getPaymentMethods();
         return $result->getPaymentMethods();
     }
 }

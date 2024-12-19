@@ -14,21 +14,26 @@ use Twig\TwigFunction;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Netzkollektiv\EasyCredit\Helper\Payment as PaymentHelper;
+use Netzkollektiv\EasyCredit\Service\PaymentAvailability;
 
 class TwigExtensions extends AbstractExtension
 {
+    private PaymentAvailability $paymentAvailabilityService;
     private PaymentHelper $paymentHelper;
 
     public function __construct(
-        PaymentHelper $paymentHelper
+        PaymentHelper $paymentHelper,
+        PaymentAvailability $paymentAvailabilityService
     ) {
         $this->paymentHelper = $paymentHelper;
+        $this->paymentAvailabilityService = $paymentAvailabilityService;
     }
 
     public function getFunctions()
     {
         return [
             new TwigFunction('easyCreditPaymentType', [$this, 'getPaymentType']),
+            new TwigFunction('easyCreditAvailablePaymentTypes', [$this, 'getAvailablePaymentTypes']),
         ];
     }
 
@@ -37,5 +42,10 @@ class TwigExtensions extends AbstractExtension
         return $this->paymentHelper
             ->getHandlerByPaymentMethod($payment)
             ->getPaymentType();
+    }
+
+    public function getAvailablePaymentTypes($salesChannelContext, $product = null) {
+        $paymentTypes = $this->paymentAvailabilityService->getAvailablePaymentTypes($salesChannelContext, $product);
+        return $paymentTypes;
     }
 }

@@ -8,19 +8,27 @@
         {# @var easycredit #}
         {% set easycredit = page.extensions.easycredit %}
 
-        {% set isProductDetail = cmsPage.type is same as 'product_detail' %}
-        {%if not isProductDetail %}
+        <meta name="easycredit-payment-types" content="{{ easyCreditAvailablePaymentTypes(context, product) | join(',') }}">
 
-        {% set price = product.calculatedPrice %}
-        {% if product.calculatedPrices.count > 0 %}
-            {% set price = product.calculatedPrices.last %}
+        {% set isProductDetail = cmsPage.type is same as 'product_detail' %}
+        {% if not isProductDetail %}
+
+        {# evaluate paymentTypes as separate condition to avoid evaluation when other conditions are not matching #}
+        {% set paymentTypes = easyCreditAvailablePaymentTypes(context, product) %}
+        {% if paymentTypes %}
+
+            {% set price = product.calculatedPrice %}
+            {% if product.calculatedPrices.count > 0 %}
+                {% set price = product.calculatedPrices.last %}
+            {% endif %}
+            <easycredit-widget 
+                webshop-id="{{ easycredit.apiKey }}" 
+                payment-types="{{ paymentTypes |join(',') }}"
+                amount="{{ price.unitPrice }}"
+                extended="true"
+            ></easycredit-widget>
+
         {% endif %}
-        <easycredit-widget 
-            webshop-id="{{ easycredit.apiKey }}" 
-            payment-types="{{ easycredit.paymentTypes |join(',') }}"
-            amount="{{ price.unitPrice }}"
-            extended="true"
-        ></easycredit-widget>
         {% endif %}
     {% endblock %}
 {% endblock %}

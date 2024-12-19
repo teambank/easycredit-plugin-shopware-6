@@ -13,5 +13,6 @@
         {% endif %}
 
         <meta name="easycredit-amount" itemprop="amount" content="{{ price.unitPrice }}">
+        <meta name="easycredit-payment-types" itemprop="payment-types" content="{{ easyCreditAvailablePaymentTypes(context, product) |join(',') }}">
     {% endif %}
 {% endblock %}

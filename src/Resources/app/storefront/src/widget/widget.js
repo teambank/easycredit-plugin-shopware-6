@@ -2,7 +2,12 @@ import Plugin from 'src/plugin-system/plugin.class'
 
 export default class EasyCreditRatenkaufWidget extends Plugin {
     init() {
-        this.initWidget(document)
+        this.initWidget(
+            document.querySelector('.cms-element-buy-box')
+        )
+        this.initWidget(
+            document.querySelector('.cms-element-product-listing')
+        )
         this.registerOffCanvas();
     }
 
@@ -24,25 +29,28 @@ export default class EasyCreditRatenkaufWidget extends Plugin {
     }
 
     initWidget(container) {
+        if (!container) {
+            return
+        }
 
         const selector = this.getMeta('widget-selector', container)
         if (selector === null) {
             return
         }
-        if (this.getMeta('api-key') === null) {
+        const apiKey = this.getMeta('api-key')
+        console.log(apiKey)
+        if (apiKey === null) {
             return
         }
 
-        let processedSelector = this.processSelector(selector)
-
-        let elements = container.querySelectorAll(processedSelector.selector)
-        elements.forEach((element) => {
-            this.applyWidget(container, element, processedSelector.attributes)
+        const processedSelector = this.processSelector(selector)
+        container.querySelectorAll(processedSelector.selector).forEach((element) => {
+            this.applyWidget(element, processedSelector.attributes)
         })
     }
 
-    applyWidget(container, element, attributes) {
-        let amount = this.getMeta('amount', container, element)
+    applyWidget(element, attributes) {
+        let amount = this.getMeta('amount', element)
 
         if (null === amount || isNaN(amount)) {
             const priceContainer = element.parentNode
@@ -58,7 +66,7 @@ export default class EasyCreditRatenkaufWidget extends Plugin {
         let widget = document.createElement('easycredit-widget')
         widget.setAttribute('webshop-id', this.getMeta('api-key'))
         widget.setAttribute('amount', amount)
-        widget.setAttribute('payment-types', this.getMeta('payment-types'))
+        widget.setAttribute('payment-types', this.getMeta('payment-types', element))
         
         if (this.getMeta('disable-flexprice')) {
             widget.setAttribute('disable-flexprice','true')
@@ -74,24 +82,17 @@ export default class EasyCreditRatenkaufWidget extends Plugin {
         element.appendChild(widget)
     }
 
-    getMeta(key, container = null, element = null) {
-        let meta
-
-        if (container === null) {
-            container = document
-        }
-
+    getMeta(key, element = null) {
         const selector = 'meta[name=easycredit-' + key + ']'
 
+        let meta;
         if (element) {
-            let box
-            if (box = element.closest('.cms-listing-col')) {
-                if (meta = box.querySelector(selector)) {
-                    return meta.content
-                }
-            }
+            meta = this.searchUpTheTree(element, selector)
+        } else {
+            meta = document.querySelector(selector);
         }
-        if (meta = container.querySelector(selector)) {
+        if (meta) {
+            console.log(key + ': ' + meta.content);
             return meta.content
         }
         return null
@@ -116,5 +117,19 @@ export default class EasyCreditRatenkaufWidget extends Plugin {
         return {
             selector: selector
         }
+    }
+
+    searchUpTheTree (element, selector) {
+        while (element) {
+            let matchingResult = Array.from(element.parentElement?.children || [])
+                .map(sibling => sibling.querySelector(selector))
+                .find(result => result !== null);
+
+            if (matchingResult) {
+                return matchingResult;
+            }
+            element = element.parentElement;
+        }
+        return null;
     }
 }

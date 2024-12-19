@@ -8,7 +8,7 @@
         {# @var easycredit #}
         {% set easycredit = page.extensions.easycredit %}
 
-        {% if easycredit.expressCartEnabled %}
+        {% if easyCreditAvailablePaymentTypes(context) and easycredit.expressCartEnabled %}
             <div class="form-row mt-3 justify-content-end">
                 {% sw_include '@EasyCreditRatenkauf/storefront/component/express-button.html.twig' with {fullWidth: true} %}
             </div>

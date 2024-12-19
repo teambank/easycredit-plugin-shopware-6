@@ -18,8 +18,14 @@ use Shopware\Core\Framework\Plugin\Context\UpdateContext;
 use Shopware\Core\Framework\Plugin\Context\InstallContext;
 use Shopware\Core\Framework\Plugin\Context\UninstallContext;
 use Shopware\Core\System\SystemConfig\SystemConfigService;
+use Shopware\Core\Framework\Rule\Rule;
+use Shopware\Core\Content\Product\State;
+use Shopware\Core\Framework\Rule\Container\MatchAllLineItemsRule;
 use Shopware\Core\Checkout\Customer\Rule\BillingCountryRule;
+use Shopware\Core\Checkout\Cart\Rule\LineItemProductStatesRule;
+use Shopware\Core\Checkout\Cart\Rule\LineItemGoodsTotalRule;
 use Shopware\Core\Framework\Rule\Container\AndRule;
+use Shopware\Core\Framework\Rule\Container\OrRule;
 use Shopware\Core\System\Currency\Rule\CurrencyRule;
 use Shopware\Core\System\Country\CountryDefinition;
 use Shopware\Core\System\Currency\CurrencyDefinition;
@@ -135,20 +141,21 @@ class InstallUninstall
                         'type' => (new AndRule())->getName(),
                         'children' => [
                             [
-                                'type' => (new BillingCountryRule())->getName(),
-                                'value' => [
-                                    'operator' => BillingCountryRule::OPERATOR_EQ,
-                                    'countryIds' => $this->getCountryIds(['DE'], $context),
-                                ],
-                            ],
-                            [
                                 'type' => (new CurrencyRule())->getName(),
                                 'value' => [
-                                    'operator' => CurrencyRule::OPERATOR_EQ,
-                                    'currencyIds' => $this->getCurrencyIds(['EUR'], $context),
+                                    'operator' => Rule::OPERATOR_EQ,
+                                    'currencyIds' => $this->getCurrencyIds(['EUR'], $context)
+                                ]
+                            ],
+                            [
+                                'type' => (new BillingCountryRule())->getName(),
+                                'value' => [
+                                    'operator' => Rule::OPERATOR_EQ,
+                                    'countryIds' => $this->getCountryIds(['DE'], $context),
                                 ],
+
                             ]
-                        ],
+                        ]
                     ]
                 ]
             ]

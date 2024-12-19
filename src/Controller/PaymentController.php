@@ -108,8 +108,7 @@ class PaymentController extends StorefrontController
             $this->updatePaymentMethod($paymentMethod, $salesChannelContext);
 
             $salesChannelContext->assign([
-                'paymentMethod' => $this->paymentHelper->getSalesChannelPaymentMethods($salesChannelContext->getSalesChannel(), $salesChannelContext->getContext())
-                    ->get($paymentMethod->get('id'))
+                'paymentMethod' => $paymentMethod
             ]);
 
             $this->checkoutService->startCheckout($salesChannelContext);

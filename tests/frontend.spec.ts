@@ -28,3 +28,16 @@ test.describe("Widget should be visible outside amount constraint @product", () 
     ).toBeVisible();
   });
 });
+
+test.describe("Widget should not be visible for digital products @product", () => {
+  test("widgetProductDigital", async ({ page }) => {
+    await test.step(`Go to product (sku: digital)`, async () => {
+      await page.goto('/search?search=digital');
+    });
+    await expect(
+      await page
+        .locator('[itemprop="offers"]')
+        .getByText(/Finanzieren ab.+?Bestellwert/)
+    ).not.toBeVisible();
+  });
+});

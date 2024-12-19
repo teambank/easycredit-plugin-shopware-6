@@ -22,6 +22,7 @@ use Netzkollektiv\EasyCredit\Payment\Handler\BillPaymentHandler;
 use Netzkollektiv\EasyCredit\Payment\Handler\InstallmentPaymentHandler;
 use Shopware\Core\Framework\DataAbstractionLayer\Exception\InconsistentCriteriaIdsException;
 use Shopware\Storefront\Page\Checkout\Confirm\CheckoutConfirmPageLoadedEvent;
+use Shopware\Core\Content\Product\State;
 use Symfony\Component\Cache\Adapter\TagAwareAdapterInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Psr\Log\LoggerInterface;
@@ -103,8 +104,6 @@ class Checkout implements EventSubscriberInterface
             }
         }
 
-        $isSelected = $this->paymentHelper->isSelected($salesChannelContext);
-
         try {
             $settings = $this->settings->getSettings($salesChannelContext->getSalesChannel()->getId());
             $checkout = $this->integrationFactory->createCheckout($salesChannelContext);
@@ -123,6 +122,7 @@ class Checkout implements EventSubscriberInterface
             return;
         }
 
+        $isSelected = $this->paymentHelper->isSelected($salesChannelContext);
         if ($isSelected && !$this->storage->get('payment_plan')) {
             if ($error === null) {
                 try {
@@ -133,7 +133,7 @@ class Checkout implements EventSubscriberInterface
             }
         }
 
-        $paymentMethods = $this->paymentHelper->getPaymentMethods($context);
+        $paymentMethods = $this->paymentHelper->getEasyCreditMethods($context);
 
         $event->getPage()->addExtension('easycredit', (new CheckoutData())->assign([
             'grandTotal' => isset($quote) ? $quote->getOrderDetails()->getOrderValue() : null,
@@ -176,7 +176,7 @@ class Checkout implements EventSubscriberInterface
     private function removePaymentMethodFromConfirmPage(CheckoutConfirmPageLoadedEvent $event): void
     {
         $paymentMethodCollection = $event->getPage()->getPaymentMethods();
-        foreach ($this->paymentHelper->getPaymentMethods($event->getContext()) as $method) {
+        foreach ($this->paymentHelper->getEasyCreditMethods($event->getContext()) as $method) {
             $paymentMethodCollection->remove($method->get('id'));
         }
     }

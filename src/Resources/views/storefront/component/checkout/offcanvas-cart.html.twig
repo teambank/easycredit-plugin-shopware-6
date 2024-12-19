@@ -5,7 +5,7 @@
     {{ parent() }}
 
     {% set easycredit = page.extensions.easycredit %}
-    {% if easycredit.widgetEnabled and easycredit.apiKey %}
+    {% if easyCreditAvailablePaymentTypes(context) and easycredit.widgetEnabled %}
     <meta name="easycredit-widget-selector" itemprop="selector" content="{{ easycredit.widgetSelector }}">
     <meta name="easycredit-amount" itemprop="amount" content="{{ easycredit.amount }}">
     {% endif %}
@@ -19,8 +19,14 @@
     {% set easycredit = page.extensions.easycredit %}
 
     {% if easycredit.expressCartEnabled %}
+    
+    {# evaluate paymentTypes as separate condition to avoid evaluation when other conditions are not matching #}
+    {% set paymentTypes = easyCreditAvailablePaymentTypes(context, product) %}
+    {% if paymentTypes %}
+
         <div class="d-block" style="margin: 10px 0;">
-            {% sw_include '@EasyCreditRatenkauf/storefront/component/express-button.html.twig' with {fullWidth: true} %}
+            {% sw_include '@EasyCreditRatenkauf/storefront/component/express-button.html.twig' with {fullWidth: true, paymentTypes: paymentTypes} %}
         </div>
+    {% endif %}
     {% endif %}
 {% endblock %}

@@ -4,7 +4,7 @@
     <easycredit-express-button 
         webshop-id="{{ easycredit.apiKey }}"
         amount="{% if easycredit.amount %}{{ easycredit.amount }}{% else %}{{ amount }}{% endif%}"
-        payment-types="{{ easycredit.paymentTypes |join(',') }}"
+        payment-types="{{ paymentTypes |join(',') }}"
         {% if fullWidth %}full-width="true"{% endif %}
     ></easycredit-express-button>
 {% endif %}

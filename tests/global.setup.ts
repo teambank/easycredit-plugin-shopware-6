@@ -115,6 +115,18 @@ async function globalSetup(config: FullConfig) {
         linked: false,
       }],
     },
+    {
+      name: "Digital",
+      productNumber: "digital",
+      downloadable: true,
+      states: ['is-download'],
+      price: [{
+        currencyId: salesChannel.currencyId,
+        gross: 11000,
+        net: 11000,
+        linked: false,
+      }],
+    },
   ];
 
   for (const productData of productsData) {
