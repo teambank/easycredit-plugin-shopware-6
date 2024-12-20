@@ -7,10 +7,11 @@
 
 namespace Netzkollektiv\EasyCredit\Service;
 
+use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Shopware\Core\Framework\Rule\Collector\RuleConditionRegistry;
 use Shopware\Core\Framework\Rule\Container\AndRule;
 use Shopware\Core\Checkout\Cart\Rule\CartRuleScope;
-
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
@@ -21,13 +22,14 @@ use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\Content\Product\SalesChannel\SalesChannelProductEntity;
-use Netzkollektiv\EasyCredit\Setting\Service\SettingsServiceInterface;
-
 use Shopware\Core\Checkout\Cart\SalesChannel\CartResponse;
 use Shopware\Core\Checkout\Cart\CartCalculator;
 use Shopware\Core\Checkout\Cart\LineItem\CartDataCollection;
+use Netzkollektiv\EasyCredit\Setting\Service\SettingsServiceInterface;
 
 class RuleEvaluator {
+
+    private ContainerInterface $container;
 
     private EntityRepository $ruleRepository;
 
@@ -35,23 +37,40 @@ class RuleEvaluator {
 
     private CartCalculator $cartCalculator;
 
-    private Line
+    private LoggerInterface $logger;
+
     private ?Cart $cart = null;
 
     public function __construct(
+        ContainerInterface $container,
         EntityRepository $ruleRepository,
         SettingsServiceInterface $settingsService,
-        CartCalculator $cartCalculator
+        CartCalculator $cartCalculator,
+        LoggerInterface $logger
     ) {
+        $this->container = $container;
         $this->ruleRepository = $ruleRepository;
         $this->settingsService = $settingsService;
         $this->cartCalculator = $cartCalculator;
+        $this->logger = $logger;
     }
 
     public function evaluateRule($rule, Cart $cart, SalesChannelContext $salesChannelContext): bool
     {
+        if (\version_compare($this->container->getParameter('kernel.shopware_version'), '6.5.0', '<')) {
+            return true;
+        }
+
+        if ($rule === null) {
+            $this->logger->debug('There is no rule to be evaluated.');
+            return true;
+        }
+
         $scope = new CartRuleScope($cart, $salesChannelContext);
-        return $rule->getPayload()->match($scope);
+
+        $evaluated = $rule->getPayload()->match($scope);
+        $this->logger->debug('Rule "' . $rule->getName() . '" evaluated: '.($evaluated ? 'true' : 'false'));
+        return $evaluated;
     }
 
     private function getBaseCart () {

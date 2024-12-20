@@ -15,9 +15,9 @@ jobs:
       fail-fast: false
       matrix:
         shopware-version:
-#          - 'v6.4.1' # Error 500
-#          - 'v6.4.2' # Error 500
-          - 'v6.4.3'
+          - 'v6.4.1' # incompatible: Error 500
+          - 'v6.4.2' # incompatible: Error 500
+          - 'v6.4.3' # incompatible: Class Shopware\Core\Checkout\Cart\Event\CartVerifyPersistEvent not found.
           - 'v6.4.4'
           - 'v6.4.5'
           - 'v6.4.6'

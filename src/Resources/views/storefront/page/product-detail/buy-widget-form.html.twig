@@ -7,10 +7,16 @@
         {# @var easycredit #}
         {% set easycredit = page.extensions.easycredit %}
 
-        {% if buyable and product.calculatedCheapestPrice.totalPrice > 0 and easyCreditAvailablePaymentTypes(context, product) and easycredit.expressProductEnabled %}
+        {% if buyable and product.calculatedCheapestPrice.totalPrice > 0 and easycredit.expressProductEnabled %}
+
+            {# evaluate paymentTypes as separate condition to avoid evaluation when other conditions are not matching #}
+            {% set paymentTypes = easyCreditAvailablePaymentTypes(context, product) %}
+            {% if paymentTypes %}
             <div class="form-row mt-3 justify-content-end d-flex">
-                {% sw_include '@EasyCreditRatenkauf/storefront/component/express-button.html.twig' %}
+                {% sw_include '@EasyCreditRatenkauf/storefront/component/express-button.html.twig' with {paymentTypes: paymentTypes}  %}
             </div>
+            {% endif %}
+
         {% endif %}
     {% endblock %}
 

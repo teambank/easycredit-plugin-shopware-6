@@ -15,6 +15,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -25,24 +26,12 @@ use Netzkollektiv\EasyCredit\Service\CheckoutService;
 
 class Redirector implements EventSubscriberInterface
 {
-    /**
-     * @var ContainerInterface
-     */
-    private $container;
+    private ContainerInterface $container;
 
-    /**
-     * @var \Symfony\Component\HttpFoundation\Request|null
-     */
-    private $request;
+    private Request $request;
 
-    /**
-     * @var UrlGeneratorInterface
-     */
-    private $router;
+    private UrlGeneratorInterface $router;
 
-    /**
-     * @var PaymentHelper
-     */
     private PaymentHelper $paymentHelper;
 
     private CheckoutService $checkoutService;

@@ -42,7 +42,7 @@ class Migration1734687546AdaptPaymentRules extends MigrationStep
         // Fetch the payment methods with the specific handler
         $sql = "SELECT id, availability_rule_id
                 FROM `payment_method`
-                WHERE `handler_identifier` IN ('" . addslashes(InstallmentPaymentHandler::class) . "', '" . addslashes(BillPaymentHandler::class) . "')";
+                WHERE `handler_identifier` IN ('" . \addslashes(InstallmentPaymentHandler::class) . "', '" . \addslashes(BillPaymentHandler::class) . "')";
 
         $paymentMethods = $connection->fetchAllAssociative($sql);
 
@@ -66,7 +66,7 @@ class Migration1734687546AdaptPaymentRules extends MigrationStep
                 $this->insertCondition($connection, $ruleId, [
                     'parent_id' => $containerId,
                     'type' => $billingCountryCondition['type'],
-                    'value' => json_encode(['operator' => 'empty'])
+                    'value' => \json_encode(['operator' => 'empty'])
                 ]);
 
                 // Update the parent_id of the existing condition, making it children of the new "orContainer"
@@ -94,7 +94,7 @@ class Migration1734687546AdaptPaymentRules extends MigrationStep
                 $this->insertCondition($connection, $ruleId, [
                     'parent_id' => $matchAllLineItemsId,
                     'type' => 'cartLineItemProductStates',
-                    'value' => json_encode([
+                    'value' => \json_encode([
                         'operator' => '=',
                         "productState" => "is-physical"
                     ])
@@ -104,7 +104,7 @@ class Migration1734687546AdaptPaymentRules extends MigrationStep
                 $this->insertCondition($connection, $ruleId, [
                     'parent_id' => $containerId,
                     'type' => 'cartLineItemGoodsTotal',
-                    'value' => json_encode([
+                    'value' => \json_encode([
                         'operator' => '=',
                         'count' => 0,
                     ])
@@ -115,7 +115,7 @@ class Migration1734687546AdaptPaymentRules extends MigrationStep
 
     protected function insertCondition ($connection, $ruleId, $data) {
         $id = Uuid::randomBytes();
-        $connection->insert('rule_condition', array_merge([
+        $connection->insert('rule_condition', \array_merge([
             'id' => $id,
             'rule_id' => $ruleId,
             'created_at' => (new \DateTime())->format(Defaults::STORAGE_DATE_TIME_FORMAT),
