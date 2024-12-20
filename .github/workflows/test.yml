@@ -15,8 +15,8 @@ jobs:
       fail-fast: false
       matrix:
         shopware-version:
-#          - 'v6.4.1' # Error 500
-#          - 'v6.4.2' # Error 500
+          #- 'v6.4.1' # incompatible: several errors in early versions, wontfix
+          #- 'v6.4.2' # incompatible: several errors in early versions, wontfix
           - 'v6.4.3'
           - 'v6.4.4'
           - 'v6.4.5'

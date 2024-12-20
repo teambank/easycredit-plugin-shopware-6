@@ -7,11 +7,13 @@ if (version_compare(str_replace('v','',getenv('SW_VERSION')), '6.5', '>=')) {
   $config['parameters']['excludePaths']['analyse'][] = getenv('PLUGIN_DIR').'/src/Compatibility';
 }
 
-
 if (version_compare(str_replace('v','',getenv('SW_VERSION')), '6.4.4', '<=')) {
   /* ignore flow completely, does not exist in early version of SW 6 */
   $config['parameters']['excludePaths']['analyse'][] = getenv('PLUGIN_DIR').'/src/Flow/Action/*';
-  
+
+  /* ignore, rule evaluation is skipped in SW <= 6.4.18 */
+  $config['parameters']['excludePaths']['analyse'][] = getenv('PLUGIN_DIR').'/src/Subscriber/PreventCartPersistDuringRuleEvaluation.php';
+ 
 } else if (version_compare(str_replace('v','',getenv('SW_VERSION')), '6.5', '<=')) {
   /* ignore stuff introduced with 6.5 */
   $config['parameters']['ignoreErrors'][] = [
@@ -32,7 +34,7 @@ if (version_compare(str_replace('v','',getenv('SW_VERSION')), '6.4.4', '<=')) {
 // constructor changed > 6.5, handled in code using reflection
 $config['parameters']['ignoreErrors'][] = [
   'message' => '#Class Shopware.Core.Checkout.Cart.Cart constructor invoked with#',
-  'path' => getenv('PLUGIN_DIR').'/src/Service/FlexpriceService.php'
+  'path' => getenv('PLUGIN_DIR').'/src/Service/RuleEvaluator.php'
 ];
 
 return $config;

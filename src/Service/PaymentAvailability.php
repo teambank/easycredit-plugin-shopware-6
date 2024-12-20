@@ -1,4 +1,10 @@
 <?php
+/*
+ * (c) NETZKOLLEKTIV GmbH <kontakt@netzkollektiv.com>
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Netzkollektiv\EasyCredit\Service;
 
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
@@ -9,6 +15,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Netzkollektiv\EasyCredit\Setting\Service\SettingsServiceInterface;
 use Netzkollektiv\EasyCredit\Helper\Payment as PaymentHelper;
 use Netzkollektiv\EasyCredit\Service\RuleEvaluator;
+use Netzkollektiv\EasyCredit\Setting\Exception\SettingsInvalidException;
 
 class PaymentAvailability {
 
@@ -60,7 +67,7 @@ class PaymentAvailability {
             $cart = $this->cartService->getCart($salesChannelContext->getToken(), $salesChannelContext);
         }
 
-        $this->cachedPaymentTypes[$cacheKey] = array_filter($paymentMethods->map(function ($paymentMethod) use ($salesChannelContext, $cart) {
+        $this->cachedPaymentTypes[$cacheKey] = \array_filter($paymentMethods->map(function ($paymentMethod) use ($salesChannelContext, $cart) {
             $available = $this->ruleEvaluator->evaluateRule(
                 $this->getAvailabilityRules($salesChannelContext->getContext())
                     ->filter(fn($rule) => $rule->getId() === $paymentMethod->getAvailabilityRuleId())->first(),
@@ -78,7 +85,7 @@ class PaymentAvailability {
         if ($product) {
             $cacheKey[] = $product->getId();
         }
-        return implode('-', $cacheKey);
+        return \implode('-', $cacheKey);
     }
 
     private function getSettings(SalesChannelContext $salesChannelContext)
@@ -95,7 +102,7 @@ class PaymentAvailability {
     private $availibilityRules = null;
 
     private function getAvailabilityRules($context) {
-        if (!$this->availibilityRules) {
+        if ($this->availibilityRules === null) {
             $ids = $this->paymentHelper->getEasyCreditMethods($context)->map(fn ($method) => $method->getAvailabilityRuleId());
             $this->availibilityRules = $this->ruleRepository->search(
                 new Criteria($ids),

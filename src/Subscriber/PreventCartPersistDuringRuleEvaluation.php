@@ -20,7 +20,7 @@ class PreventCartPersistDuringRuleEvaluation implements EventSubscriberInterface
 
     public function preventPersist(CartVerifyPersistEvent $event): void {
         $prefix = 'easycredit';
-        if (substr($event->getCart()->getToken(), 0, strlen($prefix)) === $prefix) {
+        if (\mb_substr($event->getCart()->getToken(), 0, \mb_strlen($prefix)) === $prefix) {
             $event->setShouldPersist(false);
         }
     }

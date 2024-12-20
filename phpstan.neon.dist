@@ -10,11 +10,9 @@ parameters:
     treatPhpDocTypesAsCertain: false
     reportUnmatchedIgnoredErrors: false
     inferPrivatePropertyTypeFromConstructor: true
-    checkMissingIterableValueType: false
-    checkGenericClassInNonGenericObjectType: false
-
-    featureToggles:
-        disableCheckMissingIterableValueType: false
+    ignoreErrors:
+        - identifier: missingType.iterableValue
+        - identifier: missingType.generics
     symfony:
         constant_hassers: false
         # the placeholder "%ShopwareHashedCacheDir%" will be replaced on execution by bin/phpstan-config-generator.php script

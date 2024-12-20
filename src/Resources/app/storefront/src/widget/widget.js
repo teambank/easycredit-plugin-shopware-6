@@ -3,7 +3,7 @@ import Plugin from 'src/plugin-system/plugin.class'
 export default class EasyCreditRatenkaufWidget extends Plugin {
     init() {
         this.initWidget(
-            document.querySelector('.cms-element-buy-box')
+            document.querySelector('.product-detail-buy')
         )
         this.initWidget(
             document.querySelector('.cms-element-product-listing')
