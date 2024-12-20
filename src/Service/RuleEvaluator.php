@@ -35,7 +35,6 @@ class RuleEvaluator {
 
     private CartCalculator $cartCalculator;
 
-    private Line
     private ?Cart $cart = null;
 
     public function __construct(

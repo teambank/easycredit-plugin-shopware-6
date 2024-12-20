@@ -32,7 +32,7 @@ if (version_compare(str_replace('v','',getenv('SW_VERSION')), '6.4.4', '<=')) {
 // constructor changed > 6.5, handled in code using reflection
 $config['parameters']['ignoreErrors'][] = [
   'message' => '#Class Shopware.Core.Checkout.Cart.Cart constructor invoked with#',
-  'path' => getenv('PLUGIN_DIR').'/src/Service/FlexpriceService.php'
+  'path' => getenv('PLUGIN_DIR').'/src/Service/RuleEvaluator.php'
 ];
 
 return $config;
