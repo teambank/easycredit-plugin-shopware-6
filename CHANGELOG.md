@@ -1,3 +1,8 @@
+# 3.0.2
+
+* das Widget und der Express-Button wird nun über die Zahlungsart-Regel gesteuert (>= SW 6.5)
+* digitale Produkte sind standardmäßig über die Regelkonfiguration ausgeschlossen (>= SW 6.5)
+
 # 3.0.1
 
 * bei Rechnungskauf-Vorgängen wird keine Zinsposition mehr angezeigt
