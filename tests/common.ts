@@ -31,7 +31,7 @@ export const goThroughPaymentPage = async (page, express: boolean = false) => {
     await page.getByTestId("uc-deny-all-button").click();
 
     await expect(
-      page.getByText("Monatliche Wunschrate")
+      page.getByRole("heading",{ name: "Monatliche Wunschrate" })
     ).toBeVisible();
 
     await page.getByRole("button", { name: "Weiter zur Dateneingabe" }).click();
@@ -67,7 +67,7 @@ export const goThroughPaymentPage = async (page, express: boolean = false) => {
     );
 
     await delay(500);
-    await page.getByRole("button", { name: "Ratenwunsch übernehmen" }).click();
+    await page.getByRole("button", { name: "Zahlungswunsch übernehmen" }).click();
   });
 };
 
