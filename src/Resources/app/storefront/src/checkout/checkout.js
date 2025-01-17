@@ -3,7 +3,12 @@ import { getCsrfToken, createHiddenField } from '../util.js'
 
 export default class EasyCreditRatenkaufCheckout extends Plugin {
     init() {
-        document.querySelector('easycredit-checkout')?.addEventListener('submit', async (e) => {
+        let element = document.querySelector('easycredit-checkout');
+        if (!element) {
+            return;
+        }
+
+        document.querySelector('easycredit-checkout').addEventListener('submit', async (e) => {
             var form = document.getElementById('changePaymentForm')
 
             let token = await getCsrfToken()
