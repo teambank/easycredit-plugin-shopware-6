@@ -262,5 +262,11 @@
             <argument type="service" id="Shopware\Core\Checkout\Payment\Cart\PaymentHandler\PaymentHandlerRegistry"/>
             <argument type="service" id="Netzkollektiv\EasyCredit\Api\IntegrationFactory"/>
         </service>
+
+        <service id="Netzkollektiv\EasyCredit\Compatibility\PriorSw66ScriptsCompatibilityDecorator"
+            decorates="Shopware\Storefront\Theme\StorefrontPluginConfiguration\StorefrontPluginConfigurationFactory">
+            <argument type="service" id="Netzkollektiv\EasyCredit\Compatibility\PriorSw66ScriptsCompatibilityDecorator.inner"/>
+            <argument type="service" id="service_container"/>
+        </service>
     </services>
 </container>
