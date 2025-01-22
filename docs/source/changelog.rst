@@ -1,6 +1,13 @@
 Changelog
 =========
 
+2.2.6
+-----
+
+* doppelte JavaScript-Builds werden während der Theme-Kompilierung (bis einschließlich SW 6.5) automatisch entfernt, anstatt das zusätzliche Build zu löschen.
+* die Storefront lässt sich unter SW 6.4 wieder erfolgreich kompilieren.
+* der Express-Checkout wird nun mit ungecachtem Warenkorb initialisiert.
+
 2.2.5
 -----
 
