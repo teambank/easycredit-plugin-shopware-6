@@ -43,9 +43,26 @@ class CheckoutService {
         $this->logger = $logger;
     }
 
+    protected function getUncachedCart ($salesChannelContext) {
+        $reflectionMethod = new \ReflectionMethod($this->cartService, 'getCart');
+        $parameters = $reflectionMethod->getParameters();
+        $paramNames = [];
+        foreach ($parameters as $parameter) {
+            $paramNames[$parameter->getName()] = $parameter;
+        }
+        if (isset($paramNames['taxed']) && $paramNames['taxed']->hasType() && $paramNames['taxed']->getType() == 'bool') {
+            $cart = $this->cartService->getCart($salesChannelContext->getToken(), $salesChannelContext, false);
+        } elseif (isset($paramNames['name']) && $paramNames['name']->hasType() && $paramNames['name']->getType() == 'string') {
+            $cart = $this->cartService->getCart($salesChannelContext->getToken(), $salesChannelContext, 'sales-channel', false);
+        } else {
+            throw new \LogicException('Unknown getCart method signature.');
+        }
+        return $cart;
+    }
+
     public function startCheckout ($salesChannelContext) {
         $checkout = $this->integrationFactory->createCheckout($salesChannelContext);
-        $cart = $this->cartService->getCart($salesChannelContext->getToken(), $salesChannelContext);
+        $cart = $this->getUncachedCart($salesChannelContext);
         $quote = $this->quoteHelper->getQuote($cart, $salesChannelContext);
         try {
             try {

@@ -79,7 +79,6 @@ class InstallUninstall
     {
         $this->addDefaultConfiguration($lifecycleContext);
         $this->addPaymentMethods($lifecycleContext->getContext());
-        $this->fixLegacyScriptLocation($lifecycleContext->getCurrentShopwareVersion());
     }
 
     public function uninstall(UninstallContext $lifecycleContext): void
@@ -91,7 +90,6 @@ class InstallUninstall
     {
         $this->addDefaultConfiguration($lifecycleContext);
         $this->addPaymentMethods($lifecycleContext->getContext());
-        $this->fixLegacyScriptLocation($lifecycleContext->getCurrentShopwareVersion());
     }
 
     private function addDefaultConfiguration($lifecycleContext): void
@@ -221,24 +219,6 @@ class InstallUninstall
             }
             $this->paymentMethodRepository->upsert([$method], $context);
 		}
-    }
-
-    protected function fixLegacyScriptLocation($swVersion) {
-        if (\version_compare($swVersion, '6.6.0', '>=')) {
-            return;
-        }
-
-        $pluginDir = \dirname(__FILE__).'/../..';
-        $scriptsDir = $pluginDir . '/Resources/app/storefront/dist/storefront/js';
-        $legacyFilePath = $scriptsDir . '/easy-credit-ratenkauf.js';
-        $newFilePath = $scriptsDir . '/easy-credit-ratenkauf/easy-credit-ratenkauf.js';
-        if (\file_exists($newFilePath)) {
-            if (!\file_exists($legacyFilePath)) {
-              \rename($newFilePath, $legacyFilePath); // move the shipped file to legacy location
-            } else {
-              \unlink($newFilePath); // delete the >= SW6.6 file to prevent duplication
-            }
-        }
     }
 
     protected function getCountryIds(array $countryIsos, Context $context): array

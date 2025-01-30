@@ -31,8 +31,10 @@ class Payment
     private PaymentHandlerRegistry $paymentHandlerRegistry;
 
     private ?EntityCollection $easyCreditMethods = null;
+
     private array $easyCreditHandlers = [];
 
+    protected $salesChannelPaymentMethods = [];
 
     public function __construct(
         EntityRepository $paymentMethodRepository,
@@ -111,14 +113,14 @@ class Payment
         return $this->getActivePaymentMethods($salesChannelContext)->count() > 0;
     }
 
-    public function getCurrentPaymentMethod(SalesChannelContext $salesChannelContext) {
+    public function getCurrentPaymentMethod(SalesChannelContext $salesChannelContext)
+    {
         return $this->getActivePaymentMethods($salesChannelContext)
             ->get($salesChannelContext->getPaymentMethod()->getId());
     }
 
-    protected $salesChannelPaymentMethods = [];
-
-    private function getSalesChannelPaymentMethods(SalesChannelContext $salesChannelContext): ?PaymentMethodCollection {
+    private function getSalesChannelPaymentMethods(SalesChannelContext $salesChannelContext): ?PaymentMethodCollection
+    {
         if ($salesChannelContext->getSalesChannel()->getPaymentMethods()) {
             return $salesChannelContext->getSalesChannel()->getPaymentMethods();
         }

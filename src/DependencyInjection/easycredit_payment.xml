@@ -303,5 +303,11 @@
         <service id="Netzkollektiv\EasyCredit\Subscriber\PreventCartPersistDuringRuleEvaluation">
             <tag name="kernel.event_subscriber"/>
         </service>
+
+        <service id="Netzkollektiv\EasyCredit\Compatibility\PriorSw66ScriptsCompatibilityDecorator"
+            decorates="Shopware\Storefront\Theme\StorefrontPluginConfiguration\StorefrontPluginConfigurationFactory">
+            <argument type="service" id="Netzkollektiv\EasyCredit\Compatibility\PriorSw66ScriptsCompatibilityDecorator.inner"/>
+            <argument type="service" id="service_container"/>
+        </service>
     </services>
 </container>
