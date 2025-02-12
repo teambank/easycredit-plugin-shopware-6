@@ -28,14 +28,21 @@
             <argument type="service" id="Netzkollektiv\EasyCredit\Setting\Service\SettingsService"/>
         </service>
 
+        <service id="Netzkollektiv\EasyCredit\Payment\State\PaymentStateDataDefinition">
+            <tag name="shopware.entity.definition" entity="easycredit_payment_state" />
+        </service>
+
         <service id="Netzkollektiv\EasyCredit\Api\IntegrationFactory">
             <argument type="service" id="Netzkollektiv\EasyCredit\Setting\Service\SettingsService"/>            
             <argument type="service" id="monolog.logger.easycredit"/>
             <argument type="service" id="Netzkollektiv\EasyCredit\Api\Storage"/>
         </service>
         <service id="Netzkollektiv\EasyCredit\Api\Storage">          
-            <argument type="service" id="request_stack"/>
             <argument type="service" id="monolog.logger.easycredit"/>
+            <argument type="service" id="Netzkollektiv\EasyCredit\Payment\State\PaymentStateService" />
+        </service>
+        <service id="Netzkollektiv\EasyCredit\Payment\State\PaymentStateService">
+            <argument type="service" id="easycredit_payment_state.repository"/>
         </service>
 
         <service id="Netzkollektiv\EasyCredit\Service\CustomerService">
@@ -51,23 +58,13 @@
 
         <service id="Netzkollektiv\EasyCredit\Service\CheckoutService">
             <argument type="service" id="Netzkollektiv\EasyCredit\Api\IntegrationFactory"/>
-            <argument type="service" id="Shopware\Core\Checkout\Cart\SalesChannel\CartService"/>
-            <argument type="service" id="Netzkollektiv\EasyCredit\Helper\Quote"/>
             <argument type="service" id="Netzkollektiv\EasyCredit\Api\Storage"/>
             <argument type="service" id="monolog.logger.easycredit"/>
         </service>
 
         <service id="Netzkollektiv\EasyCredit\Controller\PaymentController" public="true">
-            <argument type="service" id="Netzkollektiv\EasyCredit\Api\IntegrationFactory"/>
-            <argument type="service" id="Shopware\Core\Checkout\Cart\SalesChannel\CartService" />
-            <argument type="service" id="Netzkollektiv\EasyCredit\Helper\Quote" />
-            <argument type="service" id="Netzkollektiv\EasyCredit\Payment\StateHandler" />
             <argument type="service" id="Netzkollektiv\EasyCredit\Api\Storage" />
-            <argument type="service" id="Netzkollektiv\EasyCredit\Helper\Payment" />
-            <argument type="service" id="Netzkollektiv\EasyCredit\Service\CustomerService" />
-            <argument type="service" id="Netzkollektiv\EasyCredit\Service\CheckoutService"/>
-            <argument type="service" id="Shopware\Core\System\SalesChannel\SalesChannel\ContextSwitchRoute" />
-            <argument type="service" id="order_transaction.repository"/>
+            <argument type="service" id="Netzkollektiv\EasyCredit\Payment\PaymentRoute" />
 
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
@@ -82,6 +79,7 @@
         </service>
 
         <service id="Netzkollektiv\EasyCredit\Helper\Quote">
+            <argument type="service" id="Shopware\Core\Checkout\Cart\SalesChannel\CartService"/>
             <argument type="service" id="Netzkollektiv\EasyCredit\Api\QuoteBuilder"/>
             <argument type="service" id="Netzkollektiv\EasyCredit\Api\OrderBuilder"/>
         </service>
@@ -104,11 +102,17 @@
             <argument type="service" id="sales_channel.repository"/>
         </service>
 
+        <service id="Netzkollektiv\EasyCredit\Subscriber\ContextSubscriber">
+            <argument type="service" id="Netzkollektiv\EasyCredit\Api\Storage"/>
+
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
         <service id="Netzkollektiv\EasyCredit\Subscriber\Redirector">
             <argument type="service" id="service_container"/>
             <argument type="service" id="request_stack"/>
-            <argument type="service" id="router"/>
             <argument type="service" id="Netzkollektiv\EasyCredit\Helper\Payment" />
+            <argument type="service" id="Netzkollektiv\EasyCredit\Helper\Quote"/>
             <argument type="service" id="Netzkollektiv\EasyCredit\Service\CheckoutService"/>
             <argument type="service" id="Netzkollektiv\EasyCredit\Api\Storage"/>
 
@@ -224,17 +228,6 @@
             <argument type="service" id="Netzkollektiv\EasyCredit\Api\Quote\CustomerBuilder" />
             <argument type="service" id="Netzkollektiv\EasyCredit\Api\SystemBuilder" />
         </service>
-        <!-- service id="Netzkollektiv\EasyCredit\Api\OrderBuilder">
-            <argument type="service" id="Netzkollektiv\EasyCredit\Helper\MetaDataProvider" />
-            <argument type="service" id="Netzkollektiv\EasyCredit\Setting\Service\SettingsService"/>            
-            <argument type="service" id="Netzkollektiv\EasyCredit\Api\Storage"/>
-            <argument type="service" id="Netzkollektiv\EasyCredit\Service\FlexpriceService" />
-            <argument type="service" id="Netzkollektiv\EasyCredit\Helper\Payment"/>
-            <argument type="service" id="Netzkollektiv\EasyCredit\Api\Quote\AddressBuilder" />
-            <argument type="service" id="Netzkollektiv\EasyCredit\Api\Quote\ItemBuilder" />
-            <argument type="service" id="Netzkollektiv\EasyCredit\Api\Quote\CustomerBuilder" />
-            <argument type="service" id="Netzkollektiv\EasyCredit\Api\SystemBuilder" />
-        </service -->
         <service id="Netzkollektiv\EasyCredit\Api\OrderBuilder" parent="Netzkollektiv\EasyCredit\Api\QuoteBuilder" />
 
         <service id="Netzkollektiv\EasyCredit\Api\Quote\ItemBuilder">
@@ -308,6 +301,17 @@
             decorates="Shopware\Storefront\Theme\StorefrontPluginConfiguration\StorefrontPluginConfigurationFactory">
             <argument type="service" id="Netzkollektiv\EasyCredit\Compatibility\PriorSw66ScriptsCompatibilityDecorator.inner"/>
             <argument type="service" id="service_container"/>
+        </service>
+
+        <service id="Netzkollektiv\EasyCredit\Payment\PaymentRoute" public="true">
+            <argument type="service" id="Shopware\Core\System\SalesChannel\SalesChannel\ContextSwitchRoute" />
+            <argument type="service" id="Netzkollektiv\EasyCredit\Api\Storage" />
+            <argument type="service" id="Netzkollektiv\EasyCredit\Helper\Payment" />
+            <argument type="service" id="Netzkollektiv\EasyCredit\Helper\Quote" />
+            <argument type="service" id="Netzkollektiv\EasyCredit\Service\CheckoutService"/>
+            <argument type="service" id="Netzkollektiv\EasyCredit\Service\CustomerService"/>
+            <argument type="service" id="Shopware\Core\Checkout\Cart\SalesChannel\CartService"/>
+            <argument type="service" id="Netzkollektiv\EasyCredit\Api\IntegrationFactory"/>
         </service>
     </services>
 </container>

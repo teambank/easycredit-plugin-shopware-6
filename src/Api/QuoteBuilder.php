@@ -21,13 +21,9 @@ use Netzkollektiv\EasyCredit\Setting\Service\SettingsServiceInterface;
 use Netzkollektiv\EasyCredit\Api\Quote\AddressBuilder;
 use Netzkollektiv\EasyCredit\Api\Quote\ItemBuilder;
 use Netzkollektiv\EasyCredit\Api\Quote\CustomerBuilder;
-use Netzkollektiv\EasyCredit\Cart\Processor;
 use Netzkollektiv\EasyCredit\Service\FlexpriceService;
 use Netzkollektiv\EasyCredit\Helper\Payment as PaymentHelper;
-use Netzkollektiv\EasyCredit\Payment\Handler\BillPaymentHandler;
-use Netzkollektiv\EasyCredit\Payment\Handler\InstallmentPaymentHandler;
 use Netzkollektiv\EasyCredit\Payment\Handler\AbstractHandler;
-use Teambank\EasyCreditApiV3\Integration;
 use Teambank\EasyCreditApiV3\Model\Transaction;
 use Teambank\EasyCreditApiV3\Model\ShippingAddress;
 use Teambank\EasyCreditApiV3\Model\InvoiceAddress;
@@ -178,8 +174,7 @@ class QuoteBuilder
         }
 
         return $this->customerBuilder->build(
-            $this->customer,
-            $this->customer ? $this->customer->getActiveBillingAddress() : null
+            $this->customer
         );
     }
 

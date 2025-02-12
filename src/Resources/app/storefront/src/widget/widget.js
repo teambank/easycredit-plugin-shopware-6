@@ -38,7 +38,6 @@ export default class EasyCreditRatenkaufWidget extends Plugin {
             return
         }
         const apiKey = this.getMeta('api-key')
-        console.log(apiKey)
         if (apiKey === null) {
             return
         }
@@ -92,7 +91,6 @@ export default class EasyCreditRatenkaufWidget extends Plugin {
             meta = document.querySelector(selector);
         }
         if (meta) {
-            console.log(key + ': ' + meta.content);
             return meta.content
         }
         return null

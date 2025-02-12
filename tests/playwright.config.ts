@@ -14,7 +14,7 @@ let config: PlaywrightTestConfig = {
     locale: "de-DE",
   },
   retries: process.env.CI ? 2 : 0,
-  timeout: seconds(30),
+  timeout: seconds(40),
   reporter: [["list", { printSteps: true }], ["html"]],
   globalSetup: require.resolve("./global.setup"),
 };

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /*
  * (c) NETZKOLLEKTIV GmbH <kontakt@netzkollektiv.com>
  * For the full copyright and license information, please view the LICENSE
@@ -31,7 +33,7 @@ class ApiCredentialService implements ApiCredentialServiceInterface
             throw new ApiCredentialsInvalidException();
         }
 
-        $checkout = $this->integrationFactory->createCheckout(null, false);
+        $checkout = $this->integrationFactory->createCheckout();
         $checkout->verifyCredentials($webshopId, $apiPassword, $apiSignature);
 
         return true;

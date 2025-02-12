@@ -11,18 +11,7 @@ namespace Netzkollektiv\EasyCredit\Migration;
 
 use Doctrine\DBAL\Connection;
 use Shopware\Core\Framework\Migration\MigrationStep;
-use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Uuid\Uuid;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
-use Shopware\Core\Framework\Rule\Rule;
-use Shopware\Core\Content\Product\State;
-use Shopware\Core\Framework\Rule\Container\MatchAllLineItemsRule;
-use Shopware\Core\Checkout\Cart\Rule\LineItemProductStatesRule;
-use Shopware\Core\Checkout\Cart\Rule\LineItemGoodsTotalRule;
-use Shopware\Core\Framework\Rule\Container\OrRule;
-use Shopware\Core\Framework\Rule\Container\AndRule;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Netzkollektiv\EasyCredit\Payment\Handler\InstallmentPaymentHandler;
 use Netzkollektiv\EasyCredit\Payment\Handler\BillPaymentHandler;
 use Shopware\Core\Defaults;
@@ -117,7 +106,8 @@ class Migration1734687546AdaptPaymentRules extends MigrationStep
         }
     }
 
-    protected function insertCondition ($connection, $ruleId, $data) {
+    protected function insertCondition($connection, $ruleId, $data)
+    {
         $id = Uuid::randomBytes();
         $connection->insert('rule_condition', \array_merge([
             'id' => $id,
@@ -128,7 +118,8 @@ class Migration1734687546AdaptPaymentRules extends MigrationStep
         return $id;
     }
 
-    protected function getBaseCondition ($ruleConditions) {
+    protected function getBaseCondition($ruleConditions)
+    {
         foreach ($ruleConditions as $ruleCondition) {
             if ($ruleCondition['parent_id'] === null) {
                 return $ruleCondition;
@@ -136,7 +127,8 @@ class Migration1734687546AdaptPaymentRules extends MigrationStep
         }
     }
 
-    protected function getBillingCountryCondition ($ruleConditions) {
+    protected function getBillingCountryCondition($ruleConditions)
+    {
         foreach ($ruleConditions as $ruleCondition) {
             if ($ruleCondition['type'] === 'customerBillingCountry') {
                 return $ruleCondition;

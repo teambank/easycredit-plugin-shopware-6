@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /*
  * (c) NETZKOLLEKTIV GmbH <kontakt@netzkollektiv.com>
  * For the full copyright and license information, please view the LICENSE
@@ -7,60 +9,74 @@
 
 namespace Netzkollektiv\EasyCredit\Api;
 
-use Teambank\EasyCreditApiV3\Integration\StorageInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Monolog\Logger;
+use Shopware\Core\System\SalesChannel\SalesChannelContext;
+use Teambank\EasyCreditApiV3\Integration\StorageInterface;
+use Netzkollektiv\EasyCredit\Payment\State\PaymentStateService;
 
 class Storage implements StorageInterface
 {
-    protected $requestStack;
+    protected Logger $logger;
 
-    protected $logger;
+    protected PaymentStateService $paymentStateService;
+
+    private SalesChannelContext $salesChannelContext;
+
+    public array $data = [];
 
     public function __construct(
-        RequestStack $requestStack,
-        Logger $logger
+        Logger $logger,
+        PaymentStateService $paymentStateService
     ) {
-        $this->requestStack = $requestStack;
         $this->logger = $logger;
+        $this->paymentStateService = $paymentStateService;
+    }
+
+    public function initialize(SalesChannelContext $salesChannelContext)
+    {
+        if ($this->data) {
+            return;
+        }
+
+        $this->salesChannelContext = $salesChannelContext;
+        $stateData = $this->paymentStateService->load($salesChannelContext);
+        if ($stateData) {
+            $this->logger->info('storage::initialize: ' . $this->salesChannelContext->getToken());
+            $this->data = $stateData->getPayload();
+        }
     }
 
     public function set($key, $value): self
     {
-        $this->logger->debug('storage::set '.$key.' = ('.\gettype($value).') '.$value);
-        $this->requestStack->getSession()->set('easycredit_' . $key, $value);
+        $this->logger->debug('storage::set ' . $key . ' = (' . \gettype($value) . ') ' . $value);
+        $this->data[$key] = $value;
 
         return $this;
     }
 
     public function get($key)
     {
-        $value = $this->requestStack->getSession()->get('easycredit_' . $key);
-        $this->logger->debug('storage::get '.$key.' = ('.\gettype($value).')'.$value);
+        $value = $this->data[$key] ?? null;
+
+        $this->logger->debug('storage::get ' . $key . ' = (' . \gettype($value) . ')' . $value);
+
         return $value;
-    }
-
-    public function all(): array
-    {
-        $session = [];
-        foreach ($this->requestStack->getSession() as $key => $value) {
-            if (\mb_strpos($key, 'easycredit') === 0) {
-                $session[$key] = $value;
-            }
-        }
-
-        return $session;
     }
 
     public function clear(): self
     {
         $backtrace = \debug_backtrace();
-        $this->logger->info('storage::clear from ' .$backtrace[1]['class'].':'.$backtrace[1]['function']);
+        $this->logger->info('storage::clear from ' . $backtrace[1]['class'] . ':' . $backtrace[1]['function']);
 
-        foreach (\array_keys($this->all()) as $key) {
-            $this->requestStack->getSession()->remove($key);
-        }
+        $this->data = [];
+        $this->persist();
 
         return $this;
+    }
+
+    public function persist()
+    {
+        $this->logger->info('storage::persist: ' . $this->salesChannelContext->getToken());
+        $this->paymentStateService->save($this->salesChannelContext, $this->data);
     }
 }
