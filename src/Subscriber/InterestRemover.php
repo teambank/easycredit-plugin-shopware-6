@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /*
  * (c) NETZKOLLEKTIV GmbH <kontakt@netzkollektiv.com>
  * For the full copyright and license information, please view the LICENSE
@@ -99,7 +101,7 @@ class InterestRemover implements EventSubscriberInterface
                 Uuid::fromHexToBytes($order->getId()),
             ]);
 
-            $this->storage->set('interest_amount', null);
+            $this->storage->set('interest_amount', null)->persist();
             $this->connection->commit();
         } catch (\Throwable $e) {
             $this->logger->error($e->getMessage());

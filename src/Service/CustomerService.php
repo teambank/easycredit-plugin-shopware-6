@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /*
  * (c) NETZKOLLEKTIV GmbH <kontakt@netzkollektiv.com>
  * For the full copyright and license information, please view the LICENSE
@@ -29,7 +31,8 @@ use Teambank\EasyCreditApiV3\Model\TransactionInformation as EasyCreditTransacti
 use Netzkollektiv\EasyCredit\Helper\Payment as PaymentHelper;
 
 
-class CustomerService {
+class CustomerService
+{
 
     public const EXPRESS_ACTIVE = 'easyCreditExpressActive';
 
@@ -85,8 +88,8 @@ class CustomerService {
             'storefrontUrl' => $this->getStorefrontUrl($salesChannelContext),
             'salutationId' => $salutationId,
             'email' => $contact->getEmail(),
-            'firstName' => $address->getFirstname(),
-            'lastName' => $address->getLastname(),
+            'firstName' => $address->getFirstName(),
+            'lastName' => $address->getLastName(),
             'billingAddress' => $this->getBillingAddress($transaction, $salesChannelContext->getContext(), $salutationId),
             'acceptedDataProtection' => true
         ]);
@@ -101,8 +104,8 @@ class CustomerService {
         $countryId = $this->getCountryId($address->getCountry(), $context);
 
         return [
-            'firstName' => $address->getFirstname(),
-            'lastName' => $address->getLastname(),
+            'firstName' => $address->getFirstName(),
+            'lastName' => $address->getLastName(),
             'salutationId' => $salutationId,
             'street' => $address->getAddress(),
             'zipcode' => $address->getZip(),
@@ -112,7 +115,8 @@ class CustomerService {
         ];
     }
 
-    public function handleExpress(EasyCreditTransaction $transaction, SalesChannelContext $context): SalesChannelContext {
+    public function handleExpress(EasyCreditTransaction $transaction, SalesChannelContext $context): SalesChannelContext
+    {
         $newContext = $this->registerCustomer($transaction, $context);
 
         $cart = $this->cartService->getCart($newContext->getToken(), $newContext);

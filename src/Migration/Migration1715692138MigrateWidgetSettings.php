@@ -23,7 +23,7 @@ class Migration1715692138MigrateWidgetSettings extends MigrationStep
     {
         // document.querySelectorAll in new widget implementation matches multiple elements
         // => change default selector to something more specific in order two show widget only once
-        $connection->executeUpdate("
+        $connection->executeStatement("
             UPDATE system_config Set configuration_value = JSON_SET(configuration_value, '$._value', '.checkout-aside-action:not(.d-grid)') WHERE 
                 configuration_key = 'EasyCreditRatenkauf.config.widgetSelectorCart' AND
                 JSON_EXTRACT(configuration_value, '$._value') = '.checkout-aside-action';

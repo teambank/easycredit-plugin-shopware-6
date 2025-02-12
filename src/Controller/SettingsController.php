@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /*
  * (c) NETZKOLLEKTIV GmbH <kontakt@netzkollektiv.com>
  * For the full copyright and license information, please view the LICENSE
@@ -49,7 +51,7 @@ class SettingsController extends AbstractController
             ]);
 
             $webshopInfo = $this->integrationFactory
-                ->createCheckout(null, false)
+                ->createCheckout()
                 ->getWebshopDetails();
 
             $this->settings->updateSettings(['webshopInfo' => $webshopInfo]);

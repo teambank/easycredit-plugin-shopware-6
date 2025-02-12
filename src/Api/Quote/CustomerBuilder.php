@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /*
  * (c) NETZKOLLEKTIV GmbH <kontakt@netzkollektiv.com>
  * For the full copyright and license information, please view the LICENSE
@@ -9,7 +11,6 @@ namespace Netzkollektiv\EasyCredit\Api\Quote;
 
 use Teambank\EasyCreditApiV3\Model\Customer;
 use Teambank\EasyCreditApiV3\Model\Contact;
-use Shopware\Core\Checkout\Customer\Aggregate\CustomerAddress\CustomerAddressEntity;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Teambank\EasyCreditApiV3\Integration\Util\PrefixConverter;
 
@@ -21,7 +22,8 @@ class CustomerBuilder
 
     protected $prefixConverter;
 
-    public function __construct(PrefixConverter $prefixConverter) {
+    public function __construct(PrefixConverter $prefixConverter)
+    {
         $this->prefixConverter = $prefixConverter;
     }
 
@@ -31,14 +33,14 @@ class CustomerBuilder
         if ($this->customer->getSalutation()) {
             $prefix = $this->customer->getSalutation()->getDisplayName();
         }
-	    if ($this->customer->getActiveBillingAddress()->getSalutation()) {
-	        $prefix = $this->customer->getActiveBillingAddress()->getSalutation()->getDisplayName();
+        if ($this->customer->getActiveBillingAddress()->getSalutation()) {
+            $prefix = $this->customer->getActiveBillingAddress()->getSalutation()->getDisplayName();
         }
 
         return $this->prefixConverter->convert($prefix);
     }
 
-    public function getFirstname(): string
+    public function getFirstName(): string
     {
         if ($this->customer->getGuest()) {
             return $this->customer->getActiveBillingAddress()->getFirstName();
@@ -47,7 +49,7 @@ class CustomerBuilder
         return $this->customer->getFirstName();
     }
 
-    public function getLastname(): string
+    public function getLastName(): string
     {
         if ($this->customer->getGuest()) {
             return $this->customer->getActiveBillingAddress()->getLastName();

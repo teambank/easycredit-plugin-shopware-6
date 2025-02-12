@@ -64,4 +64,18 @@
             </list>
         </default>
     </route>
+    <route path="/store-api/easycredit/init-payment" id="store-api.easycredit.init-payment" controller="Netzkollektiv\EasyCredit\Payment\PaymentRoute::initPayment" methods="POST">
+        <default key="_routeScope">
+            <list>
+                <string>store-api</string>
+            </list>
+        </default>
+    </route>
+    <route path="/store-api/easycredit/finalize-payment" id="store-api.easycredit.finalize-payment" controller="Netzkollektiv\EasyCredit\Payment\PaymentRoute::finalizePayment" methods="POST">
+        <default key="_routeScope">
+            <list>
+                <string>store-api</string>
+            </list>
+        </default>
+    </route>
 </routes>

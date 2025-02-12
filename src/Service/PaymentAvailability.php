@@ -17,7 +17,8 @@ use Netzkollektiv\EasyCredit\Helper\Payment as PaymentHelper;
 use Netzkollektiv\EasyCredit\Service\RuleEvaluator;
 use Netzkollektiv\EasyCredit\Setting\Exception\SettingsInvalidException;
 
-class PaymentAvailability {
+class PaymentAvailability
+{
 
     private EntityRepository $ruleRepository;
 
@@ -45,7 +46,8 @@ class PaymentAvailability {
         $this->ruleEvaluator = $ruleEvaluator;
     }
 
-    public function getAvailablePaymentTypes($salesChannelContext, $product = null): array {
+    public function getAvailablePaymentTypes($salesChannelContext, $product = null): array
+    {
         $cacheKey = $this->getCacheKey($salesChannelContext, $product);
 
         if (isset($this->cachedPaymentTypes[$cacheKey])) {
@@ -80,7 +82,8 @@ class PaymentAvailability {
         return $this->cachedPaymentTypes[$cacheKey];
     }
 
-    private function getCacheKey (SalesChannelContext $salesChannelContext, $product) {
+    private function getCacheKey(SalesChannelContext $salesChannelContext, $product)
+    {
         $cacheKey = [$salesChannelContext->getToken()];
         if ($product) {
             $cacheKey[] = $product->getId();
@@ -101,9 +104,10 @@ class PaymentAvailability {
 
     private $availibilityRules = null;
 
-    private function getAvailabilityRules($context) {
+    private function getAvailabilityRules($context)
+    {
         if ($this->availibilityRules === null) {
-            $ids = $this->paymentHelper->getEasyCreditMethods($context)->map(fn ($method) => $method->getAvailabilityRuleId());
+            $ids = $this->paymentHelper->getEasyCreditMethods($context)->map(fn($method) => $method->getAvailabilityRuleId());
             $this->availibilityRules = $this->ruleRepository->search(
                 new Criteria($ids),
                 $context
