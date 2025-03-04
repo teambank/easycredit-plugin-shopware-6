@@ -102,9 +102,7 @@ jobs:
       - name: Static Analyze
         run: |
           cd $PLUGIN_DIR
-          php $PLUGIN_DIR/bin/phpstan-config-generator.php
-          php $PLUGIN_DIR/vendor/bin/phpstan dump-parameters
-          php $PLUGIN_DIR/vendor/bin/phpstan analyze $PLUGIN_DIR/src
+          php bin/static-analyze.sh
       - name: Coding Style
         run: |
           cd $PLUGIN_DIR

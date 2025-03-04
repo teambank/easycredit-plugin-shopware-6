@@ -14,12 +14,13 @@
         "netzkollektiv/easycredit-api-v3-php": "^2.0"
     },
     "require-dev": {
-        "phpstan/phpstan": "^1.10",
-        "phpstan/phpstan-symfony": "^1.2",
-        "phpstan/phpstan-deprecation-rules": "^1.0",
-        "phpstan/phpstan-doctrine": "^1.3",
+        "phpstan/phpstan": "^2.0",
+        "phpstan/phpstan-symfony": "^2.0",
+        "phpstan/phpstan-deprecation-rules": "^2.0",
+        "phpstan/phpstan-doctrine": "^2.0",
         "symplify/easy-coding-standard": "^10.1",
-        "rector/rector": "^0.15.20"
+        "rector/rector": "^2.0",
+        "phpstan/phpstan-strict-rules": "^2.0"
     },
     "replace": {
         "psr/http-client": "*",
@@ -57,11 +58,11 @@
     },
     "config": {
       "preferred-install": {
-        "netzkollektiv/ratenkaufbyeasycredit-api-v3-php": "auto",
         "*": "dist"
       },
-        "allow-plugins": {
-            "symfony/runtime": true
-        }
+      "allow-plugins": {
+        "symfony/runtime": true,
+        "phpstan/extension-installer": true
+      }
     }
 }
