@@ -163,6 +163,7 @@ class PaymentRoute extends AbstractPaymentRoute
             $salesChannelContext->getContext()
         );
 
+        $this->storage->set('payment_type', $transaction->getTransaction()->getPaymentType());
         $this->updatePaymentMethod($paymentMethod, $salesChannelContext);
 
         $this->storage->persist();
