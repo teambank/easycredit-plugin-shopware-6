@@ -31,10 +31,6 @@ class RuleEvaluator {
 
     private ContainerInterface $container;
 
-    private EntityRepository $ruleRepository;
-
-    private SettingsServiceInterface $settingsService;
-
     private CartCalculator $cartCalculator;
 
     private LoggerInterface $logger;
@@ -43,14 +39,10 @@ class RuleEvaluator {
 
     public function __construct(
         ContainerInterface $container,
-        EntityRepository $ruleRepository,
-        SettingsServiceInterface $settingsService,
         CartCalculator $cartCalculator,
         LoggerInterface $logger
     ) {
         $this->container = $container;
-        $this->ruleRepository = $ruleRepository;
-        $this->settingsService = $settingsService;
         $this->cartCalculator = $cartCalculator;
         $this->logger = $logger;
     }

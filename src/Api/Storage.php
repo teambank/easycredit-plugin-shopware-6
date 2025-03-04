@@ -22,7 +22,7 @@ class Storage implements StorageInterface
 
     private SalesChannelContext $salesChannelContext;
 
-    public array $data = [];
+    private array $data = [];
 
     public function __construct(
         Logger $logger,
@@ -32,23 +32,26 @@ class Storage implements StorageInterface
         $this->paymentStateService = $paymentStateService;
     }
 
-    public function initialize(SalesChannelContext $salesChannelContext)
+    public function initialize(SalesChannelContext $salesChannelContext): self
     {
         if ($this->data) {
-            return;
+            return $this;
         }
 
         $this->salesChannelContext = $salesChannelContext;
         $stateData = $this->paymentStateService->load($salesChannelContext);
+
+        $this->logger->debug('storage::initialize: ' . $this->salesChannelContext->getToken());
         if ($stateData) {
-            $this->logger->info('storage::initialize: ' . $this->salesChannelContext->getToken());
             $this->data = $stateData->getPayload();
         }
+
+        return $this;
     }
 
     public function set($key, $value): self
     {
-        $this->logger->debug('storage::set ' . $key . ' = (' . \gettype($value) . ') ' . $value);
+        $this->logger->debug(\sprintf('storage::set %s = (%s) %s', $key, \gettype($value), $value));
         $this->data[$key] = $value;
 
         return $this;
@@ -57,8 +60,7 @@ class Storage implements StorageInterface
     public function get($key)
     {
         $value = $this->data[$key] ?? null;
-
-        $this->logger->debug('storage::get ' . $key . ' = (' . \gettype($value) . ')' . $value);
+        $this->logger->debug(\sprintf('storage::get %s = (%s) %s', $key, \gettype($value), $value));
 
         return $value;
     }
@@ -66,17 +68,22 @@ class Storage implements StorageInterface
     public function clear(): self
     {
         $backtrace = \debug_backtrace();
-        $this->logger->info('storage::clear from ' . $backtrace[1]['class'] . ':' . $backtrace[1]['function']);
-
+        $caller = $backtrace[1]['class'] . ':' . $backtrace[1]['function'];
+        $this->logger->debug(\sprintf('storage::clear from %s', $caller));
         $this->data = [];
         $this->persist();
 
         return $this;
     }
 
-    public function persist()
+    public function persist(): void
     {
-        $this->logger->info('storage::persist: ' . $this->salesChannelContext->getToken());
+        if (!isset($this->salesChannelContext)) {
+            $this->logger->error('storage::persist called before initialization.');
+            return;
+        }
+
+        $this->logger->debug('storage::persist: ' . $this->salesChannelContext->getToken());
         $this->paymentStateService->save($this->salesChannelContext, $this->data);
     }
 }

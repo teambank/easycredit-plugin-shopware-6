@@ -80,7 +80,7 @@ class PaymentRoute extends AbstractPaymentRoute
     // see routes.xml
     public function initPayment(Request $request, SalesChannelContext $salesChannelContext): PaymentRouteResponse
     {
-        $params = [...$request->query->all(), ...$request->request->all()];
+        $params = \array_merge($request->query->all(), $request->request->all());
 
         if (isset($params['easycredit'])) {
             $params = $params['easycredit'];
@@ -102,7 +102,9 @@ class PaymentRoute extends AbstractPaymentRoute
         $this->storage->set('cartToken', $cart->getToken());
 
         if (isset($params['returnUrl'])) {
-            $quote->getRedirectLinks()->setUrlSuccess($params['returnUrl']);
+            $quote->getRedirectLinks()->setUrlSuccess($params['returnUrl'])
+                ->setUrlCancellation($params['returnUrl'])
+                ->setUrlDenial($params['returnUrl']);
         }
 
         $this->checkoutService->startCheckout($salesChannelContext, $quote);
@@ -130,10 +132,10 @@ class PaymentRoute extends AbstractPaymentRoute
       -H "Content-Type: application/json" \
       -H 'sw-context-token: ...' \
       -H 'sw-access-key: ...' \
-      $BASE_URL/store-api/easycredit/finalize-payment
+      $BASE_URL/store-api/easycredit/return
     */
 
-    // #[Route(path: '/store-api/easycredit/return', name: 'store-api.easycredit.finalize-payment', methods: ['POST'])]
+    // #[Route(path: '/store-api/easycredit/return', name: 'store-api.easycredit.return', methods: ['POST'])]
     // see routes.xml
     public function returnFromPaymentPage(Request $request, SalesChannelContext $salesChannelContext): PaymentRouteResponse
     {

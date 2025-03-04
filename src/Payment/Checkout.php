@@ -39,9 +39,9 @@ class Checkout implements EventSubscriberInterface
 
     private FlexpriceService $flexpriceService;
 
-    private $cache;
+    private LoggerInterface $logger;
 
-    private $logger;
+    private TagAwareAdapterInterface $cache;
 
     public function __construct(
         PaymentHelper $paymentHelper,
@@ -150,11 +150,16 @@ class Checkout implements EventSubscriberInterface
 
     protected function buildPaymentPlan($summary)
     {
-        $summary = \json_decode((string)$summary);
-        if ($summary === false || $summary === null) {
+        if (empty($summary)) {
             return null;
         }
-        return \json_encode($summary);
+
+        try {
+            $decoded = \json_decode((string)$summary, true, 512, JSON_THROW_ON_ERROR);
+            return \json_encode($decoded);
+        } catch (\JsonException $e) {
+            return null;
+        }
     }
 
     public function getWebshopDetails($checkout)

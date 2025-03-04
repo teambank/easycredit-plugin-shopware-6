@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /*
  * (c) NETZKOLLEKTIV GmbH <kontakt@netzkollektiv.com>
  * For the full copyright and license information, please view the LICENSE
@@ -18,13 +20,6 @@ class Processor implements CartProcessorInterface
     public const DATA_KEY = 'interest_amount';
     public const LINE_ITEM_TYPE = 'easycredit-interest';
 
-    /**
-     * @throws \Shopware\Core\Checkout\Cart\Exception\InvalidQuantityException
-     * @throws \Shopware\Core\Checkout\Cart\Exception\LineItemNotStackableException
-     * @throws \Shopware\Core\Checkout\Cart\Exception\MixedLineItemTypeException
-     * @throws \Shopware\Core\Checkout\Cart\Exception\PayloadKeyNotFoundException
-     * @throws \Shopware\Core\Checkout\Promotion\Exception\InvalidPriceDefinitionException
-     */
     public function process(CartDataCollection $data, Cart $original, Cart $calculated, SalesChannelContext $context, CartBehavior $behavior): void
     {
         if (!$data->has(self::DATA_KEY)) {

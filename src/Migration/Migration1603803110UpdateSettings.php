@@ -20,7 +20,7 @@ class Migration1603803110UpdateSettings extends MigrationStep
     public function update(Connection $connection): void
     {
         $sql = "UPDATE system_config Set configuration_key = REPLACE(configuration_key, '.settings.', '.config.') WHERE configuration_key LIKE 'EasyCreditRatenkauf.settings%'";
-        $connection->executeUpdate($sql);
+        $connection->executeStatement($sql);
     }
 
     public function updateDestructive(Connection $connection): void

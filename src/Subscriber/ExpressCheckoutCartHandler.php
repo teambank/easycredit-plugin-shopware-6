@@ -23,15 +23,11 @@ use Shopware\Core\Framework\Validation\BuildValidationEvent;
 
 class ExpressCheckoutCartHandler implements EventSubscriberInterface
 {
-    private CartService $cartService;
-
     private Storage $storage;
 
     public function __construct(
-        CartService $cartService,
         Storage $storage
     ) {
-        $this->cartService = $cartService;
         $this->storage = $storage;
     }
 

@@ -70,12 +70,19 @@ class PaymentAvailability
         }
 
         $this->cachedPaymentTypes[$cacheKey] = \array_filter($paymentMethods->map(function ($paymentMethod) use ($salesChannelContext, $cart) {
+            $rule = $this->getAvailabilityRules($salesChannelContext->getContext())
+                ->filter(fn($rule) => $rule->getId() === $paymentMethod->getAvailabilityRuleId())->first();
+
+            if ($rule === null) {
+                return false;
+            }
+
             $available = $this->ruleEvaluator->evaluateRule(
-                $this->getAvailabilityRules($salesChannelContext->getContext())
-                    ->filter(fn($rule) => $rule->getId() === $paymentMethod->getAvailabilityRuleId())->first(),
+                $rule,
                 $cart,
                 $salesChannelContext
             );
+
             return $available ? $this->paymentHelper->getHandlerByPaymentMethod($paymentMethod)->getPaymentType() : null;
         }));
 
@@ -102,17 +109,17 @@ class PaymentAvailability
         return true;
     }
 
-    private $availibilityRules = null;
+    private $availabilityRules = null;
 
     private function getAvailabilityRules($context)
     {
-        if ($this->availibilityRules === null) {
+        if ($this->availabilityRules === null) {
             $ids = $this->paymentHelper->getEasyCreditMethods($context)->map(fn($method) => $method->getAvailabilityRuleId());
-            $this->availibilityRules = $this->ruleRepository->search(
+            $this->availabilityRules = $this->ruleRepository->search(
                 new Criteria($ids),
                 $context
             );
         }
-        return $this->availibilityRules;
+        return $this->availabilityRules;
     }
 }

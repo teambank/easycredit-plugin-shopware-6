@@ -1,0 +1,19 @@
+<?xml version="1.0" ?>
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+    <services>
+        <service id="Netzkollektiv\EasyCredit\Compatibility\Capabilities">
+            <argument>%kernel.shopware_version%</argument>
+        </service>
+        <service id="Netzkollektiv\EasyCredit\Compatibility\ContextResolverListenerModifier">
+            <argument type="service" id="Netzkollektiv\EasyCredit\Helper\MetaDataProvider"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+        <service id="Netzkollektiv\EasyCredit\Compatibility\PriorSw66ScriptsCompatibilityDecorator"
+            decorates="Shopware\Storefront\Theme\StorefrontPluginConfiguration\StorefrontPluginConfigurationFactory">
+            <argument type="service" id="Netzkollektiv\EasyCredit\Compatibility\PriorSw66ScriptsCompatibilityDecorator.inner"/>
+            <argument type="service" id="service_container"/>
+        </service>
+    </services>
+</container>

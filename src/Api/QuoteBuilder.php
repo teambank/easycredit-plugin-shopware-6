@@ -32,7 +32,10 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class QuoteBuilder
 {
-    protected Cart $cart;
+    /**
+     * @var Cart|\Shopware\Core\Checkout\Order\OrderEntity|null $cart
+     */
+    protected $cart;
 
     private SalesChannelContext $salesChannelContext;
 

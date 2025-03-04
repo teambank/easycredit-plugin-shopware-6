@@ -44,31 +44,23 @@ class CustomerService
 
     private SystemConfigService $systemConfigService;
 
-    private PaymentHelper $paymentHelper;
-
-    private AbstractSalesChannelContextFactory $salesChannelContextFactory;
-
     private  SalesChannelContextServiceInterface $contextService;
 
     private CartService $cartService;
 
     public function __construct(
         AbstractRegisterRoute $registerRoute,
-        AbstractSalesChannelContextFactory $salesChannelContextFactory,
         SalesChannelContextServiceInterface $contextService,
         EntityRepository $countryRepository,
         EntityRepository $salutationRepository,
         SystemConfigService $systemConfigService,
-        PaymentHelper $paymentHelper,
         CartService $cartService
     ) {
         $this->registerRoute = $registerRoute;
-        $this->salesChannelContextFactory = $salesChannelContextFactory;
         $this->contextService = $contextService;
         $this->countryRepository = $countryRepository;
         $this->salutationRepository = $salutationRepository;
         $this->systemConfigService = $systemConfigService;
-        $this->paymentHelper = $paymentHelper;
         $this->cartService = $cartService;
     }
 

@@ -38,13 +38,6 @@ class StateHandler
         $this->settings = $settingsService;
     }
 
-    /**
-     * @throws InconsistentCriteriaIdsException
-     * @throws StateMachineNotFoundException
-     * @throws IllegalTransitionException
-     * @throws StateMachineInvalidEntityIdException
-     * @throws StateMachineInvalidStateFieldException
-     */
     public function handleTransactionState(OrderTransactionEntity $transaction, SalesChannelContext $salesChannelContext): void
     {
         $paymentStatus = $this->settings->getSettings($salesChannelContext->getSalesChannel()->getId(), false)->getPaymentStatus();
@@ -62,13 +55,6 @@ class StateHandler
         }
     }
 
-    /**
-     * @throws InconsistentCriteriaIdsException
-     * @throws StateMachineNotFoundException
-     * @throws IllegalTransitionException
-     * @throws StateMachineInvalidEntityIdException
-     * @throws StateMachineInvalidStateFieldException
-     */
     public function handleOrderState(OrderEntity $order, SalesChannelContext $salesChannelContext): void
     {
         $orderStatus = $this->settings->getSettings($salesChannelContext->getSalesChannel()->getId(), false)->getOrderStatus();

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /*
  * (c) NETZKOLLEKTIV GmbH <kontakt@netzkollektiv.com>
  * For the full copyright and license information, please view the LICENSE
@@ -51,6 +53,7 @@ class EasyCreditRatenkauf extends Plugin
         parent::build($container);
 
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__ . '/DependencyInjection/'));
+        $loader->load('compatibility.xml');
         $loader->load('easycredit_payment.xml');
 
         if ((new Capabilities($container->getParameter('kernel.shopware_version')))->hasFlowBuilder()) {
@@ -64,7 +67,8 @@ class EasyCreditRatenkauf extends Plugin
         $this->loadPackagesConfig($container);
     }
 
-    protected function loadPackagesConfig ($container) {
+    protected function loadPackagesConfig($container)
+    {
         $locator = new FileLocator('Resources/config');
 
         $resolver = new LoaderResolver([
@@ -85,7 +89,6 @@ class EasyCreditRatenkauf extends Plugin
         (new InstallUninstall(
             $this->container->get('system_config.repository'),
             $this->container->get('payment_method.repository'),
-            $this->container->get('sales_channel.repository'),
             $this->container->get('country.repository'),
             $this->container->get('currency.repository'),
             $this->container->get(PluginIdProvider::class),
@@ -107,7 +110,6 @@ class EasyCreditRatenkauf extends Plugin
         (new InstallUninstall(
             $this->container->get('system_config.repository'),
             $this->container->get('payment_method.repository'),
-            $this->container->get('sales_channel.repository'),
             $this->container->get('country.repository'),
             $this->container->get('currency.repository'),
             $this->container->get(PluginIdProvider::class),
@@ -123,7 +125,6 @@ class EasyCreditRatenkauf extends Plugin
         (new InstallUninstall(
             $this->container->get('system_config.repository'),
             $this->container->get('payment_method.repository'),
-            $this->container->get('sales_channel.repository'),
             $this->container->get('country.repository'),
             $this->container->get('currency.repository'),
             $this->container->get(PluginIdProvider::class),

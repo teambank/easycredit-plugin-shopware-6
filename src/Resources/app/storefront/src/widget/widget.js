@@ -119,7 +119,8 @@ export default class EasyCreditRatenkaufWidget extends Plugin {
 
     searchUpTheTree (element, selector) {
         while (element) {
-            let matchingResult = Array.from(element.parentElement?.children || [])
+            let el = element.parentElement && element.parentElement.children ? element.parentElement.children : [];
+            let matchingResult = Array.from(el)
                 .map(sibling => sibling.querySelector(selector))
                 .find(result => result !== null);
 

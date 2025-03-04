@@ -11,14 +11,20 @@ namespace Netzkollektiv\EasyCredit\Payment\State;
 
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\DataAbstractionLayer\Doctrine\RetryableQuery;
+use Doctrine\DBAL\Connection;
 
 class PaymentStateService
 {
+    private Connection $connection;
+
     private EntityRepository $paymentStateRepository;
 
     public function __construct(
+        Connection $connection,
         EntityRepository $paymentStateRepository
     ) {
+        $this->connection = $connection;
         $this->paymentStateRepository = $paymentStateRepository;
     }
 
@@ -34,18 +40,27 @@ class PaymentStateService
     public function save($salesChannelContext, $data)
     {
         if ($data) {
-            $this->paymentStateRepository->upsert([
-                [
-                    'token' => $salesChannelContext->getToken(),
-                    'payload' => $data,
-                ],
-            ], $salesChannelContext->getContext());
+            $sql = <<<'SQL'
+            INSERT INTO `easycredit_payment_state` (`token`, `payload`)
+            VALUES (:token, :payload)
+            ON DUPLICATE KEY UPDATE `payload` = :payload;
+            SQL;
+
+            $data = [
+                'token' => $salesChannelContext->getToken(),
+                'payload' => \json_encode($data)
+            ];
         } else {
-            $this->paymentStateRepository->delete([
-                [
-                    'token' => $salesChannelContext->getToken(),
-                ],
-            ], $salesChannelContext->getContext());
+            $sql = <<<'SQL'
+            DELETE FROM `easycredit_payment_state` WHERE token = :token;
+            SQL;
+
+            $data = [
+                'token' => $salesChannelContext->getToken()
+            ];
         }
+
+        $query = new RetryableQuery($this->connection, $this->connection->prepare($sql));
+        $query->execute($data);
     }
 }

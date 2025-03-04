@@ -96,8 +96,8 @@ class Payment
         $paymentMethods = $this->getEasyCreditMethods($salesChannelContext->getContext())->filter(static function ($paymentMethod) {
             return $paymentMethod->get('active');
         });
-        if (!$paymentMethods) {
-            return false;
+        if ($paymentMethods->count() === 0) {
+            return $paymentMethods;
         }
 
         return $this->getSalesChannelPaymentMethods($salesChannelContext)

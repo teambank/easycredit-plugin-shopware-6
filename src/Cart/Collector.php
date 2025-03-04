@@ -52,12 +52,10 @@ class Collector implements CartDataCollectorInterface
         $this->requestStack = $requestStack;
     }
 
-    /**
-     * @throws InvalidPayloadException
-     * @throws InvalidQuantityException
-     */
     public function collect(CartDataCollection $data, Cart $cart, SalesChannelContext $context, CartBehavior $behavior): void
     {
+        $this->storage->initialize($context); // needed for SW 6.4
+
         if (!$this->requestStack->getCurrentRequest()) {
             return; // do not run in CLI
         }
