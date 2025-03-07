@@ -7,7 +7,9 @@
 
 namespace Netzkollektiv\EasyCredit;
 
-require_once __DIR__ . '/../vendor/autoload.php';
+if (file_exists(__DIR__ . '/../vendor/autoload.php')) {
+    require_once __DIR__ . '/../vendor/autoload.php';
+}
 
 use Netzkollektiv\EasyCredit\Util\Lifecycle\ActivateDeactivate;
 use Netzkollektiv\EasyCredit\Util\Lifecycle\InstallUninstall;
