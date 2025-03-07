@@ -21,10 +21,6 @@
         "symplify/easy-coding-standard": "^10.1",
         "rector/rector": "^0.15.20"
     },
-    "replace": {
-        "psr/http-client": "*",
-        "psr/http-message": "*"
-    },
     "extra": {
         "shopware-plugin-class": "Netzkollektiv\\EasyCredit\\EasyCreditRatenkauf",
         "copyright": "(c) by NETZKOLLEKTIV GmbH",
