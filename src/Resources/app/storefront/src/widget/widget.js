@@ -117,17 +117,22 @@ export default class EasyCreditRatenkaufWidget extends Plugin {
         }
     }
 
-    searchUpTheTree (element, selector) {
-        while (element) {
-            let el = element.parentElement && element.parentElement.children ? element.parentElement.children : [];
-            let matchingResult = Array.from(el)
-                .map(sibling => sibling.querySelector(selector))
-                .find(result => result !== null);
+    searchUpTheTree(element, selector) {
+        while (element && element.parentElement) {
+            const parent = element.parentElement;
+            const match = Array.from(parent.children)
+                .find(sibling => sibling !== element && sibling.matches(selector));
 
-            if (matchingResult) {
-                return matchingResult;
+            if (match) {
+                return match;
             }
-            element = element.parentElement;
+
+            element = parent;
+        }
+
+        // If we reached <html>, check <head> as a last resort
+        if (element === document.documentElement) {
+            return Array.from(document.head.children).find(el => el.matches(selector)) || null;
         }
         return null;
     }
