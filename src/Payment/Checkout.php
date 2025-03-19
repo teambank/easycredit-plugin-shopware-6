@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Netzkollektiv\EasyCredit\Payment;
 
-use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Netzkollektiv\EasyCredit\Api\IntegrationFactory;
 use Netzkollektiv\EasyCredit\Api\Storage;
 use Netzkollektiv\EasyCredit\Helper\Payment as PaymentHelper;
@@ -22,7 +21,6 @@ use Netzkollektiv\EasyCredit\Payment\Handler\BillPaymentHandler;
 use Netzkollektiv\EasyCredit\Payment\Handler\InstallmentPaymentHandler;
 use Shopware\Core\Framework\DataAbstractionLayer\Exception\InconsistentCriteriaIdsException;
 use Shopware\Storefront\Page\Checkout\Confirm\CheckoutConfirmPageLoadedEvent;
-use Shopware\Core\Content\Product\State;
 use Symfony\Component\Cache\Adapter\TagAwareAdapterInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Psr\Log\LoggerInterface;
@@ -41,9 +39,9 @@ class Checkout implements EventSubscriberInterface
 
     private FlexpriceService $flexpriceService;
 
-    private $cache;
+    private LoggerInterface $logger;
 
-    private $logger;
+    private TagAwareAdapterInterface $cache;
 
     public function __construct(
         PaymentHelper $paymentHelper,
@@ -95,7 +93,7 @@ class Checkout implements EventSubscriberInterface
         $error = null;
         if ($this->storage->get('error')) {
             $error = $this->storage->get('error');
-            $this->storage->set('error', null);
+            $this->storage->set('error', null)->persist();
         }
 
         foreach ($cart->getErrors()->getElements() as $cartError) {
@@ -123,10 +121,10 @@ class Checkout implements EventSubscriberInterface
         }
 
         $isSelected = $this->paymentHelper->isSelected($salesChannelContext);
-        if ($isSelected && !$this->storage->get('payment_plan')) {
+        if ($isSelected && !$this->storage->get('summary')) {
             if ($error === null) {
                 try {
-                    $quote = $this->quoteHelper->getQuote($cart, $salesChannelContext);
+                    $quote = $this->quoteHelper->getQuote($salesChannelContext, $cart);
                 } catch (\Throwable $e) {
                     $error = $e->getMessage();
                 }
@@ -152,11 +150,16 @@ class Checkout implements EventSubscriberInterface
 
     protected function buildPaymentPlan($summary)
     {
-        $summary = \json_decode((string)$summary);
-        if ($summary === false || $summary === null) {
+        if (empty($summary)) {
             return null;
         }
-        return \json_encode($summary);
+
+        try {
+            $decoded = \json_decode((string)$summary, true, 512, JSON_THROW_ON_ERROR);
+            return \json_encode($decoded);
+        } catch (\JsonException $e) {
+            return null;
+        }
     }
 
     public function getWebshopDetails($checkout)

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /*
  * (c) NETZKOLLEKTIV GmbH <kontakt@netzkollektiv.com>
  * For the full copyright and license information, please view the LICENSE
@@ -50,12 +52,10 @@ class Collector implements CartDataCollectorInterface
         $this->requestStack = $requestStack;
     }
 
-    /**
-     * @throws InvalidPayloadException
-     * @throws InvalidQuantityException
-     */
     public function collect(CartDataCollection $data, Cart $cart, SalesChannelContext $context, CartBehavior $behavior): void
     {
+        $this->storage->initialize($context); // needed for SW 6.4
+
         if (!$this->requestStack->getCurrentRequest()) {
             return; // do not run in CLI
         }
@@ -75,7 +75,6 @@ class Collector implements CartDataCollectorInterface
         if ($this->storage->get('interest_amount') === null) {
             return null;
         }
-        $this->storage->set('debug','adding interest line item: '. (float) $this->storage->get('interest_amount'));
 
         return new CalculatedPrice(
             (float) $this->storage->get('interest_amount'),

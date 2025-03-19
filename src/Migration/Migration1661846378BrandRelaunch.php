@@ -35,19 +35,19 @@ class Migration1661846378BrandRelaunch extends MigrationStep
         }
         $fields = \implode(', ', $fields);
 
-        $connection->executeUpdate("
+        $connection->executeStatement("
             UPDATE payment_method_translation pmt INNER JOIN payment_method pm ON pm.id = pmt.payment_method_id Set 
                 {$fields}
             WHERE pm.handler_identifier = :handler;
         ", ['handler' => 'Netzkollektiv\\EasyCredit\\Payment\\Handler']);
 
-        $connection->executeUpdate("
+        $connection->executeStatement("
             UPDATE plugin_translation pt INNER JOIN plugin p ON p.id = pt.plugin_id Set
                 {$this->_replace('pt.label')}
             WHERE p.name = 'EasyCreditRatenkauf';
         ");
 
-        $connection->executeUpdate(" 
+        $connection->executeStatement(" 
             UPDATE rule r INNER JOIN payment_method pm ON r.id = pm.availability_rule_id Set
                 {$this->_replace('r.name')},
                 {$this->_replace('r.description')}

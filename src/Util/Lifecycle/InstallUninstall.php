@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /*
  * (c) NETZKOLLEKTIV GmbH <kontakt@netzkollektiv.com>
  * For the full copyright and license information, please view the LICENSE
@@ -43,8 +45,6 @@ class InstallUninstall
 
     private $paymentMethodRepository;
 
-    private $salesChannelRepository;
-
     private EntityRepository $countryRepository;
 
     private EntityRepository $currencyRepository;
@@ -58,7 +58,6 @@ class InstallUninstall
     public function __construct(
         EntityRepository $systemConfigRepository,
         $paymentMethodRepository,
-        $salesChannelRepository,
         EntityRepository $countryRepository,
         EntityRepository $currencyRepository,
         PluginIdProvider $pluginIdProvider,
@@ -67,7 +66,6 @@ class InstallUninstall
     ) {
         $this->systemConfigRepository = $systemConfigRepository;
         $this->paymentMethodRepository = $paymentMethodRepository;
-        $this->salesChannelRepository = $salesChannelRepository;
         $this->countryRepository = $countryRepository;
         $this->currencyRepository = $currencyRepository;
         $this->pluginIdProvider = $pluginIdProvider;
@@ -127,10 +125,11 @@ class InstallUninstall
         $this->systemConfigRepository->delete($ids, $context);
     }
 
-    private function getAvailabilityRule ($name, $context) {
+    private function getAvailabilityRule($name, $context)
+    {
         return [
             'availabilityRule' => [
-                'name' => $name.' - nur verfügbar in DE, bei Zahlung in EUR',
+                'name' => $name . ' - nur verfügbar in DE, bei Zahlung in EUR',
                 'priority' => 1,
                 'description' => 'Diese Verfügbarkeitsregel wurde automatisch bei Installation von ' . $name . ' erstellt. 
                     Sie kann beliebig angepasst werden und wird bei Updates nicht überschrieben.',
@@ -218,7 +217,7 @@ class InstallUninstall
                 $method['id'] = $paymentMethodId;
             }
             $this->paymentMethodRepository->upsert([$method], $context);
-		}
+        }
     }
 
     protected function getCountryIds(array $countryIsos, Context $context): array

@@ -17,7 +17,8 @@ use Netzkollektiv\EasyCredit\Helper\Payment as PaymentHelper;
 use Netzkollektiv\EasyCredit\Service\RuleEvaluator;
 use Netzkollektiv\EasyCredit\Setting\Exception\SettingsInvalidException;
 
-class PaymentAvailability {
+class PaymentAvailability
+{
 
     private EntityRepository $ruleRepository;
 
@@ -45,7 +46,8 @@ class PaymentAvailability {
         $this->ruleEvaluator = $ruleEvaluator;
     }
 
-    public function getAvailablePaymentTypes($salesChannelContext, $product = null): array {
+    public function getAvailablePaymentTypes($salesChannelContext, $product = null): array
+    {
         $cacheKey = $this->getCacheKey($salesChannelContext, $product);
 
         if (isset($this->cachedPaymentTypes[$cacheKey])) {
@@ -68,19 +70,27 @@ class PaymentAvailability {
         }
 
         $this->cachedPaymentTypes[$cacheKey] = \array_filter($paymentMethods->map(function ($paymentMethod) use ($salesChannelContext, $cart) {
+            $rule = $this->getAvailabilityRules($salesChannelContext->getContext())
+                ->filter(fn($rule) => $rule->getId() === $paymentMethod->getAvailabilityRuleId())->first();
+
+            if ($rule === null) {
+                return false;
+            }
+
             $available = $this->ruleEvaluator->evaluateRule(
-                $this->getAvailabilityRules($salesChannelContext->getContext())
-                    ->filter(fn($rule) => $rule->getId() === $paymentMethod->getAvailabilityRuleId())->first(),
+                $rule,
                 $cart,
                 $salesChannelContext
             );
+
             return $available ? $this->paymentHelper->getHandlerByPaymentMethod($paymentMethod)->getPaymentType() : null;
         }));
 
         return $this->cachedPaymentTypes[$cacheKey];
     }
 
-    private function getCacheKey (SalesChannelContext $salesChannelContext, $product) {
+    private function getCacheKey(SalesChannelContext $salesChannelContext, $product)
+    {
         $cacheKey = [$salesChannelContext->getToken()];
         if ($product) {
             $cacheKey[] = $product->getId();
@@ -99,16 +109,17 @@ class PaymentAvailability {
         return true;
     }
 
-    private $availibilityRules = null;
+    private $availabilityRules = null;
 
-    private function getAvailabilityRules($context) {
-        if ($this->availibilityRules === null) {
-            $ids = $this->paymentHelper->getEasyCreditMethods($context)->map(fn ($method) => $method->getAvailabilityRuleId());
-            $this->availibilityRules = $this->ruleRepository->search(
+    private function getAvailabilityRules($context)
+    {
+        if ($this->availabilityRules === null) {
+            $ids = $this->paymentHelper->getEasyCreditMethods($context)->map(fn($method) => $method->getAvailabilityRuleId());
+            $this->availabilityRules = $this->ruleRepository->search(
                 new Criteria($ids),
                 $context
             );
         }
-        return $this->availibilityRules;
+        return $this->availabilityRules;
     }
 }

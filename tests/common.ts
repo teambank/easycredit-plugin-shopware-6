@@ -107,12 +107,14 @@ export const goThroughPaymentPage = async ({
   page,
   paymentType,
   express = false,
+  switchPaymentType = false
 }: {
   page: any;
   paymentType: PaymentTypes;
   express?: boolean;
+  switchPaymentType?: boolean;
 }) => {
-  await test.step(`easyCredit-Ratenkauf Payment`, async () => {
+  await test.step(`easyCredit Payment (${paymentType})`, async () => {
     await page.getByTestId("uc-deny-all-button").click();
 
     await expect(
@@ -124,6 +126,13 @@ export const goThroughPaymentPage = async ({
       })
     ).toBeVisible();
 
+    if (switchPaymentType) {
+      await page
+        .locator(".paymentoptions")
+        .getByText(paymentType === PaymentTypes.INSTALLMENT ? "Rechnung" : "Ratenkauf")
+        .click();
+    }
+
     await page.getByRole("button", { name: "Weiter zur Dateneingabe" }).click();
 
     if (express) {
@@ -134,13 +143,27 @@ export const goThroughPaymentPage = async ({
     await page.locator("#dateOfBirth").fill("05.04.1972");
 
     if (express) {
-      await page.locator("#email").getByRole('textbox').fill("ralf.ratenkauf@teambank.de");
+      await page
+        .locator("#email")
+        .getByRole("textbox")
+        .fill("ralf.ratenkauf@teambank.de");
     }
 
     await page.locator("tbk-vorwahldropdown .tel-wrapper").click();
-    await page.locator('tbk-vorwahldropdown').locator('li').filter({ hasText: '+49' }).getByRole('paragraph').click();
-    await page.locator('#mobilfunknummer').getByRole('textbox').fill('1703404848');
-    await page.locator('app-ratenkauf-iban-input-dumb').getByRole('textbox').fill("DE12500105170648489890");
+    await page
+      .locator("tbk-vorwahldropdown")
+      .locator("li")
+      .filter({ hasText: "+49" })
+      .getByRole("paragraph")
+      .click();
+    await page
+      .locator("#mobilfunknummer")
+      .getByRole("textbox")
+      .fill("1703404848");
+    await page
+      .locator("app-ratenkauf-iban-input-dumb")
+      .getByRole("textbox")
+      .fill("DE12500105170648489890");
 
     if (express) {
       await page.locator("#streetAndNumber").fill("Beuthener Str. 25");
@@ -157,7 +180,9 @@ export const goThroughPaymentPage = async ({
     );
 
     await delay(500);
-    await page.getByRole("button", { name: "Zahlungswunsch übernehmen" }).click();
+    await page
+      .getByRole("button", { name: "Zahlungswunsch übernehmen" })
+      .click();
   });
 };
 

@@ -1,12 +1,12 @@
 includes:
     - vendor/phpstan/phpstan/conf/bleedingEdge.neon
-    #- vendor/phpstan/phpstan-deprecation-rules/rules.neon
+    - vendor/phpstan/phpstan-deprecation-rules/rules.neon
     - vendor/phpstan/phpstan-symfony/extension.neon
     - vendor/phpstan/phpstan-symfony/rules.neon
-    - phpstan-ignore-by-sw-version.php
+    - bin/phpstan-ignore-by-sw-version.php
 
 parameters:
-    level: 1
+    level: 4
     treatPhpDocTypesAsCertain: false
     reportUnmatchedIgnoredErrors: false
     inferPrivatePropertyTypeFromConstructor: true
@@ -14,9 +14,9 @@ parameters:
         - identifier: missingType.iterableValue
         - identifier: missingType.generics
     symfony:
-        constant_hassers: false
+        constantHassers: false
         # the placeholder "%ShopwareHashedCacheDir%" will be replaced on execution by bin/phpstan-config-generator.php script
-        container_xml_path: '%ShopwareRoot%%ShopwareHashedCacheDir%/%ShopwareKernelClass%DevDebugContainer.xml'
+        containerXmlPath: '%ShopwareRoot%%ShopwareHashedCacheDir%/%ShopwareKernelClass%DevDebugContainer.xml'
     scanDirectories:
         - %ShopwareRoot%/vendor
         - %ShopwareRoot%/src

@@ -111,6 +111,39 @@ test.describe("go through @express @bill", () => {
   });
 });
 
+test.describe("go through standard @installment and switch to @bill", () => {
+  test("standardCheckoutInstallmentSwitchToBill", async ({ page }) => {
+    await goToProduct(page);
+
+    await page
+      .getByRole("button", { name: "Add to shopping cart" })
+      .first()
+      .click();
+    await page.locator(".offcanvas .begin-checkout");
+    await expect(
+      page
+        .locator(".offcanvas")
+        .getByRole("link", { name: /Product/ })
+        .first()
+    ).toBeVisible();
+
+    await fillCheckout(page);
+
+    /* Confirm Page */
+    await selectAndProceed({ page, paymentType: PaymentTypes.INSTALLMENT });
+
+    await goThroughPaymentPage({
+      page: page,
+      paymentType: PaymentTypes.INSTALLMENT,
+      switchPaymentType: true
+    });
+    await confirmOrder({
+      page: page,
+      paymentType: PaymentTypes.BILL,
+    });
+  });
+});
+
 test.describe("company should not be able to pay @bill @installment", () => {
   test("companyBlocked", async ({ page }) => {
     await goToProduct(page);

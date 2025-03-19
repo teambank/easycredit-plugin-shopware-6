@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /*
  * (c) NETZKOLLEKTIV GmbH <kontakt@netzkollektiv.com>
  * For the full copyright and license information, please view the LICENSE
@@ -16,7 +18,6 @@ use Psr\Log\LoggerInterface;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\MessageFormatter;
-use Symfony\Component\HttpFoundation\Session\Session;
 use Netzkollektiv\EasyCredit\Api\Storage;
 
 class IntegrationFactory
@@ -37,7 +38,8 @@ class IntegrationFactory
         $this->storage = $storage;
     }
 
-    protected function getClient() {
+    protected function getClient()
+    {
         $stack = HandlerStack::create();
         $stack->push(
             Middleware::log(
@@ -46,12 +48,13 @@ class IntegrationFactory
             )
         );
         return new Client([
-            'debug'=> false,
+            'debug' => false,
             'handler' => $stack
         ]);
     }
 
-    protected function getConfig(?SalesChannelContext $salesChannelContext = null, bool $validateSettings = true) {
+    protected function getConfig(?SalesChannelContext $salesChannelContext = null, bool $validateSettings = true)
+    {
         $salesChannelId = null;
         if ($salesChannelContext) {
             $salesChannelId = $salesChannelContext->getSalesChannel()->getId();
@@ -65,7 +68,7 @@ class IntegrationFactory
             ->setAccessToken($settings->getApiSignature());
     }
 
-    public function createCheckout(?SalesChannelContext $salesChannelContext = null, bool $validateSettings = true): Api\Integration\Checkout
+    public function createCheckout(?SalesChannelContext $salesChannelContext = null): Api\Integration\Checkout
     {
         $client = $this->getClient();
         $config = $this->getConfig($salesChannelContext);
@@ -88,13 +91,13 @@ class IntegrationFactory
             $transactionApi,
             $installmentplanApi,
             $this->storage,
-			new Api\Integration\Util\AddressValidator(),
+            new Api\Integration\Util\AddressValidator(),
             new Api\Integration\Util\PrefixConverter(),
             $this->logger
         );
     }
 
-    public function createTransactionApi(?SalesChannelContext $salesChannelContext = null): Api\Service\TransactionApi
+    public function createTransactionApi(): Api\Service\TransactionApi
     {
         $client = $this->getClient();
         $config = $this->getConfig()

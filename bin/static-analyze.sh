@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
+set -e
 
-DIR=`dirname $0`
+DIR=$(dirname "$(dirname "$0")")
 
-#ln -s `realpath $DIR/../` $SWDIR/custom/plugins/EasyCreditRatenkauf
+if [ ! -f $DIR/phpstan.neon ]; then
+  php $DIR/bin/phpstan-config-generator.php
+fi;
 
-php $DIR/phpstan-config-generator.php
-
-php $DIR/../vendor/bin/phpstan analyze src
+php $DIR/vendor/bin/phpstan dump-parameters
+php $DIR/vendor/bin/phpstan analyze $DIR/src

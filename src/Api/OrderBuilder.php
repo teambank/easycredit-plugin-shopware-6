@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /*
  * (c) NETZKOLLEKTIV GmbH <kontakt@netzkollektiv.com>
  * For the full copyright and license information, please view the LICENSE
@@ -25,11 +27,13 @@ class OrderBuilder extends QuoteBuilder
         return '';
     }
 
-    public function getIsClickAndCollect(): Bool {
+    public function getIsClickAndCollect(): Bool
+    {
         return false;
     }
 
-    public function getDuration(): ?string {
+    public function getDuration(): ?string
+    {
         return null;
     }
 
@@ -41,7 +45,8 @@ class OrderBuilder extends QuoteBuilder
     public function getShippingAddress(): ShippingAddress
     {
         $deliveries = $this->cart->getDeliveries();
-        if ($deliveries->first() === null
+        if (
+            $deliveries->first() === null
             || $deliveries->first()->getShippingOrderAddress() === null
         ) {
             throw new QuoteInvalidException('quote invalid');

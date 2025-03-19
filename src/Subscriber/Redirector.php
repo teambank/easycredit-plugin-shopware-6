@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /*
  * (c) NETZKOLLEKTIV GmbH <kontakt@netzkollektiv.com>
  * For the full copyright and license information, please view the LICENSE
@@ -7,10 +9,6 @@
 
 namespace Netzkollektiv\EasyCredit\Subscriber;
 
-use Netzkollektiv\EasyCredit\Api\Storage;
-use Netzkollektiv\EasyCredit\Helper\Payment as PaymentHelper;
-use Shopware\Core\System\SalesChannel\Event\SalesChannelContextSwitchEvent;
-use Shopware\Storefront\Page\Checkout\Confirm\CheckoutConfirmPageLoadedEvent;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -18,11 +16,12 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Psr\Log\LoggerInterface;
-use Teambank\EasyCreditApiV3\Integration\ValidationException;
-use Teambank\EasyCreditApiV3\ApiException;
+use Shopware\Core\System\SalesChannel\Event\SalesChannelContextSwitchEvent;
+use Shopware\Storefront\Page\Checkout\Confirm\CheckoutConfirmPageLoadedEvent;
+use Netzkollektiv\EasyCredit\Api\Storage;
+use Netzkollektiv\EasyCredit\Helper\Payment as PaymentHelper;
 use Netzkollektiv\EasyCredit\Service\CheckoutService;
+use Netzkollektiv\EasyCredit\Helper\Quote as QuoteHelper;
 
 class Redirector implements EventSubscriberInterface
 {
@@ -30,9 +29,9 @@ class Redirector implements EventSubscriberInterface
 
     private Request $request;
 
-    private UrlGeneratorInterface $router;
-
     private PaymentHelper $paymentHelper;
+
+    private QuoteHelper $quoteHelper;
 
     private CheckoutService $checkoutService;
 
@@ -41,15 +40,15 @@ class Redirector implements EventSubscriberInterface
     public function __construct(
         ContainerInterface $container,
         RequestStack $requestStack,
-        UrlGeneratorInterface $router,
         PaymentHelper $paymentHelper,
+        QuoteHelper $quoteHelper,
         CheckoutService $checkoutService,
         Storage $storage
     ) {
         $this->container = $container;
         $this->request = $requestStack->getCurrentRequest();
-        $this->router = $router;
         $this->paymentHelper = $paymentHelper;
+        $this->quoteHelper = $quoteHelper;
         $this->checkoutService = $checkoutService;
         $this->storage = $storage;
     }
@@ -66,19 +65,20 @@ class Redirector implements EventSubscriberInterface
     public function onSalesChannelContextSwitch(SalesChannelContextSwitchEvent $event): void
     {
         $salesChannelContext = $event->getSalesChannelContext();
-        $attributes = (isset($this->request->attributes)) ? $this->request->attributes : null;
 
         if (!$this->isRoute('frontend.checkout.configure', $this->request)) {
             return;
         }
 
-        if (!$event->getRequestDataBag()->get('paymentMethodId')
+        if (
+            !$event->getRequestDataBag()->get('paymentMethodId')
             || !$this->paymentHelper->isSelected($salesChannelContext, $event->getRequestDataBag()->get('paymentMethodId'))
         ) {
             return;
         }
 
-        if (\version_compare($this->container->getParameter('kernel.shopware_version'), '6.4.0', '>=')
+        if (
+            \version_compare($this->container->getParameter('kernel.shopware_version'), '6.4.0', '>=')
             && !$event->getRequestDataBag()->get('easycredit')
         ) {
             return;
@@ -87,7 +87,8 @@ class Redirector implements EventSubscriberInterface
         $this->storage
             ->set('express', false)
             ->set('duration', $event->getRequestDataBag()->get('easycredit')->get('number-of-installments'))
-            ->set('init', true);
+            ->set('init', true)
+            ->persist();
     }
 
     public function onCheckoutConfirmLoaded(CheckoutConfirmPageLoadedEvent $event): void
@@ -97,22 +98,29 @@ class Redirector implements EventSubscriberInterface
         }
 
         $salesChannelContext = $event->getSalesChannelContext();
+        $cart = $event->getPage()->getCart();
 
         $this->storage->set('init', false);
-        $this->storage->set('cartToken', $event->getPage()->getCart()->getToken());
+        $this->storage->set('cartToken', $cart->getToken());
 
-        $this->checkoutService->startCheckout($salesChannelContext);
+        $this->checkoutService->startCheckout(
+            $salesChannelContext,
+            $this->quoteHelper->getQuote($salesChannelContext, $cart)
+        );
     }
 
     public function onKernelResponse(ResponseEvent $event): void
     {
-        if (!$this->request->hasSession()) {
+        if (
+            !$this->request->hasSession() ||
+            $this->request->attributes->get('_routeScope') === ['store-api']
+        ) {
             return; // do not run in CLI & API
         }
 
         if ($redirectUrl = $this->storage->get('redirect_url')) {
             $event->setResponse(new RedirectResponse($redirectUrl));
-            $this->storage->set('redirect_url', null);
+            $this->storage->set('redirect_url', null)->persist();
         }
     }
 
@@ -120,7 +128,8 @@ class Redirector implements EventSubscriberInterface
     {
         $attributes = (isset($request->attributes)) ? $request->attributes : null;
 
-        if ($attributes === null
+        if (
+            $attributes === null
             || $attributes->get('_route') !== $route
         ) {
             return false;

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /*
  * (c) NETZKOLLEKTIV GmbH <kontakt@netzkollektiv.com>
  * For the full copyright and license information, please view the LICENSE
@@ -67,6 +69,10 @@ class Validator implements CartValidatorInterface
             return;
         }
 
+        if ($this->requestStack->getCurrentRequest()->attributes->get('_route') === 'frontend.easycredit.return') {
+            return;
+        }
+
         if (\method_exists($cart, 'getName') && \in_array($cart->getName(), ['recalculation', 'sales-channel'])) { // skip validation on recalculation (SW <= 6.4)
             return;
         }
@@ -100,7 +106,7 @@ class Validator implements CartValidatorInterface
         }
 
         try {
-            $quote = $this->quoteHelper->getQuote($cart, $salesChannelContext);
+            $quote = $this->quoteHelper->getQuote($salesChannelContext, $cart);
         } catch (QuoteInvalidException $e) {
             $this->storage->clear();
 
@@ -116,8 +122,9 @@ class Validator implements CartValidatorInterface
         if (!$checkout->isAmountValid($quote)) {
             try {
                 $checkout->update($quote);
+                $this->storage->persist();
             } catch (\Throwable $e) {
-                $this->logger->debug('InterestError: amount not valid'. $e->getMessage());
+                $this->logger->debug('InterestError: amount not valid' . $e->getMessage());
                 $this->storage->clear();
                 $errors->add(new InterestError());
             }
