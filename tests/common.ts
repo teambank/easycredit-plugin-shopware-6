@@ -149,13 +149,6 @@ export const goThroughPaymentPage = async ({
         .fill("ralf.ratenkauf@teambank.de");
     }
 
-    await page.locator("tbk-vorwahldropdown .tel-wrapper").click();
-    await page
-      .locator("tbk-vorwahldropdown")
-      .locator("li")
-      .filter({ hasText: "+49" })
-      .getByRole("paragraph")
-      .click();
     await page
       .locator("#mobilfunknummer")
       .getByRole("textbox")
