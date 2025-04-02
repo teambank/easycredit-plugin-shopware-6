@@ -149,13 +149,6 @@ export const goThroughPaymentPage = async ({
         .fill("ralf.ratenkauf@teambank.de");
     }
 
-    await page.locator("tbk-vorwahldropdown .tel-wrapper").click();
-    await page
-      .locator("tbk-vorwahldropdown")
-      .locator("li")
-      .filter({ hasText: "+49" })
-      .getByRole("paragraph")
-      .click();
     await page
       .locator("#mobilfunknummer")
       .getByRole("textbox")
@@ -205,7 +198,7 @@ export const confirmOrder = async ({
       await expect(
         page.locator("easycredit-checkout[payment-type=BILL]")
       ).toContainText(
-        "Heutebestellen"
+        "Gesamtbetrag"
       );      
     }
 
