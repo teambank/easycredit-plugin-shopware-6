@@ -1,3 +1,12 @@
+# 3.1.0
+
+* das Plugin unterstützt nun die Initialisierung über die API (/easycredit/init-payment, /easycredit/return), z.B. für Shopware Frontends.
+* der Zahlungsstatus wird jetzt in der Datenbank statt in der Session gespeichert.
+* handle_payment ist nun API-kompatibel
+* Abwärtskompatibilität bis Shopware 6.4
+* die Installation ist nun auch über Composer von Github möglich
+* der Widget-Betrag wird nun wieder korrekt ermittelt
+
 # 2.2.6
 
 * doppelte JavaScript-Builds werden während der Theme-Kompilierung (bis einschließlich SW 6.5) automatisch entfernt, anstatt das zusätzliche Build zu löschen.
