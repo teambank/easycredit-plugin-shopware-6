@@ -95,13 +95,18 @@ class RuleEvaluator {
         $cart->add($lineItem);
 
         // disable Shopware\Core\Framework\Script\Execution\ScriptExecutor for performance reasons
-        $disableExtensions = $_ENV['DISABLE_EXTENSIONS'] ?? null;
+        $disableExtensions = $_ENV['DISABLE_EXTENSIONS'] ?? null; // Store the original value
         $_ENV['DISABLE_EXTENSIONS'] = true;
 
-        $cart =  $this->cartCalculator->calculate($cart, $salesChannelContext);
-
-        if ($disableExtensions !== null) {
-            $_ENV['DISABLE_EXTENSIONS'] = $disableExtensions;
+        try {
+            $cart = $this->cartCalculator->calculate($cart, $salesChannelContext);
+        } finally {
+            // Restore the original value if it was set, or unset the environment variable
+            if ($disableExtensions !== null) {
+                $_ENV['DISABLE_EXTENSIONS'] = $disableExtensions; // Restore original value
+            } else {
+                unset($_ENV['DISABLE_EXTENSIONS']); // Unset if it wasn't originally set
+            }
         }
 
         return $cart;
