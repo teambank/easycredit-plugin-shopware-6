@@ -10,17 +10,18 @@
         }
     ],
     "require": {
-        "shopware/core": "^6.4 | ^6.5 | ^6.6",
+        "shopware/core": "^6.4 | ^6.5 | ^6.6 | ^6.7",
         "netzkollektiv/easycredit-api-v3-php": "^2.0"
     },
     "require-dev": {
         "phpstan/phpstan": "^2.0",
         "phpstan/phpstan-symfony": "^2.0",
-        "phpstan/phpstan-deprecation-rules": "^2.0",
         "phpstan/phpstan-doctrine": "^2.0",
-        "symplify/easy-coding-standard": "^10.1",
+        "phpstan/phpstan-strict-rules": "^2.0",
+        "phpstan/phpstan-deprecation-rules": "^2.0",
         "rector/rector": "^2.0",
-        "phpstan/phpstan-strict-rules": "^2.0"
+        "symfony/filesystem": "^7.2",
+        "friendsofphp/php-cs-fixer": "^3.75"
     },
     "extra": {
         "shopware-plugin-class": "Netzkollektiv\\EasyCredit\\EasyCreditRatenkauf",

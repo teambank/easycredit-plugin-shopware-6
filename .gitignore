@@ -2,6 +2,7 @@
 coverage/
 .phpunit.result.cache
 phpstan.neon
+.php-cs-fixer.php
 *hot-update.js
 /dist
 /vendor
