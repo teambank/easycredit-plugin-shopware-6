@@ -62,8 +62,13 @@ class FlexpriceService {
             return false;
         }
 
+        $rule = $this->getFlexpriceRule($salesChannelContext->getContext());
+        if (!$rule) {
+            return false;
+        }
+
         return $this->ruleEvaluator->evaluateRule(
-            $this->getFlexpriceRule($salesChannelContext->getContext()),
+            $rule,
             $cart,
             $salesChannelContext
         );
@@ -74,7 +79,7 @@ class FlexpriceService {
             return false;
         }
 
-        $cart = $this->ruleEvaluator->getCartForProduct($salesChannelContext, $product, $quantity);
+        $cart = $this->ruleEvaluator->getCartForProduct($product, $salesChannelContext, $quantity);
         return $this->shouldDisableFlexprice($salesChannelContext, $cart);
     }
 }

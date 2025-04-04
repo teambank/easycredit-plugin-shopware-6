@@ -77,7 +77,7 @@ class RuleEvaluator {
         return $this->cart;
     }
 
-    public function getCartForProduct ($product, SalesChannelContext $salesChannelContext, $quantity = 1) {
+    public function getCartForProduct (SalesChannelProductEntity $product, SalesChannelContext $salesChannelContext, $quantity = 1) {
         $cart = $this->getBaseCart();
 
         $lineItem = new LineItem($product->getId(), LineItem::PRODUCT_LINE_ITEM_TYPE, $product->getId(), $quantity);
