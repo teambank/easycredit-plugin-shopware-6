@@ -1,3 +1,9 @@
+# 3.1.1
+
+* wenn Zinsflex aktiviert ist, werden Produkte standardmäßig mit Zinsflex dargestellt
+* behebt einen Fehler, der auftrat nachdem Zinsflex aktiviert wurde
+* behebt ein Problem, durch das App-Templates nicht gefunden wurden
+
 # 3.1.0
 
 * das Plugin unterstützt nun die Initialisierung über die API (/easycredit/init-payment, /easycredit/return), z.B. für Shopware Frontends.
