@@ -1,0 +1,25 @@
+{
+  "base": "/bundles/easycreditratenkauf/administration/",
+  "entryPoints": {
+    "easy-credit-ratenkauf": {
+      "css": [
+        "/bundles/easycreditratenkauf/administration/assets/easy-credit-ratenkauf-DvzSjrIP.css"
+      ],
+      "dynamic": [],
+      "js": [
+        "/bundles/easycreditratenkauf/administration/assets/easy-credit-ratenkauf-BS35-Bqj.js"
+      ],
+      "legacy": false,
+      "preload": []
+    }
+  },
+  "legacy": false,
+  "metadatas": {},
+  "version": [
+    "7.1.0",
+    7,
+    1,
+    0
+  ],
+  "viteServer": null
+}
