@@ -29,10 +29,10 @@ export const fillCheckout = async (page) => {
       randomLetters += String.fromCharCode(97 + Math.floor(Math.random() * 26));
     }
     await personalForm
-      .getByRole("textbox", { name: "First name*" })
+      .getByRole("textbox", { name: "First name" })
       .fill(randomize("Ralf"));
     await personalForm
-      .getByRole("textbox", { name: "Last name*" })
+      .getByRole("textbox", { name: "Last name" })
       .fill("Ratenkauf");
 
     // SW 6.4
@@ -41,17 +41,17 @@ export const fillCheckout = async (page) => {
       await page.click("text=Do not create a customer account");
     }
 
-    await personalForm.getByLabel("Email address*").fill("test@email.com");
+    await personalForm.getByLabel("Email address").fill("test@email.com");
 
     const billingForm = page.locator(".register-billing");
     await billingForm
-      .getByRole("textbox", { name: "Street address*" })
+      .getByRole("textbox", { name: "Street address" })
       .fill("Beuthener Str. 25");
     await billingForm
       .getByRole("textbox", { name: "Postal code" })
       .fill("90402");
-    await billingForm.getByRole("textbox", { name: "City*" }).fill("Nürnberg");
-    await billingForm.getByLabel("Country*").selectOption({ label: "Germany" });
+    await billingForm.getByRole("textbox", { name: "City" }).fill("Nürnberg");
+    await billingForm.getByLabel("Country").selectOption({ label: "Germany" });
 
     await page.getByRole("button", { name: "Continue" }).click();
   });
@@ -166,7 +166,7 @@ export const goThroughPaymentPage = async ({
 
     await page.locator("#agreeAll").click();
 
-    await delay(500);
+    await delay(1000);
 
     await clickWithRetry(
       page.getByRole("button", { name: "Zahlungswunsch prüfen" })
@@ -226,24 +226,35 @@ export const confirmOrder = async ({
   });
 };
 
-export const checkAddressInvalidation = async (page) => {
-  await test.step("Check if an address change invalidates payment", async () => {
-    await page.waitForURL("**/checkout/confirm");
-
+export const openEditShippingAddressModal = async (page) => {
     await page.getByText("Change shipping address").click();
-    await page
-      .locator(".address-editor-modal")
-      .getByText("Edit address")
-      .first()
-      .click();
+    if (greaterOrEqualsThan("6.7.0")) {
+      await page
+        .locator(".address-manager-modal")
+        .getByLabel("Address options")
+        .first()
+        .click();
+      await page
+        .locator(".address-manager-select-address")
+        .getByRole('link', { name: 'Edit' })
+        .first()
+        .click();
+    } else {
+      await page
+        .locator(".address-editor-modal")
+        .getByText("Edit address")
+        .first()
+        .click();
+    }  
+}
 
-    await page
-      .getByRole("textbox", { name: "Street address*" })
-      .fill("Beuthener Str. 24");
-
-    await delay(1000);
-
-    if (greaterOrEqualsThan("6.4.7")) {
+export const saveShippingAddressModal = async (page) => {
+    if (greaterOrEqualsThan("6.7.0")) {
+      await page
+        .locator(".address-manager-modal")
+        .getByText("Save address")
+        .click();
+    } else if (greaterOrEqualsThan("6.4.7")) {
       await page
         .locator("#shipping-address-create-edit")
         .getByText("Save address")
@@ -254,6 +265,22 @@ export const checkAddressInvalidation = async (page) => {
         .getByText("Save address")
         .click();
     }
+}
+
+export const checkAddressInvalidation = async (page) => {
+  await test.step("Check if an address change invalidates payment", async () => {
+    await page.waitForURL("**/checkout/confirm");
+
+
+    await openEditShippingAddressModal(page);
+
+    await page
+      .getByRole("textbox", { name: "Street address" })
+      .fill("Beuthener Str. 24");
+
+    await delay(1000);
+
+    await saveShippingAddressModal(page);
 
     await expect(
       page

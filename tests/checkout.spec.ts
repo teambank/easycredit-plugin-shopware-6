@@ -10,6 +10,8 @@ import {
   confirmOrder,
   checkAddressInvalidation,
   checkAmountInvalidation,
+  openEditShippingAddressModal,
+  saveShippingAddressModal
 } from "./common";
 import { PaymentTypes } from "./types";
 
@@ -154,28 +156,13 @@ test.describe("company should not be able to pay @bill @installment", () => {
 
     await page.waitForURL("**/checkout/confirm");
 
-    await page.getByText("Change shipping address").click();
-    await page
-      .locator(".address-editor-modal")
-      .getByText("Edit address")
-      .first()
-      .click();
+    await openEditShippingAddressModal(page);
 
     await page.getByRole("textbox", { name: "Company" }).fill("Testfirma");
 
     await delay(1000);
 
-    if (greaterOrEqualsThan("6.4.7")) {
-      await page
-        .locator("#shipping-address-create-edit")
-        .getByText("Save address")
-        .click();
-    } else {
-      await page
-        .locator("#address-create-edit")
-        .getByText("Save address")
-        .click();
-    }
+    await saveShippingAddressModal(page);
 
     /* Confirm Page */
     for (let paymentType of [PaymentTypes.BILL, PaymentTypes.INSTALLMENT]) {
