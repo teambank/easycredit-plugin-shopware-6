@@ -8,10 +8,14 @@ export default class EasyCreditRatenkaufCheckout extends Plugin {
             return;
         }
 
-        document.querySelector('easycredit-checkout').addEventListener('submit', async (e) => {
+        document.addEventListener("easycredit-submit", async (e) => {
+            if (!e.target.matches('easycredit-checkout')) {
+                return;
+            }
+
             var form = document.getElementById('changePaymentForm')
 
-            let token = await getCsrfToken()
+            const token = await getCsrfToken()
             if (token) {
               form.append(createHiddenField('_csrf_token', token))
             }

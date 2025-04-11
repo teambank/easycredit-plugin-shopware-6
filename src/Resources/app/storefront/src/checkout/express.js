@@ -1,9 +1,13 @@
 import Plugin from "src/plugin-system/plugin.class";
-import { getCsrfToken, createHiddenField } from "../util.js";
+import { getCsrfToken } from "../util.js";
 
 export default class EasyCreditRatenkaufExpressCheckout extends Plugin {
   init() {
-    this.el.addEventListener("submit", async (e) => {
+    document.addEventListener("easycredit-submit", async (e) => {
+      if (!e.target.matches('easycredit-express-button')) {
+        return;
+      }
+      const component = e.target;
       const easyCreditParams = this.buildAdditionalParams(e.detail);
 
       const buyForm = document.getElementById(
@@ -30,7 +34,7 @@ export default class EasyCreditRatenkaufExpressCheckout extends Plugin {
 
       if (
         document.querySelector(".is-ctl-checkout.is-act-cartpage") ||
-        this.el.closest(".cart-offcanvas")
+        component.closest(".cart-offcanvas")
       ) {
         const params = new URLSearchParams(easyCreditParams).toString();
         window.location.href = "/easycredit/express" + "?" + params;
