@@ -54,7 +54,7 @@ class SettingsController extends AbstractController
                 ->createCheckout()
                 ->getWebshopDetails();
 
-            $this->settings->updateSettings(['webshopInfo' => $webshopInfo]);
+            $this->settings->updateSettings(['webshopInfo' => \json_encode($webshopInfo)]);
         }
 
         return new JsonResponse(['credentialsValid' => $credentialsValid]);

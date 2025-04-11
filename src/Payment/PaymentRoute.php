@@ -139,7 +139,7 @@ class PaymentRoute extends AbstractPaymentRoute
     // see routes.xml
     public function returnFromPaymentPage(Request $request, SalesChannelContext $salesChannelContext): PaymentRouteResponse
     {
-        $checkout = $this->integrationFactory->createCheckout($salesChannelContext);
+        $checkout = $this->integrationFactory->createCheckout($salesChannelContext->getSalesChannel()->getId());
 
         if (!$checkout->isInitialized()) {
             throw new \Exception(

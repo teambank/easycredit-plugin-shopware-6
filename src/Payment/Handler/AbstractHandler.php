@@ -11,11 +11,20 @@ namespace Netzkollektiv\EasyCredit\Payment\Handler;
 
 use Monolog\Logger;
 
-use Shopware\Core\Checkout\Payment\Cart\PaymentHandler\SynchronousPaymentHandlerInterface;
-use Shopware\Core\Checkout\Payment\Cart\SyncPaymentTransactionStruct;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
+
+use Shopware\Core\Checkout\Payment\Cart\PaymentHandler\AbstractPaymentHandler;
 use Shopware\Core\Checkout\Payment\Exception\SyncPaymentProcessException;
-use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
-use Shopware\Core\System\SalesChannel\SalesChannelContext;
+use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
+use Shopware\Core\Checkout\Order\OrderEntity;
+use Shopware\Core\Checkout\Payment\Cart\PaymentHandler\PaymentHandlerType;
+use Shopware\Core\Checkout\Payment\Cart\PaymentTransactionStruct;
+use Shopware\Core\Checkout\Payment\PaymentException;
+use Shopware\Core\Framework\Struct\Struct;
 
 use Teambank\EasyCreditApiV3 as ApiV3;
 
@@ -24,8 +33,10 @@ use Netzkollektiv\EasyCredit\Api\Storage;
 use Netzkollektiv\EasyCredit\EasyCreditRatenkauf;
 use Netzkollektiv\EasyCredit\Payment\StateHandler;
 
-abstract class AbstractHandler implements SynchronousPaymentHandlerInterface
+abstract class AbstractHandler extends AbstractPaymentHandler
 {
+    private EntityRepository $orderTransactionRepository;
+
     private StateHandler $stateHandler;
 
     private IntegrationFactory $integrationFactory;
@@ -35,11 +46,13 @@ abstract class AbstractHandler implements SynchronousPaymentHandlerInterface
     protected Storage $storage;
 
     public function __construct(
+        EntityRepository $orderTransactionRepository,
         StateHandler $stateHandler,
         IntegrationFactory $integrationFactory,
         Storage $storage,
         Logger $logger
     ) {
+        $this->orderTransactionRepository = $orderTransactionRepository;
         $this->stateHandler = $stateHandler;
 
         $this->integrationFactory = $integrationFactory;
@@ -47,15 +60,27 @@ abstract class AbstractHandler implements SynchronousPaymentHandlerInterface
         $this->logger = $logger;
     }
 
-    public function pay(SyncPaymentTransactionStruct $transaction, RequestDataBag $dataBag, SalesChannelContext $salesChannelContext): void
-    {
-        try {
-            $checkout = $this->integrationFactory->createCheckout(
-                $salesChannelContext
-            );
+    public function supports(
+        PaymentHandlerType $type,
+        string $paymentMethodId,
+        Context $context
+    ): bool {
+        return true;
+    }
 
-            $order = $transaction->getOrder();
-            $orderTransaction = $transaction->getOrderTransaction();
+    public function pay(
+        Request $request,
+        PaymentTransactionStruct $transaction,
+        Context $context,
+        ?Struct $validateStruct
+    ): ?RedirectResponse {
+        try {
+
+            [$orderTransaction, $order] = $this->fetchOrderTransaction($transaction->getOrderTransactionId(), $context);
+            
+            $checkout = $this->integrationFactory->createCheckout(
+                $order->getSalesChannelId()
+            );
 
             $token = $orderTransaction->getCustomFields()[EasyCreditRatenkauf::ORDER_TRANSACTION_CUSTOM_FIELDS_EASYCREDIT_TECHNICAL_TRANSACTION_ID];
             $this->storage->set('token', $token);
@@ -81,11 +106,11 @@ abstract class AbstractHandler implements SynchronousPaymentHandlerInterface
             if ($tx->getStatus() === ApiV3\Model\TransactionInformation::STATUS_AUTHORIZED) {
                 $this->stateHandler->handleTransactionState(
                     $orderTransaction,
-                    $salesChannelContext
+                    $context
                 );
                 $this->stateHandler->handleOrderState(
                     $order,
-                    $salesChannelContext
+                    $context
                 );
             }
         } catch (\Throwable $e) {
@@ -95,6 +120,7 @@ abstract class AbstractHandler implements SynchronousPaymentHandlerInterface
                 'Could not complete transaction: ' . $e->getMessage()
             );
         }
+        return null;
     }
 
     protected function handlePaymentException($transaction, $message)
@@ -116,4 +142,26 @@ abstract class AbstractHandler implements SynchronousPaymentHandlerInterface
     }
 
     abstract public function getPaymentType();
+
+    /**
+     * @return array{0: OrderTransactionEntity, 1: OrderEntity}
+    */
+    private function fetchOrderTransaction(string $transactionId, Context $context): array
+    {
+        $criteria = new Criteria([$transactionId]);
+        $criteria->addAssociation('order.billingAddress.country');
+        $criteria->addAssociation('order.currency');
+        $criteria->addAssociation('order.deliveries.shippingOrderAddress.country');
+        $criteria->addAssociation('order.lineItems');
+        $criteria->addAssociation('order.orderCustomer.customer');
+        $criteria->addAssociation('order.salesChannel');
+
+        $transaction = $this->orderTransactionRepository->search($criteria, $context)->first();
+        \assert($transaction instanceof OrderTransactionEntity);
+
+        $order = $transaction->getOrder();
+        \assert($order instanceof OrderEntity);
+
+        return [$transaction, $order];
+    }
 }

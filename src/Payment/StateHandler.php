@@ -12,14 +12,9 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionDefi
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\OrderDefinition;
 use Shopware\Core\Checkout\Order\OrderEntity;
-use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Core\System\StateMachine\StateMachineRegistry;
 use Shopware\Core\System\StateMachine\Transition;
-use Shopware\Core\Framework\DataAbstractionLayer\Exception\InconsistentCriteriaIdsException;
-use Shopware\Core\System\StateMachine\Exception\StateMachineNotFoundException;;
-use Shopware\Core\System\StateMachine\Exception\IllegalTransitionException;
-use Shopware\Core\System\StateMachine\Exception\StateMachineInvalidEntityIdException;
-use Shopware\Core\System\StateMachine\Exception\StateMachineInvalidStateFieldException;
+use Shopware\Core\Framework\Context;
 
 class StateHandler
 {
@@ -38,11 +33,11 @@ class StateHandler
         $this->settings = $settingsService;
     }
 
-    public function handleTransactionState(OrderTransactionEntity $transaction, SalesChannelContext $salesChannelContext): void
+    public function handleTransactionState(OrderTransactionEntity $transaction, Context $context): void
     {
-        $paymentStatus = $this->settings->getSettings($salesChannelContext->getSalesChannel()->getId(), false)->getPaymentStatus();
+        $paymentStatus = $this->settings->getSettings($transaction->getOrder()->getSalesChannelId(), false)->getPaymentStatus();
 
-        if ($transition = $this->getSelectedTransition('order_transaction', $transaction, $paymentStatus, $salesChannelContext->getContext())) {
+        if ($transition = $this->getSelectedTransition('order_transaction', $transaction, $paymentStatus, $context)) {
             $this->stateMachineRegistry->transition(
                 new Transition(
                     OrderTransactionDefinition::ENTITY_NAME,
@@ -50,16 +45,16 @@ class StateHandler
                     $transition->getActionName(),
                     'stateId'
                 ),
-                $salesChannelContext->getContext()
+                $context
             );
         }
     }
 
-    public function handleOrderState(OrderEntity $order, SalesChannelContext $salesChannelContext): void
+    public function handleOrderState(OrderEntity $order, Context $context): void
     {
-        $orderStatus = $this->settings->getSettings($salesChannelContext->getSalesChannel()->getId(), false)->getOrderStatus();
+        $orderStatus = $this->settings->getSettings($order->getSalesChannelId(), false)->getOrderStatus();
 
-        if ($transition = $this->getSelectedTransition('order', $order, $orderStatus, $salesChannelContext->getContext())) {
+        if ($transition = $this->getSelectedTransition('order', $order, $orderStatus, $context)) {
             $this->stateMachineRegistry->transition(
                 new Transition(
                     OrderDefinition::ENTITY_NAME,
@@ -67,7 +62,7 @@ class StateHandler
                     $transition->getActionName(),
                     'stateId'
                 ),
-                $salesChannelContext->getContext()
+                $context
             );
         }
     }

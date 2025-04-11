@@ -6,6 +6,7 @@
 
     <services>
         <service id="Netzkollektiv\EasyCredit\Payment\Handler\AbstractHandler" abstract="true">
+            <argument type="service" id="order_transaction.repository"/>
             <argument type="service" id="Netzkollektiv\EasyCredit\Payment\StateHandler"/>
             <argument type="service" id="Netzkollektiv\EasyCredit\Api\IntegrationFactory"/>
             <argument type="service" id="Netzkollektiv\EasyCredit\Api\Storage"/>
@@ -14,11 +15,13 @@
 
         <service id="Netzkollektiv\EasyCredit\Payment\Handler\InstallmentPaymentHandler"
             parent="Netzkollektiv\EasyCredit\Payment\Handler\AbstractHandler">
-            <tag name="shopware.payment.method.sync"/>
+            <tag name="shopware.payment.method.sync"/><!-- < SW 6.7 -->
+            <tag name="shopware.payment.method"/>
         </service>
         <service id="Netzkollektiv\EasyCredit\Payment\Handler\BillPaymentHandler"
             parent="Netzkollektiv\EasyCredit\Payment\Handler\AbstractHandler">
-            <tag name="shopware.payment.method.sync"/>
+            <tag name="shopware.payment.method.sync"/><!-- < SW 6.7 -->
+            <tag name="shopware.payment.method"/>
         </service>
 
         <service id="Netzkollektiv\EasyCredit\Payment\StateHandler">

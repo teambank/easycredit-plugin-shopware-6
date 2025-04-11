@@ -103,8 +103,9 @@ class Checkout implements EventSubscriberInterface
         }
 
         try {
-            $settings = $this->settings->getSettings($salesChannelContext->getSalesChannel()->getId());
-            $checkout = $this->integrationFactory->createCheckout($salesChannelContext);
+            $salesChannelId = $salesChannelContext->getSalesChannel()->getId();
+            $settings = $this->settings->getSettings($salesChannelId);
+            $checkout = $this->integrationFactory->createCheckout($salesChannelId);
         } catch (SettingsInvalidException $e) {
             $this->removePaymentMethodFromConfirmPage($event);
 

@@ -39,7 +39,7 @@ class CheckoutService
     public function startCheckout(SalesChannelContext $salesChannelContext, Transaction $quote)
     {
         try {
-            $checkout = $this->integrationFactory->createCheckout($salesChannelContext);
+            $checkout = $this->integrationFactory->createCheckout($salesChannelContext->getSalesChannel()->getId());
 
             if (!$this->storage->get('express')) {
                 $checkout->isAvailable($quote);

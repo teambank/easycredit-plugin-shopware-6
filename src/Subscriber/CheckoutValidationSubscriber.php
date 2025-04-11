@@ -61,7 +61,7 @@ class CheckoutValidationSubscriber implements EventSubscriberInterface
         $paymentHandler = $this->paymentHelper->getHandlerByPaymentMethod($salesChannelContext->getPaymentMethod());
 
         $checkout = $this->integrationFactory->createCheckout(
-            $salesChannelContext
+            $salesChannelContext->getSalesChannel()->getId()
         );
 
         if ($paymentHandler instanceof EasyCreditPaymentHandler) {
