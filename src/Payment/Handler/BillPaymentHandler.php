@@ -9,10 +9,20 @@ declare(strict_types=1);
 
 namespace Netzkollektiv\EasyCredit\Payment\Handler;
 
-class BillPaymentHandler extends AbstractHandler
-{
-    public function getPaymentType()
+if (\class_exists('Shopware\Core\Checkout\Payment\Cart\PaymentHandler\AbstractPaymentHandler')) {
+    class BillPaymentHandler extends AbstractHandler
     {
-        return 'BILL';
+        public function getPaymentType()
+        {
+            return 'BILL';
+        }
+    }
+} else { // <= SW 6.6
+    class BillPaymentHandler extends AbstractSynchronousHandler
+    {
+        public function getPaymentType()
+        {
+            return 'BILL';
+        }
     }
 }

@@ -5,23 +5,25 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-        <service id="Netzkollektiv\EasyCredit\Payment\Handler\AbstractHandler" abstract="true">
+        <service id="Netzkollektiv\EasyCredit\Payment\Handler\InstallmentPaymentHandler">
             <argument type="service" id="order_transaction.repository"/>
             <argument type="service" id="Netzkollektiv\EasyCredit\Payment\StateHandler"/>
             <argument type="service" id="Netzkollektiv\EasyCredit\Api\IntegrationFactory"/>
             <argument type="service" id="Netzkollektiv\EasyCredit\Api\Storage"/>
             <argument type="service" id="monolog.logger.easycredit"/>
-        </service>
 
-        <service id="Netzkollektiv\EasyCredit\Payment\Handler\InstallmentPaymentHandler"
-            parent="Netzkollektiv\EasyCredit\Payment\Handler\AbstractHandler">
             <tag name="shopware.payment.method.sync"/><!-- < SW 6.7 -->
-            <tag name="shopware.payment.method"/>
+            <tag name="shopware.payment.method"/><!-- >= SW 6.7 -->
         </service>
-        <service id="Netzkollektiv\EasyCredit\Payment\Handler\BillPaymentHandler"
-            parent="Netzkollektiv\EasyCredit\Payment\Handler\AbstractHandler">
+        <service id="Netzkollektiv\EasyCredit\Payment\Handler\BillPaymentHandler">
+            <argument type="service" id="order_transaction.repository"/>
+            <argument type="service" id="Netzkollektiv\EasyCredit\Payment\StateHandler"/>
+            <argument type="service" id="Netzkollektiv\EasyCredit\Api\IntegrationFactory"/>
+            <argument type="service" id="Netzkollektiv\EasyCredit\Api\Storage"/>
+            <argument type="service" id="monolog.logger.easycredit"/>
+
             <tag name="shopware.payment.method.sync"/><!-- < SW 6.7 -->
-            <tag name="shopware.payment.method"/>
+            <tag name="shopware.payment.method"/><!-- >= SW 6.7 -->
         </service>
 
         <service id="Netzkollektiv\EasyCredit\Payment\StateHandler">

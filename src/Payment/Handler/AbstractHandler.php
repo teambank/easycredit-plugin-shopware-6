@@ -125,20 +125,10 @@ abstract class AbstractHandler extends AbstractPaymentHandler
 
     protected function handlePaymentException($transaction, $message)
     {
-        // SW > 6.6
-        if (\class_exists(PaymentException::class)) {
-            throw PaymentException::syncProcessInterrupted(
-                $transaction->getOrderTransaction()->getId(),
-                $message
-            );
-        }
-        // SW < 6.6
-        if (\class_exists(SyncPaymentProcessException::class)) {
-            throw new SyncPaymentProcessException(
-                $transaction->getOrderTransaction()->getId(),
-                $message
-            );
-        }
+        throw PaymentException::syncProcessInterrupted(
+            $transaction->getOrderTransaction()->getId(),
+            $message
+        );
     }
 
     abstract public function getPaymentType();

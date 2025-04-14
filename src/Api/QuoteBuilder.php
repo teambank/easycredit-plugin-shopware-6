@@ -24,6 +24,7 @@ use Netzkollektiv\EasyCredit\Api\Quote\CustomerBuilder;
 use Netzkollektiv\EasyCredit\Service\FlexpriceService;
 use Netzkollektiv\EasyCredit\Helper\Payment as PaymentHelper;
 use Netzkollektiv\EasyCredit\Payment\Handler\AbstractHandler;
+use Netzkollektiv\EasyCredit\Payment\Handler\AbstractSynchronousHandler;
 use Teambank\EasyCreditApiV3\Model\Transaction;
 use Teambank\EasyCreditApiV3\Model\ShippingAddress;
 use Teambank\EasyCreditApiV3\Model\InvoiceAddress;
@@ -137,7 +138,7 @@ class QuoteBuilder
         }
 
         $paymentHandler = $this->paymentHelper->getHandlerByPaymentMethod($method);
-        if ($paymentHandler instanceof AbstractHandler) {
+        if (method_exists($paymentHandler, 'getPaymentType')) {
             return $paymentHandler->getPaymentType() . '_PAYMENT';
         }
     }
