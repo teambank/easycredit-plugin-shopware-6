@@ -107,7 +107,7 @@ export const goThroughPaymentPage = async ({
   page,
   paymentType,
   express = false,
-  switchPaymentType = false
+  switchPaymentType = false,
 }: {
   page: any;
   paymentType: PaymentTypes;
@@ -127,10 +127,13 @@ export const goThroughPaymentPage = async ({
     ).toBeVisible();
 
     if (switchPaymentType) {
-      await page
+      const switchButton  = await page
         .locator(".paymentoptions")
-        .getByText(paymentType === PaymentTypes.INSTALLMENT ? "Rechnung" : "Ratenkauf")
-        .click();
+        .getByText(
+          paymentType === PaymentTypes.INSTALLMENT ? "Rechnung" : "Ratenkauf"
+        );
+      await expect(switchButton).toBeVisible();
+      await switchButton.click({ force: true });
     }
 
     await page.getByRole("button", { name: "Weiter zur Dateneingabe" }).click();
@@ -164,7 +167,7 @@ export const goThroughPaymentPage = async ({
       await page.locator("#city").fill("Nürnberg");
     }
 
-    await page.locator("#agreeAll").click();
+    await page.locator("#agreeSepa").click();
 
     await delay(1000);
 
