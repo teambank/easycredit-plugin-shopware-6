@@ -2,14 +2,12 @@
     <div class="easycredit-payment-detail">
         <div v-if="!isLoading">
             <sw-card :title="$tc('easycredit-payment.paymentDetails.cardTitle')">
-                <template slot="grid">
-                    <sw-card-section>
-                        <sw-container columns="1fr"
-                                      gap="0px 30px">
-                            <easycredit-tx-widget :order="order" componentType="manager" />
-                        </sw-container>
-                    </sw-card-section>
-                </template>
+                <sw-card-section>
+                    <sw-container columns="300px 1fr"
+                                    gap="0px 30px">
+                        <easycredit-tx-widget :order="order" componentType="manager" />
+                    </sw-container>
+                </sw-card-section>
             </sw-card>
         </div>
         <sw-loader v-if="isLoading">

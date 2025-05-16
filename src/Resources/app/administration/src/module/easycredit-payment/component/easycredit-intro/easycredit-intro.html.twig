@@ -1,102 +1,104 @@
-<sw-alert
-    variant="info"
-    :showIcon="false"
-    v-if="billPaymentActive && !paymentMethodStatuses['easycredit_rechnung']"
->
-    <span class="badge">{{ $tc('easycredit-payment.intro.introAlert.new') }}</span>
-    <strong>{{ $tc('easycredit-payment.intro.introAlert.text') }}</strong> <a href="/admin#/sw/settings/payment/overview">{{ $tc('easycredit-payment.intro.introAlert.activate') }}</a>
-</sw-alert>
+<div>
+    <sw-alert
+        variant="info"
+        :showIcon="false"
+        v-if="billPaymentActive && !paymentMethodStatuses['easycredit_rechnung']"
+    >
+        <span class="badge">{{ $tc('easycredit-payment.intro.introAlert.new') }}</span>
+        <strong>{{ $tc('easycredit-payment.intro.introAlert.text') }}</strong> <a href="/admin#/sw/settings/payment/overview">{{ $tc('easycredit-payment.intro.introAlert.activate') }}</a>
+    </sw-alert>
+    
+    <div class="easycredit-marketing__grid">
+        <div class="sw-card">
+            <div class="sw-card__content">
+                <div class="easycredit-marketing intro-2024">
+                    <div class="easycredit-marketing__grid">
+                        <div class="easycredit-marketing__content">
+                            <h2>{{ $tc('easycredit-payment.intro.introText.title') }}</h2>
+                            <p>{{ $tc('easycredit-payment.intro.introText.text') }}</p>
+                            <sw-button
+                                variant="primary"
+                                link="https://netzkollektiv.com/docs/easycredit-shopware6/index.html"
+                                class="mt-button"
+                            >
+                                {{ $tc('easycredit-payment.intro.introText.documentation') }}
+                            </sw-button>
+                            <sw-button
+                                variant="primary"
+                                link="https://easycredit-demo.netzkollektiv.com/"
+                                class="mt-button"
+                            >
+                                {{ $tc('easycredit-payment.intro.introText.demoshop') }}
+                            </sw-button>
+                            <a href="https://partner.easycredit-ratenkauf.de/registrierung/firmendaten" target="_blank" class="not-decorated">{{ $tc('easycredit-payment.intro.introText.register') }}</a>
+                        </div>
 
-<div class="easycredit-marketing__grid">
-    <div class="sw-card">
-        <div class="sw-card__content">
-            <div class="easycredit-marketing intro-2024">
-                <div class="easycredit-marketing__grid">
+                        <div class="easycredit-marketing__image bg fill aspect-2-3">
+                            <img :src="assetFilter('/easycreditratenkauf/static/card-intro-image.png')">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="sw-card dimmed">
+            <div class="sw-card__content">
+                <div class="easycredit-marketing intro-2024">
                     <div class="easycredit-marketing__content">
-                        <h2>{{ $tc('easycredit-payment.intro.introText.title') }}</h2>
-                        <p>{{ $tc('easycredit-payment.intro.introText.text') }}</p>
-                        <sw-button
-                            variant="primary"
-                            link="https://netzkollektiv.com/docs/easycredit-shopware6/index.html"
-                            class="mt-button"
-                        >
-                            {{ $tc('easycredit-payment.intro.introText.documentation') }}
-                        </sw-button>
-                        <sw-button
-                            variant="primary"
-                            link="https://easycredit-demo.netzkollektiv.com/"
-                            class="mt-button"
-                        >
-                            {{ $tc('easycredit-payment.intro.introText.demoshop') }}
-                        </sw-button>
-                        <a href="https://partner.easycredit-ratenkauf.de/registrierung/firmendaten" target="_blank" class="not-decorated">{{ $tc('easycredit-payment.intro.introText.register') }}</a>
-                    </div>
-
-                    <div class="easycredit-marketing__image bg fill aspect-2-3">
-                        <img :src="assetFilter('/easycreditratenkauf/static/card-intro-image.png')">
+                        <h2>{{ $tc('easycredit-payment.intro.introLinks.title') }}</h2>
+                        <p>{{ $tc('easycredit-payment.intro.introLinks.text') }}</p>
+                        <ul>
+                            <li><a href="https://www.easycredit-ratenkauf.de/kontakt/" target="_blank">{{ $tc('easycredit-payment.intro.introLinks.support') }}</a></li>
+                            <li><a href="tel:091153902726" target="_blank">{{ $tc('easycredit-payment.intro.introLinks.call-us') }}</a></li>
+                            <li><a href="https://www.easycredit-ratenkauf.de/kontakt/#b064f73c4cdfc080a73b69ea0125da53" target="_blank">{{ $tc('easycredit-payment.intro.introLinks.contact-form') }}</a></li>
+                        </ul>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="sw-card dimmed">
+    <div
+        class="sw-card"
+        id="ecbill"
+        v-if="!billPaymentActive || !paymentMethodStatuses['easycredit_rechnung']"
+    >
         <div class="sw-card__content">
             <div class="easycredit-marketing intro-2024">
-                <div class="easycredit-marketing__content">
-                    <h2>{{ $tc('easycredit-payment.intro.introLinks.title') }}</h2>
-                    <p>{{ $tc('easycredit-payment.intro.introLinks.text') }}</p>
-                    <ul>
-                        <li><a href="https://www.easycredit-ratenkauf.de/kontakt/" target="_blank">{{ $tc('easycredit-payment.intro.introLinks.support') }}</a></li>
-                        <li><a href="tel:091153902726" target="_blank">{{ $tc('easycredit-payment.intro.introLinks.call-us') }}</a></li>
-                        <li><a href="https://www.easycredit-ratenkauf.de/kontakt/#b064f73c4cdfc080a73b69ea0125da53" target="_blank">{{ $tc('easycredit-payment.intro.introLinks.contact-form') }}</a></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+                <div class="easycredit-marketing__grid grid-50-50">
+                    <div class="easycredit-marketing__image bg fill aspect-36-2">
+                        <img :src="assetFilter('/easycreditratenkauf/static/card-easycredit-rechnung-image.png')">
+                    </div>
 
-<div
-    class="sw-card"
-    id="ecbill"
-    v-if="!billPaymentActive || !paymentMethodStatuses['easycredit_rechnung']"
->
-    <div class="sw-card__content">
-        <div class="easycredit-marketing intro-2024">
-            <div class="easycredit-marketing__grid grid-50-50">
-                <div class="easycredit-marketing__image bg fill aspect-36-2">
-                    <img :src="assetFilter('/easycreditratenkauf/static/card-easycredit-rechnung-image.png')">
-                </div>
-
-                <div class="easycredit-marketing__content">
-                    <span class="badge">Neu</span>
-                    <h2>{{ $tc('easycredit-payment.intro.introBill.title') }}</h2>
-                    <p>{{ $tc('easycredit-payment.intro.introBill.text') }}</p>
-                    <sw-button
-                        variant="primary"
-                        link="/admin#/sw/settings/payment/overview"
-                        target="_self"
-                        class="mt-button"
-                        v-if="billPaymentActive"
-                    >
-                        {{ $tc('easycredit-payment.intro.introBill.activate') }}
-                    </sw-button>
-                    <sw-button
-                        variant="primary"
-                        link="https://partner.easycredit-ratenkauf.de/portal"
-                        class="mt-button"
-                        v-if="!billPaymentActive"
-                    >
-                        {{ $tc('easycredit-payment.intro.introBill.unlock') }}
-                    </sw-button>
-                    <sw-button
-                        variant="context"
-                        link="https://www.easycredit-ratenkauf.de/produkt/"
-                        class="mt-external-link"
-                    >
-                        {{ $tc('easycredit-payment.intro.introBill.learnMore') }} <sw-icon name="regular-external-link-s" />
-                    </sw-button>
+                    <div class="easycredit-marketing__content">
+                        <span class="badge">Neu</span>
+                        <h2>{{ $tc('easycredit-payment.intro.introBill.title') }}</h2>
+                        <p>{{ $tc('easycredit-payment.intro.introBill.text') }}</p>
+                        <sw-button
+                            variant="primary"
+                            link="/admin#/sw/settings/payment/overview"
+                            target="_self"
+                            class="mt-button"
+                            v-if="billPaymentActive"
+                        >
+                            {{ $tc('easycredit-payment.intro.introBill.activate') }}
+                        </sw-button>
+                        <sw-button
+                            variant="primary"
+                            link="https://partner.easycredit-ratenkauf.de/portal"
+                            class="mt-button"
+                            v-if="!billPaymentActive"
+                        >
+                            {{ $tc('easycredit-payment.intro.introBill.unlock') }}
+                        </sw-button>
+                        <sw-button
+                            variant="context"
+                            link="https://www.easycredit-ratenkauf.de/produkt/"
+                            class="mt-external-link"
+                        >
+                            {{ $tc('easycredit-payment.intro.introBill.learnMore') }} <sw-icon name="regular-external-link-s" />
+                        </sw-button>
+                    </div>
                 </div>
             </div>
         </div>
