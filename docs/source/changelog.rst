@@ -1,6 +1,11 @@
 Changelog
 =========
 
+3.1.2
+-----
+
+* Anpassungen zur Kompatibilität mit Shopware 6.7
+
 3.1.1
 -----
 
