@@ -7,7 +7,7 @@
         },
         "settingForm": {
             "save": "Save",
-            "test": "Test API access data & synchronise ID",
+            "test": "Test API access data",
             "titleSaveSuccess": "easyCredit settings",
             "titleTestSuccess": "API credentials",
             "titleTestError": "API credentials error",

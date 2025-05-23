@@ -49,12 +49,6 @@ class SettingsController extends AbstractController
                 'apiPassword' => $apiPassword,
                 'apiSignature' => $apiSignature
             ]);
-
-            $webshopInfo = $this->integrationFactory
-                ->createCheckout()
-                ->getWebshopDetails();
-
-            $this->settings->updateSettings(['webshopInfo' => \json_encode($webshopInfo)]);
         }
 
         return new JsonResponse(['credentialsValid' => $credentialsValid]);
