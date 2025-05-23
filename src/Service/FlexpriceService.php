@@ -21,32 +21,35 @@ use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\Content\Product\SalesChannel\SalesChannelProductEntity;
-use Netzkollektiv\EasyCredit\Setting\Service\SettingsServiceInterface;
 use Netzkollektiv\EasyCredit\Service\RuleEvaluator;
+use Netzkollektiv\EasyCredit\Service\WebshopInfoService;
 
 class FlexpriceService {
 
     private EntityRepository $ruleRepository;
 
-    private SettingsServiceInterface $settingsService;
-
     private RuleEvaluator $ruleEvaluator;
+
+    private WebshopInfoService $webshopInfoService;
 
     public function __construct(
         EntityRepository $ruleRepository,
-        SettingsServiceInterface $settingsService,
-        RuleEvaluator $ruleEvaluator
+        RuleEvaluator $ruleEvaluator,
+        WebshopInfoService $webshopInfoService
     ) {
         $this->ruleRepository = $ruleRepository;
-        $this->settingsService = $settingsService;
         $this->ruleEvaluator = $ruleEvaluator;
+        $this->webshopInfoService = $webshopInfoService;
     }
 
     public function isEnabled(SalesChannelContext $salesChannelContext) {
-        $webshopInfo = $this->settingsService
-            ->getSettings($salesChannelContext->getSalesChannel()->getId())
-            ->getWebshopInfo();
-        return \is_array($webshopInfo) && isset($webshopInfo['flexprice']) && $webshopInfo['flexprice'] === true;
+        try {
+            return $this->webshopInfoService
+                ->getWebshopInfo($salesChannelContext->getSalesChannel()->getId())
+                ->getFlexprice() === true;
+        } catch (\Throwable $e) {
+            return false;
+        }
     }
 
     protected function getFlexpriceRule(Context $context)

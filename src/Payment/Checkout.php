@@ -24,6 +24,7 @@ use Shopware\Storefront\Page\Checkout\Confirm\CheckoutConfirmPageLoadedEvent;
 use Symfony\Component\Cache\Adapter\TagAwareAdapterInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Psr\Log\LoggerInterface;
+use Netzkollektiv\EasyCredit\Service\WebshopInfoService;
 
 class Checkout implements EventSubscriberInterface
 {
@@ -41,26 +42,26 @@ class Checkout implements EventSubscriberInterface
 
     private LoggerInterface $logger;
 
-    private TagAwareAdapterInterface $cache;
+    private WebshopInfoService $webshopInfoService;
 
     public function __construct(
-        PaymentHelper $paymentHelper,
-        SettingsServiceInterface $settingsService,
-        IntegrationFactory $integrationFactory,
-        QuoteHelper $quoteHelper,
         Storage $storage,
-        FlexpriceService $flexpriceService,
+        PaymentHelper $paymentHelper,
+        QuoteHelper $quoteHelper,
+        SettingsServiceInterface $settings,
+        IntegrationFactory $integrationFactory,
+        WebshopInfoService $webshopInfoService,
         LoggerInterface $logger,
-        TagAwareAdapterInterface $cache
+        FlexpriceService $flexpriceService
     ) {
-        $this->paymentHelper = $paymentHelper;
-        $this->settings = $settingsService;
-        $this->integrationFactory = $integrationFactory;
-        $this->quoteHelper = $quoteHelper;
         $this->storage = $storage;
-        $this->flexpriceService = $flexpriceService;
+        $this->paymentHelper = $paymentHelper;
+        $this->quoteHelper = $quoteHelper;
+        $this->settings = $settings;
+        $this->integrationFactory = $integrationFactory;
+        $this->webshopInfoService = $webshopInfoService;
         $this->logger = $logger;
-        $this->cache = $cache;
+        $this->flexpriceService = $flexpriceService;
     }
 
     public static function getSubscribedEvents(): array
@@ -113,7 +114,7 @@ class Checkout implements EventSubscriberInterface
         }
 
         try {
-            $this->getWebshopDetails($checkout);
+            $this->webshopInfoService->getWebshopInfo($salesChannelId);
         } catch (\Throwable $e) {
             $this->logger->error($e->getMessage());
             $this->removePaymentMethodFromConfirmPage($event);
@@ -161,20 +162,6 @@ class Checkout implements EventSubscriberInterface
         } catch (\JsonException $e) {
             return null;
         }
-    }
-
-    public function getWebshopDetails($checkout)
-    {
-        $agreement = [];
-        $cacheItem = $this->cache->getItem('easycredit-webshop-details');
-        if ($cacheItem->isHit() && $cacheItem->get()) {
-            $agreement = $cacheItem->get();
-        } else {
-            $agreement = $checkout->getWebshopDetails();
-            $cacheItem->set($agreement);
-            $this->cache->save($cacheItem);
-        }
-        return $agreement;
     }
 
     private function removePaymentMethodFromConfirmPage(CheckoutConfirmPageLoadedEvent $event): void

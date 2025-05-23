@@ -151,8 +151,6 @@ class SettingStruct extends Struct
      */
     protected $expressCartEnabled = true;
 
-    protected ?string $webshopInfo = null;
-
     public function getWebshopId(): ?string
     {
         return $this->webshopId;
@@ -431,15 +429,5 @@ class SettingStruct extends Struct
     public function setExpressCartEnabled(bool $expressCartEnabled): void
     {
         $this->expressCartEnabled = $expressCartEnabled;
-    }
-
-    public function getWebshopInfo(): ?\stdClass
-    {
-        return $this->webshopInfo ? \json_decode($this->webshopInfo) : null;
-    }
-
-    public function setWebshopInfo(array $webshopInfo): void
-    {
-        $this->webshopInfo = \json_encode($webshopInfo);
     }
 }

@@ -122,14 +122,14 @@
         </service>
 
         <service id="Netzkollektiv\EasyCredit\Payment\Checkout">
+            <argument type="service" id="Netzkollektiv\EasyCredit\Api\Storage"/>
             <argument type="service" id="Netzkollektiv\EasyCredit\Helper\Payment"/>
+            <argument type="service" id="Netzkollektiv\EasyCredit\Helper\Quote"/>
             <argument type="service" id="Netzkollektiv\EasyCredit\Setting\Service\SettingsService"/>
             <argument type="service" id="Netzkollektiv\EasyCredit\Api\IntegrationFactory"/>
-            <argument type="service" id="Netzkollektiv\EasyCredit\Helper\Quote"/>
-            <argument type="service" id="Netzkollektiv\EasyCredit\Api\Storage"/>
-            <argument type="service" id="Netzkollektiv\EasyCredit\Service\FlexpriceService"/>
+            <argument type="service" id="Netzkollektiv\EasyCredit\Service\WebshopInfoService"/>
             <argument type="service" id="monolog.logger.easycredit"/>
-            <argument type="service" id="cache.object"/>
+            <argument type="service" id="Netzkollektiv\EasyCredit\Service\FlexpriceService"/>
 
             <tag name="kernel.event_subscriber"/>
         </service>
@@ -258,8 +258,8 @@
         </service>
         <service id="Netzkollektiv\EasyCredit\Service\FlexpriceService">
             <argument type="service" id="rule.repository"/>
-            <argument type="service" id="Netzkollektiv\EasyCredit\Setting\Service\SettingsService"/>
             <argument type="service" id="Netzkollektiv\EasyCredit\Service\RuleEvaluator" />
+            <argument type="service" id="Netzkollektiv\EasyCredit\Service\WebshopInfoService" />
         </service>
         <service id="Netzkollektiv\EasyCredit\Subscriber\CheckoutValidationSubscriber">
             <argument type="service" id="request_stack"/>
@@ -268,7 +268,11 @@
 
             <tag name="kernel.event_subscriber"/>
         </service>
-
+        <service id="Netzkollektiv\EasyCredit\Service\WebshopInfoService">
+            <argument type="service" id="Netzkollektiv\EasyCredit\Api\IntegrationFactory"/>
+            <argument type="service" id="cache.object"/>
+            <argument type="service" id="monolog.logger.easycredit"/>
+        </service>
         <service id="Netzkollektiv\EasyCredit\Subscriber\CheckoutOrderPlacedSubscriber">
             <argument type="service" id="order_transaction.repository"/>
             <argument type="service" id="Netzkollektiv\EasyCredit\Api\Storage" />
