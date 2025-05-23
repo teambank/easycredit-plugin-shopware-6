@@ -11,21 +11,9 @@ Shopware.Application.addServiceProviderDecorator('ruleConditionDataProviderServi
         scopes: ['cart'],
         group: 'cart',
     });
-
-    const systemConfigApiService = Shopware.Service('systemConfigApiService');
-    systemConfigApiService.getValues('EasyCreditRatenkauf')
-        .then((cfg) => {
-            if (typeof cfg['EasyCreditRatenkauf.config.webshopInfo'] === 'object' &&
-                cfg['EasyCreditRatenkauf.config.webshopInfo'].flexprice
-            ) {
-                ruleConditionService.addModuleType({
-                        id: 'easycredit-flexprice',
-                        name: 'easycredit.rule.flexPriceType',
-                });
-            }
-        })
-        .catch((error) => {
-            // fail silently
-        });
+    ruleConditionService.addModuleType({
+            id: 'easycredit-flexprice',
+            name: 'easycredit.rule.flexPriceType',
+    });
     return ruleConditionService;
 });

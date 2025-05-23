@@ -7,7 +7,7 @@
         },
         "settingForm": {
             "save": "Speichern",
-            "test": "API Zugangsdaten testen & Kennung synchronisieren",
+            "test": "API Zugangsdaten testen",
             "titleSaveSuccess": "easyCredit Einstellungen",
             "titleTestSuccess": "API Zugangsdaten",
             "titleTestError": "API Zugangsdaten Fehler",
