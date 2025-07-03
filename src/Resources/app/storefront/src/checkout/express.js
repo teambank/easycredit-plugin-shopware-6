@@ -10,6 +10,15 @@ export default class EasyCreditRatenkaufExpressCheckout extends Plugin {
       const component = e.target;
       const easyCreditParams = this.buildAdditionalParams(e.detail);
 
+      if (
+        document.querySelector(".is-ctl-checkout.is-act-cartpage") ||
+        component.closest(".cart-offcanvas")
+      ) {
+        const params = new URLSearchParams(easyCreditParams).toString();
+        window.location.href = "/easycredit/express" + "?" + params;
+        return;
+      }
+
       const buyForm = document.getElementById(
         "productDetailPageBuyProductForm"
       );
@@ -30,15 +39,6 @@ export default class EasyCreditRatenkaufExpressCheckout extends Plugin {
           replicatedForm.submit();
           return;
         }
-      }
-
-      if (
-        document.querySelector(".is-ctl-checkout.is-act-cartpage") ||
-        component.closest(".cart-offcanvas")
-      ) {
-        const params = new URLSearchParams(easyCreditParams).toString();
-        window.location.href = "/easycredit/express" + "?" + params;
-        return;
       }
 
       window.alert(
