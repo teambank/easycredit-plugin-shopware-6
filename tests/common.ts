@@ -93,11 +93,11 @@ export const startExpress = async ({
 }) => {
   await test.step(`Start express checkout (${paymentType})`, async () => {
     if (paymentType === PaymentTypes.INSTALLMENT) {
-      await page.locator("a").filter({ hasText: "Jetzt direkt in Raten zahlen" }).click();
+      await page.locator("button").filter({ hasText: "in Raten" }).click();
       await page.getByText("Akzeptieren", { exact: true }).click();
     }
     if (paymentType === PaymentTypes.BILL) {
-      await page.locator("a").filter({ hasText: "In 30 Tagen" }).click();
+      await page.locator("button").filter({ hasText: "heute bestellen" }).click();
       await page.getByText("Akzeptieren", { exact: true }).click();
     }
   });
@@ -136,7 +136,7 @@ export const goThroughPaymentPage = async ({
       await switchButton.click({ force: true });
     }
 
-    await page.getByRole("button", { name: "Weiter zur Dateneingabe" }).click();
+    await page.getByRole("button", { name: "Dateneingabe" }).click();
 
     if (express) {
       await page.locator("#firstName").fill(randomize("Ralf"));
@@ -167,18 +167,16 @@ export const goThroughPaymentPage = async ({
       await page.locator("#city").fill("Nürnberg");
     }
 
-    await page.locator("#agreeSepa").click();
+    await page.locator("#sepamandat tbk-svg-icon").click();
 
     await delay(1000);
 
-    await clickWithRetry(
-      page.getByRole("button", { name: "Zahlungswunsch prüfen" })
-    );
+    await page.locator("#next-btn").click();
 
     await delay(500);
-    await page
-      .getByRole("button", { name: "Zahlungswunsch übernehmen" })
-      .click();
+    await clickWithRetry(
+      page.getByRole("button", { name: "Zahlung übernehmen" })
+    );
   });
 };
 
