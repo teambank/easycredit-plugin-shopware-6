@@ -15,7 +15,7 @@ Eine Zahlung über easyCredit ist unter den folgenden Bedingungen möglich:
 Bestellvorgang
 --------------
 
-easyCredit-Rechnung und easyCredit-Ratenkauf wird als Zahlungsmethode im Bezahlvorgang angezeigt. Nach Bestätigung der Zustimmungserklärung und Auswahl der Anrede wird der Nutzer auf das Zahlungsterminal von easyCredit weitergeleitet.
+easyCredit-Rechnung und easyCredit-Ratenkauf wird als Zahlungsmethode im Bezahlvorgang angezeigt. Nach dem Klick auf "Weiter zu easyCredit-Rechnung" oder "Weiter zu easyCredit-Ratenkauf" wird der Kunde auf das Zahlungsterminal von easyCredit weitergeleitet.
 
 .. image:: ./_static/usage-customer-payment-methods.png
            :scale: 25%

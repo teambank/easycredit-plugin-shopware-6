@@ -6,12 +6,12 @@
 Konfiguration
 =============
 
-Nachdem Sie die Installation erfolgreich abgeschlossen haben, konfigurieren Sie das Plugin. Damit das Plugin als Zahlungsmethode angezeigt wird aktivieren Sie easyCredit-Ratenkauf und easyCredit-Rechnung als Zahlungsmethode für den deutschen Store.
+Nachdem Sie die Installation erfolgreich abgeschlossen haben, konfigurieren Sie das Plugin. Damit das Plugin als Zahlungsmethode angezeigt wird, aktivieren Sie easyCredit-Ratenkauf und easyCredit-Rechnung als Zahlungsmethoden für den deutschen Store.
 
 Konfigurations Menü öffnen
 --------------------------
 
-Zur Konfiguration öffnen Sie in der Administration den Bereich *Erweiterungen -> Meine Erweiterungen*. In der Liste der installierten Plugins sollte nun **easyCredit-Rechnung & Ratenkauf für Shopware 6** enthalten sein.
+Zur Konfiguration öffnen Sie in der Administration den Bereich :menuselection:`Erweiterungen --> Meine Erweiterungen`. In der Liste der installierten Plugins sollte nun **easyCredit-Rechnung & Ratenkauf für Shopware 6** enthalten sein.
 In dieser Zeile klicken Sie einfach auf das Plugin um die Konfiguration zu öffnen.
 
 .. image:: ./_static/config-open.png
@@ -100,7 +100,7 @@ Die Zins-Flexibilisierung bietet dem Händler die Möglichkeit seinen Kunden ein
 
 .. note:: Die Ausnahme-Funktion ist ab der Version 2.2.4 integriert.
 
-Defintion von Ausnahmen über den Rule-Builder
+Definition von Ausnahmen über den Rule-Builder
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Die Ausnahmen von der Zins-Flexibilisierung können über den Rule-Builder definiert werden. Um die Funktionalität zu aktivieren, muss die Kennung mittels Klick auf "Zugangsdaten testen & Kennung synchronsieren" synchronisiert werden.

@@ -11,7 +11,7 @@ Zur Nutzung von **easyCredit-Rechnung und Ratenkauf für Shopware 6** benötigen
 Versionskompatibilität
 ----------------------
 
-Die Erweiterung hat neben Shopware 6.x keine weiteren Abhängigkeiten. Es wurde für die folgenden Versionen mit dem "Shopware default" Theme getestet:
+Die Erweiterung hat neben Shopware 6.x keine weiteren Abhängigkeiten und wurde für die folgenden Versionen mit dem "Shopware default" Theme getestet:
 
 * 6.6.x
 * 6.5.x

@@ -60,7 +60,7 @@ In den E-Mail Templates lässt sich diese Position über eine Anpassung des Temp
         {% endif %}
     {% endfor %}
 
-Da es sich an dieser Stelle im Template nicht zweifelsfrei feststellen lässt, ob das easyCredit-Plugin für die Position ursächlich ist, haben wir diese Template-Überschreibung nicht ins Plugin aufgenommen.
+Da es sich an dieser Stelle im Template nicht eindeutig feststellen lässt, ob das easyCredit-Plugin für die Position ursächlich ist, haben wir diese Template-Überschreibung nicht ins Plugin aufgenommen.
 
 in älteren Shopware-Versionen (< v6.6) kommt es zu dem JavaScript-Fehler `Uncaught Error: Plugin "EasyCreditRatenkaufCheckout" is already registered`
 ------------------------------------------------------------------------------------------------------------------------------------------------------

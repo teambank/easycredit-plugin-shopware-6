@@ -13,12 +13,9 @@ Shopware Community Store
 Sie finden das Erweiterung im Shopware Community Store unter der folgenden URL:
 https://store.shopware.com/easyc36021249341f/easycredit-ratenkauf-fuer-shopware-6.html
 
-Legen Sie die Erweiterung in den Warenkorb und kaufen Sie es kostenlos unter der ihrer Lizenzdomain. In der Shopware-Administration sollte die Erweiterung nun unter :menuselection:`Erweiterungen --> Meine Erweiterungen` zu finden sein:
+Legen Sie die Erweiterung in den Warenkorb und kaufen Sie diesw kostenlos unter ihrer Lizenzdomain. In der Shopware-Administration sollte die Erweiterung nun unter :menuselection:`Erweiterungen --> Meine Erweiterungen` zu finden sein. Die Erweiterung wird Ihnen nun unter :menuselection:`Erweiterungen --> Meine Erweiterungen --> Reiter "Apps"` zur Installation angezeigt. Installieren Sie die Erweiterung durch Klick auf Installieren. Fahren Sie anschließend mit der Konfiguration fort.
 
 .. image:: ./_static/installation-community_store.png
-
-
-Die Erweiterung wird Ihnen nun unter „Erweiterungen -> Meine Erweiterungen -> Reiter "Apps"“ zur Installation angezeigt. Installieren Sie die Erweiterung durch Klick auf Installieren. Fahren Sie anschließend mit der Konfiguration fort.
 
 manueller Datei-Upload
 ---------------------------------
@@ -47,7 +44,7 @@ Um sicher zu gehen, überprüfen Sie, ob das folgende Verzeichnis existiert: ``c
     $ ./bin/console plugin:install EasyCreditRatenkauf
     $ ./bin/console plugin:activate EasyCreditRatenkauf
 
-Fahren Sie anschließend mit der :ref:`configuration` fort.
+Fahren Sie danach mit der :ref:`configuration` fort.
 
 ..
 ..  Sollten Ihnen die Zugangsdaten bereits vorliegen, können Sie diese gleich bei der Installation mit den folgenden Befehlen setzen:
