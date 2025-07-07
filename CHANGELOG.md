@@ -1,3 +1,11 @@
+# 3.1.3
+
+* Zinsflex ist im Plugin nun für alle Händler verfügbar
+* beim Start des Express-Checkouts aus dem Offcanvas-Warenkorb auf der Produktseite werden Artikel nicht mehr dupliziert
+* die Webshop-Daten werden nicht mehr in der Konfiguration gespeichert, sondern erst bei Bedarf abgerufen
+* die Express-Buttons werden auf der Warenkorb-Seite nun entsprechend der Konfiguration dargestellt
+* kleinere Darstellungsfehler in der Konfiguration wurden behoben (SW 6.7)
+
 # 3.1.2
 
 * Anpassungen zur Kompatibilität mit Shopware 6.7
