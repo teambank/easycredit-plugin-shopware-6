@@ -95,6 +95,11 @@ $color-darkblue: #002C5A;
     }
 
     &__grid {
+        --grid-column-gap: 48px;
+        --grid-column-gap-m: 36px;
+        --grid-template-columns: 3fr 2fr;
+        --grid-template-columns-50-50: 1fr 1fr;
+
         display: grid;
         grid-template-columns: var(--grid-template-columns);
         grid-column-gap: var(--grid-column-gap);
@@ -202,11 +207,14 @@ $color-darkblue: #002C5A;
             }
         }
 
-        .sw-button {
+        .sw-button,
+        .mt-button {
             margin-bottom: 10px;
+            font-size: $font-size-base;
 
-            .sw-icon {
-                width: 10px;
+            .sw-icon,
+            .mt-icon {
+                width: 10px !important;
 
                 &.icon--regular-flow {
                     width: 15px;
@@ -463,6 +471,33 @@ $color-darkblue: #002C5A;
             padding: 0;
             background: transparent;
             border-radius: 0;
+        }
+    }
+}
+
+// SW67 adjustments due to new Meteor components
+.mt-card {
+    &:has(.intro-2024) {
+        background-color: transparent;
+        border: 0;
+
+        .mt-card__content {
+            padding: 0;
+        }
+
+        .sw-card {
+            margin: 0 auto var(--scale-size-40);
+            background-color: var(--color-elevation-surface-raised);
+            border: 1px solid var(--color-border-primary-default);
+            border-radius: var(--border-radius-card);
+
+            &.dimmed {
+                background-color: transparent;
+            }
+
+            &__content {
+                padding: var(--scale-size-24);
+            }
         }
     }
 }
