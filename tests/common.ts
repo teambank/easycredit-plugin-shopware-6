@@ -246,7 +246,7 @@ export const openEditShippingAddressModal = async (page) => {
         .getByText("Edit address")
         .first()
         .click();
-    }  
+    }
 }
 
 export const saveShippingAddressModal = async (page) => {
@@ -257,10 +257,10 @@ export const saveShippingAddressModal = async (page) => {
         .click();
     } else if (greaterOrEqualsThan("6.4.7")) {
       await page
-        .locator("#shipping-address-create-edit")
+        .locator("#shipping-address-create-edit, #shipping-edit-address-create-edit")
         .getByText("Save address")
         .click();
-    } else {
+    } else  {
       await page
         .locator("#address-create-edit")
         .getByText("Save address")

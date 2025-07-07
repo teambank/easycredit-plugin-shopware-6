@@ -47,7 +47,7 @@ export const greaterOrEqualsThan = (v) => {
       sensitivity: "base",
     }) <= 0
   );
-};
+}
 
 export async function clickWithRetry(locator, maxRetries = 3) {
   let attempt = 0;
