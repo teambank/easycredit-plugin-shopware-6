@@ -125,7 +125,7 @@
             }
         },
         "clickAndCollect": {
-            "introText": "<p>Sie wollen Click&Collect in Verbindung mit easyCredit nutzen? Nichts einfacher als das! Um das Feature nutzen zu können, benötigen Sie eine ergänzende Zusatzvereinbarung zu Ihrem Factoringvertrag. Sprechen Sie dazu einfach Ihren Key-Account-Manager an oder fragen Sie diesen über unser <a href=\"https://www.easycredit-ratenkauf.de/click-und-collect/\" target=\"_blank\">Click&Collect-Formular</a> an.</p><p>Wichtig für Sie ist, dass Sie bei Nutzung von Click&Collect sicherstellen müssen, dass das gekaufte Produkt ausschließlich an den Vertragspartner übergeben wird. Die Verantwortung für die korrekte Übergabe liegt bei Ihnen als Händler.</p><p>Bitte stellen Sie im Folgenden die Versandart mit der Sie Click&Collect anbieten ein:</p>"
+            "introText": "<p>Sie wollen Click&Collect in Verbindung mit easyCredit nutzen? Nichts einfacher als das! Um das Feature nutzen zu können, benötigen Sie eine ergänzende Zusatzvereinbarung zu Ihrem Factoringvertrag. Sprechen Sie dazu einfach Ihren Key-Account-Manager an oder fragen Sie diesen über unser <a href=\"https://partner.easycredit.de/service-optionen/#clickundcollect\" target=\"_blank\">Click&Collect-Formular</a> an.</p><p>Wichtig für Sie ist, dass Sie bei Nutzung von Click&Collect sicherstellen müssen, dass das gekaufte Produkt ausschließlich an den Vertragspartner übergeben wird. Die Verantwortung für die korrekte Übergabe liegt bei Ihnen als Händler.</p><p>Bitte stellen Sie im Folgenden die Versandart mit der Sie Click&Collect anbieten ein:</p>"
         },
         "transactionHandling": {
             "capture": {
