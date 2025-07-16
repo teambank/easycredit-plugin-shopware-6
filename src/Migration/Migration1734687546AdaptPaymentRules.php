@@ -20,7 +20,7 @@ class Migration1734687546AdaptPaymentRules extends MigrationStep
 {
     public function getCreationTimestamp(): int
     {
-        return 1657600000; // Timestamp for your migration
+        return 1734687546; // Timestamp for your migration
     }
 
     /**

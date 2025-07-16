@@ -22,8 +22,8 @@ class Migration171257360AddBillPaymentHandler extends MigrationStep
 
     public function update(Connection $connection): void
     {
-        $sql = "UPDATE payment_method Set handler_identifier = '" . InstallmentPaymentHandler::class . "'
-            WHERE handler_identifier = '" . self::LEGACY_HANDLER_IDENTIFIER . "'";
+        $sql = "UPDATE payment_method Set handler_identifier = '" . \addslashes(InstallmentPaymentHandler::class) . "'
+            WHERE handler_identifier = '" . \addslashes(self::LEGACY_HANDLER_IDENTIFIER) . "'";
         $connection->executeStatement($sql);
     }
 

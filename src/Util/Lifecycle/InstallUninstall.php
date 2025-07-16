@@ -208,14 +208,16 @@ class InstallUninstall
             $criteria = (new Criteria())
                 ->addFilter(new EqualsAnyFilter('handlerIdentifier', $handlerIdentifiers));
 
-            if (isset($data[0]['id'])) { // if installment exists, but billPayment does not, this must be an update => leave billPayment inactive
-                $method['active'] = false;
-            }
-
             $paymentMethodId = $this->paymentMethodRepository->searchIds($criteria, $context)->firstId();
             if ($paymentMethodId !== null) {
                 $method['id'] = $paymentMethodId;
+                continue; // do not recreate or update the method, if it exists
             }
+
+            if (isset($data[0]['id'])) { // if installment existed, but billPayment does not, this must be an update => leave billPayment inactive
+                $method['active'] = false;
+            }
+
             $this->paymentMethodRepository->upsert([$method], $context);
         }
     }
