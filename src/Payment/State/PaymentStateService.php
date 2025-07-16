@@ -30,6 +30,10 @@ class PaymentStateService
 
     public function load($salesChannelContext)
     {
+        if (empty($salesChannelContext->getToken())) {
+            return; // skip silently, happens if a salesChannelContext is created without token
+        }
+
         $criteria = new Criteria([$salesChannelContext->getToken()]);
 
         return $this->paymentStateRepository
