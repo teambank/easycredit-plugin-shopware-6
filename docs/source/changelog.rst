@@ -1,6 +1,13 @@
 Changelog
 =========
 
+3.1.4
+-----
+
+* behebt einen Fehler im Update-Prozess, bei dem die Zahlart-Einstellungen überschrieben wurden und Rule-Builder Regeln u.U. doppelt angelegt wurden
+* der `StorageInitializer` lädt nur noch bei vorhandenem Token und verhindert einen Fehler bei SalesChannelContext mit leerem Token
+* einige externe Links wurden aktualisiert
+
 3.1.3
 -----
 
