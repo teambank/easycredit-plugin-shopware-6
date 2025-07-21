@@ -1,3 +1,7 @@
+# 3.1.5
+
+* das Storefront-Skript wurde neu gebaut (enthält nun die Änderung aus v3.1.3 bzgl. Duplizierung bei Express-Checkout)
+
 # 3.1.4
 
 * behebt einen Fehler im Update-Prozess, bei dem die Zahlart-Einstellungen überschrieben wurden und Rule-Builder Regeln u.U. doppelt angelegt wurden
