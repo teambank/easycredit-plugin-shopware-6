@@ -28,6 +28,15 @@
 
 {% endblock %}
 
+{% block layout_head_javascript_router %}
+    {{ parent() }}
+    <script>
+    if (typeof window.router === 'object') {
+        window.router['frontend.easycredit.express'] = '{{ path('frontend.easycredit.express') }}';
+    }
+    </script>
+{% endblock %}
+
 {# >= SW 6.5 #}
 {% block layout_head_javascript_hmr_mode %}
     {{ parent() }}

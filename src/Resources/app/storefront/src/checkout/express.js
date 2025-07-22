@@ -15,7 +15,8 @@ export default class EasyCreditRatenkaufExpressCheckout extends Plugin {
         component.closest(".cart-offcanvas")
       ) {
         const params = new URLSearchParams(easyCreditParams).toString();
-        window.location.href = "/easycredit/express" + "?" + params;
+        const baseUrl = window.router['frontend.easycredit.express'] ?? '/easycredit/express';
+        window.location.href = [baseUrl, params].join('?');
         return;
       }
 
