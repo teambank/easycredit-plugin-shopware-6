@@ -15,7 +15,6 @@ use Teambank\EasyCreditApiV3\Model\CustomerRelationship;
 use Netzkollektiv\EasyCredit\Api\Storage;
 use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
-use Shopware\Core\Checkout\Cart\LineItem\LineItem;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Netzkollektiv\EasyCredit\Setting\Service\SettingsServiceInterface;
 use Netzkollektiv\EasyCredit\Api\Quote\AddressBuilder;
@@ -201,7 +200,7 @@ class QuoteBuilder
     {
         $_items = [];
         foreach ($items as $item) {
-            if ($item->getType() !== LineItem::PRODUCT_LINE_ITEM_TYPE) {
+            if ($item->getType() === Processor::LINE_ITEM_TYPE) {
                 continue;
             }
 
