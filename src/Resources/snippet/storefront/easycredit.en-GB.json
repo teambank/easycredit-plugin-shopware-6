@@ -12,6 +12,6 @@
     "error": {
         "EASYCREDIT_INSTALLMENTS_MUST_BE_RECALCULATED": "easyCredit: Your order was changed, please recalculate installments.",
         "EASYCREDIT_INIT_ERROR": "easyCredit: Please correct your order and click 'Recalculate installments'",
-        "EASYCREDIT_TRANSATION_NOT_APRROVED": "Pre-authorisation is required to complete the order with easyCredit."
+        "EASYCREDIT_TRANSATION_NOT_APRROVED": "To complete your order using this payment method, please proceed to easyCredit."
     }
 }
