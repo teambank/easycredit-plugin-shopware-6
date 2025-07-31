@@ -20,6 +20,7 @@ use Netzkollektiv\EasyCredit\Setting\Service\SettingsServiceInterface;
 use Netzkollektiv\EasyCredit\Api\Quote\AddressBuilder;
 use Netzkollektiv\EasyCredit\Api\Quote\ItemBuilder;
 use Netzkollektiv\EasyCredit\Api\Quote\CustomerBuilder;
+use Netzkollektiv\EasyCredit\Cart\Processor;
 use Netzkollektiv\EasyCredit\Service\FlexpriceService;
 use Netzkollektiv\EasyCredit\Helper\Payment as PaymentHelper;
 use Netzkollektiv\EasyCredit\Payment\Handler\AbstractHandler;

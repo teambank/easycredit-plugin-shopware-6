@@ -101,11 +101,11 @@ class ItemBuilder
 
         return new ShoppingCartInformationItem([
             'productName' => $item->getLabel(),
-            'productUrl' => $this->seoUrlReplacer->replace(
+            'productUrl' => $item->getReferencedId() ? $this->seoUrlReplacer->replace(
                 $this->seoUrlReplacer->generate('frontend.detail.page', ['productId' => $item->getReferencedId()]),
                 $context->getSalesChannel()->getDomains()->first()->getUrl(),
                 $context
-            ),
+            ) : null,
             'productImageUrl' => $item->getCover() ? $item->getCover()->getUrl() : null,
             'quantity' => $item->getQuantity(),
             'price' => $item->getPrice() === null ? 0 : $item->getPrice()->getTotalPrice(),
