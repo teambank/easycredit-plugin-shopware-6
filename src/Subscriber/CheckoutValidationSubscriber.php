@@ -9,10 +9,10 @@ declare(strict_types=1);
 
 namespace Netzkollektiv\EasyCredit\Subscriber;
 
-use Netzkollektiv\EasyCredit\Payment\Handler\AbstractHandler as EasyCreditPaymentHandler;
+use Netzkollektiv\EasyCredit\Payment\Handler\AbstractHandler;
+use Netzkollektiv\EasyCredit\Payment\Handler\AbstractSynchronousHandler;
 use Netzkollektiv\EasyCredit\Api\IntegrationFactory;
 use Netzkollektiv\EasyCredit\Helper\Payment as PaymentHelper;
-
 use Shopware\Core\Checkout\Payment\Cart\PaymentHandler\PaymentHandlerRegistry;
 use Shopware\Core\Framework\Validation\BuildValidationEvent;
 use Shopware\Core\PlatformRequest;
@@ -64,7 +64,10 @@ class CheckoutValidationSubscriber implements EventSubscriberInterface
             $salesChannelContext->getSalesChannel()->getId()
         );
 
-        if ($paymentHandler instanceof EasyCreditPaymentHandler) {
+        if (
+            $paymentHandler instanceof AbstractHandler ||
+            $paymentHandler instanceof AbstractSynchronousHandler
+        ) {
             if (!$checkout->isApproved()) {
                 throw new ConstraintViolationException(new ConstraintViolationList([
                     new ConstraintViolation(

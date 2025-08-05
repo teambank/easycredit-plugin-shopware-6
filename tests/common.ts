@@ -57,6 +57,50 @@ export const fillCheckout = async (page) => {
   });
 };
 
+export const paymentSelect = async ({
+  page,
+  paymentType,
+}: {
+  page: any;
+  paymentType: PaymentTypes;
+}) => {
+  await test.step(`Select payment type (${paymentType})`, async () => {
+    if (paymentType === PaymentTypes.INSTALLMENT) {
+      await page
+        .locator("easycredit-checkout-label[payment-type=INSTALLMENT]")
+        .click();
+      return;
+    }
+    if (paymentType === PaymentTypes.BILL) {
+      await page
+        .locator("easycredit-checkout-label[payment-type=BILL]")
+        .click();
+      return;
+    }
+  });
+}
+
+export const paymentProceed = async ({
+  page,
+  paymentType,
+}: {
+  page: any;
+  paymentType: PaymentTypes;
+}) => {
+  await test.step(`Proceed with payment (${paymentType})`, async () => {
+    if (paymentType === PaymentTypes.INSTALLMENT) {
+      await page.getByRole("button", { name: "Weiter zu easyCredit-Ratenkauf" }).click();
+      return;
+    }
+    if (paymentType === PaymentTypes.BILL) {
+      await page
+        .getByRole("button", { name: "Weiter zu easyCredit-Rechnung" })
+        .click();
+      return;
+    }
+  });
+}
+
 export const selectAndProceed = async ({
   page,
   paymentType,
@@ -65,22 +109,8 @@ export const selectAndProceed = async ({
   paymentType: PaymentTypes;
 }) => {
   await test.step(`Start standard checkout (${paymentType})`, async () => {
-    if (paymentType === PaymentTypes.INSTALLMENT) {
-      await page
-        .locator("easycredit-checkout-label[payment-type=INSTALLMENT]")
-        .click();
-      await page.getByRole("button", { name: "Weiter zu easyCredit-Ratenkauf" }).click();
-      return;
-    }
-    if (paymentType === PaymentTypes.BILL) {
-      await page
-        .locator("easycredit-checkout-label[payment-type=BILL]")
-        .click();
-      await page
-        .getByRole("button", { name: "Weiter zu easyCredit-Rechnung" })
-        .click();
-      return;
-    }
+    await paymentSelect({ page, paymentType });
+    await paymentProceed({ page, paymentType });
   });
 }
 

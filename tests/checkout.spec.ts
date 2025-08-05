@@ -11,7 +11,8 @@ import {
   checkAddressInvalidation,
   checkAmountInvalidation,
   openEditShippingAddressModal,
-  saveShippingAddressModal
+  saveShippingAddressModal,
+  paymentSelect
 } from "./common";
 import { PaymentTypes } from "./types";
 
@@ -306,5 +307,30 @@ test.describe("product above amount constraint should not be buyable @bill @inst
         await page.locator(`easycredit-checkout[payment-type=${paymentType}]`)
       ).toContainText("liegt außerhalb der zulässigen Beträge");
     }
+  });
+});
+
+test.describe("order without authorization should not be possible", () => {
+  test("orderWithoutAuthorizationRestricted", async ({ page }) => {
+    await goToProduct(page);
+    await addCurrentProductToCart(page);
+
+    await page.goto("checkout/confirm");
+    await fillCheckout(page);
+
+    await paymentSelect({ page, paymentType: PaymentTypes.INSTALLMENT })
+
+    /* Confirm Page */
+    await expect(page.getByText("I have read")).toBeVisible({ timeout: 10000 });
+    await page.evaluate(async () => {
+      // workaround: checking checkboxes results in "Target closed" on CI
+      document.getElementById("tos").checked = true;
+    });
+
+    await page.getByRole('button', { name: 'Submit order' }).click();
+
+    await expect(
+      await page.getByText('To complete your order using this payment method, please proceed to easyCredit.')
+    ).toBeVisible();
   });
 });
