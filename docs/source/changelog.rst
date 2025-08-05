@@ -1,6 +1,14 @@
 Changelog
 =========
 
+3.1.6
+-----
+
+* die Initialisierung mit Bundle-Produkten ist nun möglich
+* der Hinweis-Text bei Bestellabschluss ohne Transaktion wurde angepasst
+* behebt einen Fehler bei der Transaktionsvalidierung (<= SW 6.5)
+* der Express-Checkout funktioniert nun auch bei Konfiguration von Shopware in Unterverzeichnis
+
 3.1.5
 -----
 
