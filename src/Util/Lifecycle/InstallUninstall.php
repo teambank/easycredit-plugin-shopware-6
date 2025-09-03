@@ -8,13 +8,11 @@ declare(strict_types=1);
  */
 
 namespace Netzkollektiv\EasyCredit\Util\Lifecycle;
-
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\ContainsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsAnyFilter;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Plugin\Util\PluginIdProvider;
 use Shopware\Core\Framework\Plugin\Context\UpdateContext;
 use Shopware\Core\Framework\Plugin\Context\InstallContext;
@@ -29,10 +27,7 @@ use Shopware\Core\Checkout\Cart\Rule\LineItemGoodsTotalRule;
 use Shopware\Core\Framework\Rule\Container\AndRule;
 use Shopware\Core\Framework\Rule\Container\OrRule;
 use Shopware\Core\System\Currency\Rule\CurrencyRule;
-use Shopware\Core\System\Country\CountryDefinition;
-use Shopware\Core\System\Currency\CurrencyDefinition;
 use Shopware\Core\Framework\Uuid\Uuid;
-use Netzkollektiv\EasyCredit\Helper\Payment as PaymentHelper;
 use Netzkollektiv\EasyCredit\Payment\Handler\BillPaymentHandler;
 use Netzkollektiv\EasyCredit\Payment\Handler\InstallmentPaymentHandler;
 use Netzkollektiv\EasyCredit\Setting\Service\SettingsService;
@@ -127,32 +122,72 @@ class InstallUninstall
 
     private function getAvailabilityRule($name, $context)
     {
+        $andChildren = [
+            [
+                'type' => (new CurrencyRule())->getName(),
+                'value' => [
+                    'operator' => Rule::OPERATOR_EQ,
+                    'currencyIds' => $this->getCurrencyIds(['EUR'], $context)
+                ]
+            ],
+            [
+                'type' => (new OrRule())->getName(),
+                'children' => [
+                    [
+                        'type' => (new BillingCountryRule())->getName(),
+                        'value' => [
+                            'operator' => Rule::OPERATOR_EQ,
+                            'countryIds' => $this->getCountryIds(['DE'], $context),
+                        ],
+                    ],
+                    [
+                        'type' => (new BillingCountryRule())->getName(),
+                        'value' => [
+                            'operator' => Rule::OPERATOR_EMPTY,
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        if (\class_exists(LineItemProductStatesRule::class)) {
+            $andChildren[] = [
+                'type' => (new OrRule())->getName(),
+                'children' => [
+                    [
+                        'type' => (new MatchAllLineItemsRule())->getName(),
+                        'value' => [ 'type' => 'product' ],
+                        'children' => [
+                            [
+                                'type' => (new LineItemProductStatesRule())->getName(),
+                                'value' => [
+                                    'operator' => Rule::OPERATOR_EQ,
+                                    'productState' => State::IS_PHYSICAL,
+                                ],
+                            ],
+                        ],
+                    ],
+                    [
+                        'type' => (new LineItemGoodsTotalRule())->getName(),
+                        'value' => [
+                            'operator' => Rule::OPERATOR_EQ,
+                            'count' => 0,
+                        ],
+                    ],
+                ],
+            ];
+        }
+
         return [
             'availabilityRule' => [
                 'name' => $name . ' - nur verfügbar in DE, bei Zahlung in EUR',
                 'priority' => 1,
-                'description' => 'Diese Verfügbarkeitsregel wurde automatisch bei Installation von ' . $name . ' erstellt. 
-                    Sie kann beliebig angepasst werden und wird bei Updates nicht überschrieben.',
+                'description' => 'Diese Verfügbarkeitsregel wurde automatisch bei Installation von ' . $name . ' erstellt.
+Sie kann beliebig angepasst werden und wird bei Updates nicht überschrieben.',
                 'conditions' => [
                     [
                         'type' => (new AndRule())->getName(),
-                        'children' => [
-                            [
-                                'type' => (new CurrencyRule())->getName(),
-                                'value' => [
-                                    'operator' => Rule::OPERATOR_EQ,
-                                    'currencyIds' => $this->getCurrencyIds(['EUR'], $context)
-                                ]
-                            ],
-                            [
-                                'type' => (new BillingCountryRule())->getName(),
-                                'value' => [
-                                    'operator' => Rule::OPERATOR_EQ,
-                                    'countryIds' => $this->getCountryIds(['DE'], $context),
-                                ],
-
-                            ]
-                        ]
+                        'children' => $andChildren,
                     ]
                 ]
             ]
