@@ -8,7 +8,10 @@
         {# @var easycredit #}
         {% set easycredit = page.extensions.easycredit %}
 
-        <meta name="easycredit-payment-types" content="{{ easyCreditAvailablePaymentTypes(context, product) | join(',') }}">
+        {% set paymentTypes = easyCreditAvailablePaymentTypes(context, product) %}
+        {% if paymentTypes %}
+        <script class="easycredit-config" type="application/json">{{ { 'payment-types': paymentTypes }|json_encode|raw }}</script>
+        {% endif %}
 
         {% set isProductDetail = cmsPage.type is same as 'product_detail' %}
         {% if not isProductDetail %}

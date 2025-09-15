@@ -7,6 +7,11 @@ export const goToProduct = async (page, sku = "regular") => {
     await page.goto(`/search?search=${sku}`);
   });
 };
+export const goToCart = async (page) => {
+  await test.step(`Go to cart`, async () => {
+    await page.goto("/checkout/cart");
+  });
+};
 
 export const addCurrentProductToCart = async (page) => {
   await page.getByRole("button", { name: "Add to shopping cart" }).first().click();

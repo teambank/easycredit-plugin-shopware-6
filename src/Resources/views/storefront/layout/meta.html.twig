@@ -6,24 +6,29 @@
     {# @var easycredit #}
     {% set easycredit = page.extensions.easycredit %}
 
+    {% set easycreditConfig = {} %}
     {% if easycredit.apiKey %}
-    <meta name="easycredit-api-key" content="{{ easycredit.apiKey }}" />
+    {% set easycreditConfig = easycreditConfig|merge({'api-key': easycredit.apiKey}) %}
     {% endif %}
 
     {% if easycredit.widgetSelector %}
-    <meta name="easycredit-widget-selector" content="{{ easycredit.widgetSelector }}" />
+    {% set easycreditConfig = easycreditConfig|merge({'widget-selector': easycredit.widgetSelector}) %}
     {% endif %}
 
     {% if easycredit.amount %}
-    <meta name="easycredit-amount" content="{{ easycredit.amount }}" />
+    {% set easycreditConfig = easycreditConfig|merge({'amount': easycredit.amount}) %}
     {% endif %}
 
-    {% if easycredit.disableFlexprice %}
-    <meta name="easycredit-disable-flexprice" content="{{ easycredit.disableFlexprice }}" />
+    {% if easycredit.disableFlexprice is not null %}
+    {% set easycreditConfig = easycreditConfig|merge({'disable-flexprice': easycredit.disableFlexprice ? true : false}) %}
     {% endif %}
 
     {% if easycredit.paymentTypes %}
-    <meta name="easycredit-payment-types" content="{{ easycredit.paymentTypes |join(',') }}" />
+    {% set easycreditConfig = easycreditConfig|merge({'payment-types': easycredit.paymentTypes}) %}
+    {% endif %}
+
+    {% if easycreditConfig is not empty %}
+    <script class="easycredit-config" type="application/json">{{ easycreditConfig|json_encode|raw }}</script>
     {% endif %}
 
 {% endblock %}

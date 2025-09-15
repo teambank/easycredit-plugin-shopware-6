@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
-import { takeScreenshot, scaleDown } from "./utils";
-import { goToProduct } from "./common.ts";
+import { takeScreenshot, scaleDown, greaterOrEqualsThan } from "./utils";
+import { goToProduct, addCurrentProductToCart, goToCart } from "./common.ts";
 
 test.beforeEach(scaleDown);
 test.afterEach(takeScreenshot);
@@ -39,5 +39,26 @@ test.describe("Widget should not be visible for digital products @product", () =
         .locator('[itemprop="offers"]')
         .getByText(/Finanzieren ab.+?Bestellwert/)
     ).not.toBeVisible();
+  });
+});
+
+test.describe("Widget should be visible @cart", () => {
+  test("widgetProduct", async ({ page }) => {
+    await goToProduct(page);
+    await addCurrentProductToCart(page);
+
+    await expect(
+      await page
+        .locator('.offcanvas')
+        .getByText(/Finanzieren ab.+?Monat/)
+    ).toBeVisible();
+
+    await goToCart(page);
+
+    await expect(
+      await page
+        .locator('.checkout-aside')
+          .getByText(/Finanzieren ab.+?Monat/)
+      ).toBeVisible();
   });
 });
