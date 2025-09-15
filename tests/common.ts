@@ -147,14 +147,12 @@ export const goThroughPaymentPage = async ({
   await test.step(`easyCredit Payment (${paymentType})`, async () => {
     await page.getByTestId("uc-deny-all-button").click();
 
-    await expect(
-      page.getByRole("heading", {
-        name:
-          paymentType === PaymentTypes.INSTALLMENT
-            ? "Monatliche Wunschrate"
-            : "Ihre Bezahloptionen",
-      })
-    ).toBeVisible();
+    const switcher = page.locator('app-ratenkauf-payment-switch-smart');
+    if (paymentType === PaymentTypes.INSTALLMENT) {
+      await expect(switcher.getByLabel('Ratenkauf')).toBeChecked();
+    } else {
+      await expect(switcher.getByLabel('Rechnung')).toBeChecked();
+}
 
     if (switchPaymentType) {
       const switchButton  = await page
@@ -173,7 +171,7 @@ export const goThroughPaymentPage = async ({
       await page.locator("#lastName").fill("Ratenkauf");
     }
 
-    await page.locator("#dateOfBirth").fill("05.04.1972");
+    await page.locator("input#dateOfBirth").fill("05.04.1972");
 
     if (express) {
       await page
@@ -197,7 +195,7 @@ export const goThroughPaymentPage = async ({
       await page.locator("#city").fill("Nürnberg");
     }
 
-    await page.locator("#sepamandat tbk-svg-icon").click();
+    await page.locator("#agreeSepa").check();
 
     await delay(1000);
 
