@@ -6,8 +6,10 @@
 
     {% set easycredit = page.extensions.easycredit %}
     {% if easyCreditAvailablePaymentTypes(context) and easycredit.widgetEnabled %}
-    <meta name="easycredit-widget-selector" itemprop="selector" content="{{ easycredit.widgetSelector }}">
-    <meta name="easycredit-amount" itemprop="amount" content="{{ easycredit.amount }}">
+    <script class="easycredit-config" type="application/json">{{ {
+        'widget-selector': easycredit.widgetSelector,
+        'amount': easycredit.amount
+    }|json_encode|raw }}</script>
     {% endif %}
 
 {% endblock %}

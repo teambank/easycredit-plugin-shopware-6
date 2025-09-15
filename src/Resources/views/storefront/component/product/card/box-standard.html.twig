@@ -11,8 +11,10 @@
         {% if product.calculatedPrices.count > 0 %}
             {% set price = product.calculatedPrices.last %}
         {% endif %}
-
-        <meta name="easycredit-amount" itemprop="amount" content="{{ price.unitPrice }}">
-        <meta name="easycredit-payment-types" itemprop="payment-types" content="{{ easyCreditAvailablePaymentTypes(context, product) |join(',') }}">
+        {% set paymentTypes = easyCreditAvailablePaymentTypes(context, product) %}
+        <script class="easycredit-config" type="application/json">{{ {
+            'amount': price.unitPrice,
+            'payment-types': paymentTypes
+        }|json_encode|raw }}</script>
     {% endif %}
 {% endblock %}

@@ -8,23 +8,26 @@ export default class EasyCreditRatenkaufWidget extends Plugin {
         this.initWidget(
             document.querySelector('.cms-element-product-listing')
         )
+        this.initWidget(
+            document.querySelector('.is-act-cartpage')
+        )
         this.registerOffCanvas();
     }
 
     registerOffCanvas () {
-        let element = document.querySelector('[data-off-canvas-cart]')
-        if (!element) {
-           return
+        let element = document.querySelector('[data-off-canvas-cart],[data-offcanvas-cart]')
+        if (element) {
+            window.PluginManager
+                .getPluginInstanceFromElement(element, 'OffCanvasCart')
+                .$emitter
+                .subscribe('offCanvasOpened', this.onOffCanvasOpened.bind(this));
+            return
         }
-        window.PluginManager
-            .getPluginInstanceFromElement(element, 'OffCanvasCart')
-            .$emitter
-            .subscribe('offCanvasOpened', this.onOffCanvasOpened.bind(this));
     }
 
     onOffCanvasOpened () {
         this.initWidget(
-            document.querySelector('div.cart-offcanvas')
+            document.querySelector('div.offcanvas-cart')
         )
     }
 
@@ -43,9 +46,14 @@ export default class EasyCreditRatenkaufWidget extends Plugin {
         }
 
         const processedSelector = this.processSelector(selector)
-        container.querySelectorAll(processedSelector.selector).forEach((element) => {
+        const elements = container.querySelectorAll(processedSelector.selector)
+        for (const element of elements) {
             this.applyWidget(element, processedSelector.attributes)
-        })
+
+            if (processedSelector.selector === '.checkout-aside-action:not(.d-grid)') {
+                break // fix specifically for cart selector in SW 6.4.20.2 or lower, .d-grid is missing
+            }
+        }
     }
 
     applyWidget(element, attributes) {
@@ -82,13 +90,29 @@ export default class EasyCreditRatenkaufWidget extends Plugin {
     }
 
     getMeta(key, element = null) {
-        const selector = 'meta[name=easycredit-' + key + ']'
+        // 1) Try nearest element-scoped JSON config
+        if (element) {
+            const localConfig = this.searchUpTheTree(element, 'script.easycredit-config[type="application/json"]')
+            const extracted = this.extractConfigValueFromJson(localConfig && localConfig.textContent, key)
+            if (extracted !== null && extracted !== undefined) {
+                return extracted
+            }
+        }
 
-        let meta;
+        // 2) Try global JSON config in head
+        const configEl = document.head.querySelector('.easycredit-config')
+        const extractedHead = this.extractConfigValueFromJson(configEl && configEl.textContent, key)
+        if (extractedHead !== null && extractedHead !== undefined) {
+            return extractedHead
+        }
+
+        // 3) Fallback to meta tags for legacy data
+        const selector = 'meta[name=easycredit-' + key + ']'
+        let meta
         if (element) {
             meta = this.searchUpTheTree(element, selector)
         } else {
-            meta = document.querySelector(selector);
+            meta = document.querySelector(selector)
         }
         if (meta) {
             return meta.content
@@ -135,5 +159,38 @@ export default class EasyCreditRatenkaufWidget extends Plugin {
             return Array.from(document.head.children).find(el => el.matches(selector)) || null;
         }
         return null;
+    }
+
+    extractConfigValue(data, key) {
+        if (!data || typeof data !== 'object') {
+            return null
+        }
+        if (!Object.prototype.hasOwnProperty.call(data, key)) {
+            return null
+        }
+        const value = data[key]
+        if (Array.isArray(value)) {
+            return value.join(',')
+        }
+        if (typeof value === 'object') {
+            return Object.values(value).join(',')
+        }
+        if (typeof value === 'boolean') {
+            return value ? 'true' : ''
+        }
+        return value
+    }
+
+    extractConfigValueFromJson(jsonText, key) {
+        if (!jsonText || (typeof jsonText === 'string' && jsonText.trim() === '')) {
+            return null
+        }
+        try {
+            const data = JSON.parse(jsonText)
+            return this.extractConfigValue(data, key)
+        } catch (e) {
+            // ignore malformed JSON
+            return null
+        }
     }
 }
