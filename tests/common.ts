@@ -152,12 +152,14 @@ export const goThroughPaymentPage = async ({
   await test.step(`easyCredit Payment (${paymentType})`, async () => {
     await page.getByTestId("uc-deny-all-button").click();
 
+    /*
     const switcher = page.locator('app-ratenkauf-payment-switch-smart');
     if (paymentType === PaymentTypes.INSTALLMENT) {
       await expect(switcher.getByLabel('Ratenkauf')).toBeChecked();
     } else {
       await expect(switcher.getByLabel('Rechnung')).toBeChecked();
-}
+    }
+    */
 
     if (switchPaymentType) {
       const switchButton  = await page

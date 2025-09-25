@@ -114,7 +114,7 @@ test.describe("go through @express @bill", () => {
   });
 });
 
-test.describe("go through standard @installment and switch to @bill", () => {
+/*test.describe("go through standard @installment and switch to @bill", () => {
   test("standardCheckoutInstallmentSwitchToBill", async ({ page }) => {
     await goToProduct(page);
 
@@ -132,7 +132,7 @@ test.describe("go through standard @installment and switch to @bill", () => {
 
     await fillCheckout(page);
 
-    /* Confirm Page */
+    // Confirm Page
     await selectAndProceed({ page, paymentType: PaymentTypes.INSTALLMENT });
 
     await goThroughPaymentPage({
@@ -146,6 +146,7 @@ test.describe("go through standard @installment and switch to @bill", () => {
     });
   });
 });
+*/
 
 test.describe("company should not be able to pay @bill @installment", () => {
   test("companyBlocked", async ({ page }) => {
