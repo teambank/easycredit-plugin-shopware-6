@@ -88,15 +88,7 @@ class EasyCreditRatenkauf extends Plugin
 
     public function install(InstallContext $installContext): void
     {
-        (new InstallUninstall(
-            $this->container->get('system_config.repository'),
-            $this->container->get('payment_method.repository'),
-            $this->container->get('country.repository'),
-            $this->container->get('currency.repository'),
-            $this->container->get(PluginIdProvider::class),
-            $this->container->get(SystemConfigService::class),
-            static::class
-        ))->install($installContext);
+        $this->createInstallUninstall()->install($installContext);
 
         parent::install($installContext);
     }
@@ -109,32 +101,30 @@ class EasyCreditRatenkauf extends Plugin
             return;
         }
 
-        (new InstallUninstall(
-            $this->container->get('system_config.repository'),
-            $this->container->get('payment_method.repository'),
-            $this->container->get('country.repository'),
-            $this->container->get('currency.repository'),
-            $this->container->get(PluginIdProvider::class),
-            $this->container->get(SystemConfigService::class),
-            static::class
-        ))->uninstall($uninstallContext);
+        $this->createInstallUninstall()->uninstall($uninstallContext);
 
         parent::uninstall($uninstallContext);
     }
 
     public function update(UpdateContext $updateContext): void
     {
-        (new InstallUninstall(
+        $this->createInstallUninstall()->update($updateContext);
+
+        parent::update($updateContext);
+    }
+
+    private function createInstallUninstall(): InstallUninstall
+    {
+        return new InstallUninstall(
             $this->container->get('system_config.repository'),
             $this->container->get('payment_method.repository'),
             $this->container->get('country.repository'),
             $this->container->get('currency.repository'),
             $this->container->get(PluginIdProvider::class),
             $this->container->get(SystemConfigService::class),
+            (string) $this->container->getParameter('kernel.shopware_version'),
             static::class
-        ))->update($updateContext);
-
-        parent::update($updateContext);
+        );
     }
 
     /**

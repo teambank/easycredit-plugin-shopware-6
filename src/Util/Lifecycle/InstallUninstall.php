@@ -46,6 +46,8 @@ class InstallUninstall
 
     private PluginIdProvider $pluginIdProvider;
 
+    private string $shopwareVersion;
+
     private string $className;
 
     private SystemConfigService $systemConfig;
@@ -57,13 +59,15 @@ class InstallUninstall
         EntityRepository $currencyRepository,
         PluginIdProvider $pluginIdProvider,
         SystemConfigService $systemConfig,
-        string $className
+        string $shopwareVersion,
+        string $className,
     ) {
         $this->systemConfigRepository = $systemConfigRepository;
         $this->paymentMethodRepository = $paymentMethodRepository;
         $this->countryRepository = $countryRepository;
         $this->currencyRepository = $currencyRepository;
         $this->pluginIdProvider = $pluginIdProvider;
+        $this->shopwareVersion = $shopwareVersion;
         $this->className = $className;
         $this->systemConfig = $systemConfig;
     }
@@ -151,12 +155,12 @@ class InstallUninstall
         ];
 
         if (\class_exists(LineItemProductStatesRule::class)) {
-            $andChildren[] = [
+            $lineItemProductStates = [
                 'type' => (new OrRule())->getName(),
                 'children' => [
                     [
                         'type' => (new MatchAllLineItemsRule())->getName(),
-                        'value' => [ 'type' => 'product' ],
+                        'value' => [ 'types' => [ 'product' ] ],
                         'children' => [
                             [
                                 'type' => (new LineItemProductStatesRule())->getName(),
@@ -176,6 +180,12 @@ class InstallUninstall
                     ],
                 ],
             ];
+
+            if (\version_compare($this->shopwareVersion, '6.7.2.0', '<')) {
+                $lineItemProductStates['children'][0]['value'] = [ 'type' => 'product' ];
+            }
+            $andChildren[] = $lineItemProductStates;
+
         }
 
         return [
