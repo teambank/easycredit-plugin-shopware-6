@@ -55,7 +55,7 @@ jobs:
           - 'v6.6.9'
           - 'v6.6.10'
           - 'v6.7.0'
-          - 'v6.7.1'
+          # - 'v6.7.1' # Shopware error: An exception has been thrown during the rendering of a template ("Call to undefined method Twig\Parser::parseExpression()"). with these parameters: {"headerParameters":[],"footerParameters":[],"themeIconConfig":[]}" at index.html.twig line 2
           - 'v6.7.2'
 
     name: Shopware ${{ matrix.shopware-version }}

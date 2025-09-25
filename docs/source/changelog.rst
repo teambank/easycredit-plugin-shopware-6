@@ -1,6 +1,14 @@
 Changelog
 =========
 
+3.1.7
+-------
+
+* die Zahlart-Verfügbarkeitsregeln werden nun vollständig bei Installation / Neuinstallation angelegt und  nicht mehr per Migration angepasst
+* die Widget-Konfiguration wird nun als JSON-Objekt angegeben (vorher: meta-Tags)
+* das Widget wird nun wieder im Warenkorb angezeigt (`/checkout/cart`) & in älteren Version auch wieder im OffCanvasCart (< 6.5)
+* Anpassungen zur Kompatibilität mit Shopware 6.7.2.x
+
 3.1.6
 -----
 

@@ -4,6 +4,7 @@ coverage/
 phpstan.neon
 .php-cs-fixer.php
 *hot-update.js
+.tmp
 /dist
 /vendor
 node_modules

@@ -60,7 +60,7 @@ class InstallUninstall
         PluginIdProvider $pluginIdProvider,
         SystemConfigService $systemConfig,
         string $shopwareVersion,
-        string $className,
+        string $className
     ) {
         $this->systemConfigRepository = $systemConfigRepository;
         $this->paymentMethodRepository = $paymentMethodRepository;
