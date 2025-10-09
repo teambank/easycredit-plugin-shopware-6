@@ -4,7 +4,7 @@
 
     {{ parent() }}
 
-    {% set easycredit = page.extensions.easycredit %}
+    {% set easycredit = (page ?? cmsPage).extensions.easycredit %}
     {% if easycredit.widgetEnabled and easycredit.apiKey %}
 
         {% set price = product.calculatedPrice %}
