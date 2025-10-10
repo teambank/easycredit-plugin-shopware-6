@@ -1,167 +1,167 @@
 name: Test
 
 on:
-  push:
-    branches:
-    - 'main'
-    - 'sw67'
+    push:
+        branches:
+            - 'main'
+            - 'sw67'
 
 jobs:
-  ci-current:
-    runs-on: ubuntu-latest
-    strategy:
-      max-parallel: 20
-      fail-fast: false
-      matrix:
-        shopware-version:
-          #- 'v6.4.1' # incompatible: several errors in early versions, wontfix
-          #- 'v6.4.2' # incompatible: several errors in early versions, wontfix
-          #- 'v6.4.3' # incompatibilities, wontfix
-          #- 'v6.4.4' # incompatibilities, wontfix
-          - 'v6.4.5'
-          - 'v6.4.6'
-          - 'v6.4.7'
-          - 'v6.4.8'
-          - 'v6.4.9'
-          - 'v6.4.10'
-          - 'v6.4.11'
-          - 'v6.4.12'
-          - 'v6.4.13'
-          - 'v6.4.14'
-          - 'v6.4.15'
-          - 'v6.4.16'
-          - 'v6.4.17'
-          - 'v6.4.18'
-          - 'v6.4.19'
-          - 'v6.4.20'
-          - 'v6.5.0'
-          - 'v6.5.1'
-          - 'v6.5.2'
-          - 'v6.5.3'
-          - 'v6.5.4'
-          - 'v6.5.5'
-          - 'v6.5.6'
-          - 'v6.5.7'
-          - 'v6.5.8'
-          - 'v6.6.0'
-          - 'v6.6.1'
-          - 'v6.6.2'
-          - 'v6.6.3'
-          - 'v6.6.4'
-          - 'v6.6.5'
-          - 'v6.6.6'
-          - 'v6.6.7'
-          #- 'v6.6.8' # version is buggy
-          - 'v6.6.9'
-          - 'v6.6.10'
-          - 'v6.7.0'
-          # - 'v6.7.1' # Shopware error: An exception has been thrown during the rendering of a template ("Call to undefined method Twig\Parser::parseExpression()"). with these parameters: {"headerParameters":[],"footerParameters":[],"themeIconConfig":[]}" at index.html.twig line 2
-          - 'v6.7.2'
+    ci-current:
+        runs-on: ubuntu-latest
+        strategy:
+            max-parallel: 20
+            fail-fast: false
+            matrix:
+                shopware-version:
+                    #- 'v6.4.1' # incompatible: several errors in early versions, wontfix
+                    #- 'v6.4.2' # incompatible: several errors in early versions, wontfix
+                    #- 'v6.4.3' # incompatibilities, wontfix
+                    #- 'v6.4.4' # incompatibilities, wontfix
+                    - 'v6.4.5'
+                    - 'v6.4.6'
+                    - 'v6.4.7'
+                    - 'v6.4.8'
+                    - 'v6.4.9'
+                    - 'v6.4.10'
+                    - 'v6.4.11'
+                    - 'v6.4.12'
+                    - 'v6.4.13'
+                    - 'v6.4.14'
+                    - 'v6.4.15'
+                    - 'v6.4.16'
+                    - 'v6.4.17'
+                    - 'v6.4.18'
+                    - 'v6.4.19'
+                    - 'v6.4.20'
+                    - 'v6.5.0'
+                    - 'v6.5.1'
+                    - 'v6.5.2'
+                    - 'v6.5.3'
+                    - 'v6.5.4'
+                    - 'v6.5.5'
+                    - 'v6.5.6'
+                    - 'v6.5.7'
+                    - 'v6.5.8'
+                    - 'v6.6.0'
+                    - 'v6.6.1'
+                    - 'v6.6.2'
+                    - 'v6.6.3'
+                    - 'v6.6.4'
+                    - 'v6.6.5'
+                    - 'v6.6.6'
+                    - 'v6.6.7'
+                    #- 'v6.6.8' # version is buggy
+                    - 'v6.6.9'
+                    - 'v6.6.10'
+                    - 'v6.7.0'
+                    # - 'v6.7.1' # Shopware error: An exception has been thrown during the rendering of a template ("Call to undefined method Twig\Parser::parseExpression()"). with these parameters: {"headerParameters":[],"footerParameters":[],"themeIconConfig":[]}" at index.html.twig line 2
+                    - 'v6.7.2'
 
-    name: Shopware ${{ matrix.shopware-version }}
+        name: Shopware ${{ matrix.shopware-version }}
 
-    container:
-      image: ghcr.io/friendsofshopware/platform-plugin-dev:${{ matrix.shopware-version }}-debian
-    env:
-      PLUGIN_DIR: /plugins/EasyCreditRatenkauf
-      SW_DIR: /opt/shopware
-      SW_VERSION: ${{ matrix.shopware-version }}
- 
-    steps:
-      - uses: actions/checkout@v4
-      - name: Debug
-        run: |
-          php -v
-          php -m
-          composer -V
-          env
-          node -v
-      - name: Start mysql server
-        run: start-mysql
-      - name: Link plugin with shopware installation and install composer deps
-        run:  |
-          ln -s $GITHUB_WORKSPACE $PLUGIN_DIR
-          cd $PLUGIN_DIR
-          composer remove shopware/core frosh/shopware-rector
-          composer install -n --no-dev
+        container:
+            image: ghcr.io/friendsofshopware/platform-plugin-dev:${{ matrix.shopware-version }}-debian
+        env:
+            PLUGIN_DIR: /plugins/EasyCreditRatenkauf
+            SW_DIR: /opt/shopware
+            SW_VERSION: ${{ matrix.shopware-version }}
 
-      - name: Prepare Shopware & run webserver
-        run:  |
-          cd $SW_DIR
-          ./bin/console sales-channel:create:storefront --url http://localhost
-          
-          if echo "${{ matrix.shopware-version }}" | grep -q '^v6\.[567].\.*'; then
-            composer run init:js
-            composer run build:js
-            composer run build:js:storefront
-          fi
+        steps:
+            - uses: actions/checkout@v4
+            - name: Debug
+              run: |
+                  php -v
+                  php -m
+                  composer -V
+                  env
+                  node -v
+            - name: Start mysql server
+              run: start-mysql
+            - name: Link plugin with shopware installation and install composer deps
+              run: |
+                  ln -s $GITHUB_WORKSPACE $PLUGIN_DIR
+                  cd $PLUGIN_DIR
+                  composer remove shopware/core frosh/shopware-rector
+                  composer install -n --no-dev
 
-          ./bin/console theme:change --all -n Storefront
-          php bin/console dal:refresh:index -qn
-          php bin/console user:create --admin --email=john@doe.com --firstName="John" --lastName="Doe" --password=shopware --no-interaction admin
+            - name: Prepare Shopware & run webserver
+              run: |
+                  cd $SW_DIR
+                  ./bin/console sales-channel:create:storefront --url http://localhost
 
-          echo 'APP_ENV="prod"' >> .env
+                  if echo "${{ matrix.shopware-version }}" | grep -q '^v6\.[567].\.*'; then
+                    composer run init:js
+                    composer run build:js
+                    composer run build:js:storefront
+                  fi
 
-          cd public
-          php -S localhost:80 &
-      - name: Static Analyze
-        run: |
-          cd $PLUGIN_DIR
-          php bin/static-analyze.sh
-      - name: Coding Style
-        if: false
-        run: |
-          cd $PLUGIN_DIR
-          php vendor/bin/php-cs-fixer check ./src
-      - name: Install & activate Plugin
-        run: |
-          cd $SW_DIR
-          php bin/console plugin:refresh
-          php bin/console plugin:install EasyCreditRatenkauf
-          php bin/console plugin:activate EasyCreditRatenkauf
-          php bin/console system:config:set EasyCreditRatenkauf.config.webshopId ${{ secrets.EASYCREDITAPIKEY }}
-          php bin/console system:config:set EasyCreditRatenkauf.config.apiPassword ${{ secrets.EASYCREDITAPIPASSWORD }}
-          php bin/console system:config:set EasyCreditRatenkauf.config.apiSignature ${{ secrets.EASYCREDITAPISIGNATURE }}
-          php bin/console system:config:set EasyCreditRatenkauf.config.debug 1
+                  ./bin/console theme:change --all -n Storefront
+                  php bin/console dal:refresh:index -qn
+                  php bin/console user:create --admin --email=john@doe.com --firstName="John" --lastName="Doe" --password=shopware --no-interaction admin
 
-          # add payment methods to sales channel
-          mysql -u root -proot shopware -e 'INSERT IGNORE INTO sales_channel_payment_method SELECT s.id, p.id FROM payment_method p INNER JOIN sales_channel s WHERE handler_identifier LIKE "Netzkollektiv%";'
+                  echo 'APP_ENV="prod"' >> .env
 
-          # only productNumber should be searchable for e2e tests
-          mysql -u root -proot shopware -e "update product_search_config_field set searchable = 0 WHERE field != 'productNumber';"
+                  cd public
+                  php -S localhost:80 &
+            - name: Static Analyze
+              run: |
+                  cd $PLUGIN_DIR
+                  php bin/static-analyze.sh
+            - name: Coding Style
+              if: false
+              run: |
+                  cd $PLUGIN_DIR
+                  php vendor/bin/php-cs-fixer check ./src
+            - name: Install & activate Plugin
+              run: |
+                  cd $SW_DIR
+                  php bin/console plugin:refresh
+                  php bin/console plugin:install EasyCreditRatenkauf
+                  php bin/console plugin:activate EasyCreditRatenkauf
+                  php bin/console system:config:set EasyCreditRatenkauf.config.webshopId ${{ secrets.EASYCREDITAPIKEY }}
+                  php bin/console system:config:set EasyCreditRatenkauf.config.apiPassword ${{ secrets.EASYCREDITAPIPASSWORD }}
+                  php bin/console system:config:set EasyCreditRatenkauf.config.apiSignature ${{ secrets.EASYCREDITAPISIGNATURE }}
+                  php bin/console system:config:set EasyCreditRatenkauf.config.debug 1
 
-          php bin/console cache:clear
-      - name: Install Dependencies
-        run: |
-          npm install --global yarn
-          yarn install --frozen-lockfile
-      - name: Setup Playwright
-        run: yarn playwright install --with-deps chromium
-      - name: Playwright E2E Tests
-        run: |
-          cd $PLUGIN_DIR
-          VERSION=${{ matrix.shopware-version }} yarn playwright test -c tests/
-      - name: Save Shopware Logs for Debugging
-        if: always()
-        run: |
-          LOG_DIR=playwright-report/logs
-          mkdir $LOG_DIR
-          cp -r $SW_DIR/var/log/* $LOG_DIR/
-          for i in $LOG_DIR/*; do
-            f=$(basename $i)
-            echo "<a href=\"$(basename $f)\">$f</a><br />" >> $LOG_DIR/index.html
-          done;
-      - name: Deploy Report
-        if: always()
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy playwright-report/ --project-name=easycredit-playwright-reports
-      - name: Deactivate & uninstall Plugin
-        if: always()
-        run: |
-          cd $SW_DIR
-          php bin/console plugin:deactivate EasyCreditRatenkauf
-          php bin/console plugin:uninstall EasyCreditRatenkauf
-          php bin/console cache:clear
+                  # add payment methods to sales channel
+                  mysql -u root -proot shopware -e 'INSERT IGNORE INTO sales_channel_payment_method SELECT s.id, p.id FROM payment_method p INNER JOIN sales_channel s WHERE handler_identifier LIKE "Netzkollektiv%";'
+
+                  # only productNumber should be searchable for e2e tests
+                  mysql -u root -proot shopware -e "update product_search_config_field set searchable = 0 WHERE field != 'productNumber';"
+
+                  php bin/console cache:clear
+            - name: Install Dependencies
+              run: |
+                  npm install --global yarn
+                  yarn install --frozen-lockfile
+            - name: Setup Playwright
+              run: yarn playwright install --with-deps chromium
+            - name: Playwright E2E Tests
+              run: |
+                  cd $PLUGIN_DIR
+                  VERSION=${{ matrix.shopware-version }} yarn playwright test -c tests/
+            - name: Save Shopware Logs for Debugging
+              if: always()
+              run: |
+                  LOG_DIR=playwright-report/logs
+                  mkdir $LOG_DIR
+                  cp -r $SW_DIR/var/log/* $LOG_DIR/
+                  for i in $LOG_DIR/*; do
+                    f=$(basename $i)
+                    echo "<a href=\"$(basename $f)\">$f</a><br />" >> $LOG_DIR/index.html
+                  done;
+            - name: Deploy Report
+              if: always()
+              uses: cloudflare/wrangler-action@v3
+              with:
+                  apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+                  accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+                  command: pages deploy playwright-report/ --project-name=easycredit-playwright-reports
+            - name: Deactivate & uninstall Plugin
+              if: always()
+              run: |
+                  cd $SW_DIR
+                  php bin/console plugin:deactivate EasyCreditRatenkauf
+                  php bin/console plugin:uninstall EasyCreditRatenkauf
+                  php bin/console cache:clear
