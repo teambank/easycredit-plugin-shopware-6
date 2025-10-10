@@ -1,10 +1,13 @@
 .idea/
-coverage/
 .phpunit.result.cache
-phpstan.neon
 .php-cs-fixer.php
-*hot-update.js
 .tmp
+
+*hot-update.js
+
+coverage/
+phpstan.neon
+node_modules
+
 /dist
 /vendor
-node_modules

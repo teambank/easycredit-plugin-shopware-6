@@ -1,0 +1,27 @@
+build:
+  # use sw 6.6 - sw 6.7 deletes the pre 6.7 administration build 
+  shopwareVersionConstraint: 6.6.10.6
+  zip:
+    # for compatibility with sw 6.4, we need to ship the vendor dir (ref #4234)
+    composer:
+      enabled: true
+      before_hooks:
+        - cp composer.json composer.json.bak
+        - composer remove shopware/core
+        - composer install --no-dev --optimize-autoloader
+      after_hooks:
+        - mv composer.json.bak composer.json
+    assets:
+      npm_strict: true
+    pack:
+      excludes:
+        paths:
+          - conf
+          - bin
+          - docs
+          - .shopware-extension.yml
+          - .vscode
+          - .githooks
+          - .gitattributes
+          - package.json
+          - package-lock.json
