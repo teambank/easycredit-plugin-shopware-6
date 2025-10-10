@@ -13,23 +13,25 @@ jobs:
     - name: Run script file
       id: build-release
       run: |
-         yarn release   
+        docker run --rm -e NODE_VERSION=16 -v $(pwd):/ext  -w /ext shopware/shopware-cli extension zip --disable-git /ext
 
-         echo "filepath=$(ls *.zip | head -1)" >> $GITHUB_OUTPUT
-         echo "filename=$(basename `ls *.zip | head -1`)" >> $GITHUB_OUTPUT
+        zipfile=$(find "$(pwd)" -maxdepth 1 -name "*.zip" | head -n 1)
+        if [[ -z "$zipfile" ]]; then
+          echo "No zip file found!"
+          exit 1
+        fi
 
-         t=$(cat docs/source/changelog.rst  | php -r 'preg_match_all("#([v\d\.]+)\n[-]+\n(.+?)\n\n#s", file_get_contents("php://stdin"), $matches); echo trim($matches[2][0]);')
+        filename=$(basename "$zipfile")
 
-         t="${t//'%'/'%25'}"
-         t="${t//$'\n'/'%0A'}"
-         t="${t//$'\r'/'%0D'}"
+        echo "filepath=$zipfile" >> $GITHUB_OUTPUT
+        echo "filename=$filename" >> $GITHUB_OUTPUT
 
-         echo "changelog=$t" >> $GITHUB_OUTPUT
+        t=$(cat docs/source/changelog.rst  | php -r 'preg_match_all("#([v\d\.]+)\n[-]+\n(.+?)\n\n#s", file_get_contents("php://stdin"), $matches); echo trim($matches[2][0]);')
 
-         #EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
-         #echo "changelog<<$EOF" >> $GITHUB_OUTPUT
-         #echo $t >> $GITHUB_OUTPUT
-         #echo "$EOF" >> $GITHUB_OUTPUT
+        # Use the multiline syntax for GitHub Actions output
+        echo "changelog<<EOF" >> $GITHUB_OUTPUT
+        echo "$t" >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT
       shell: bash
     - name: Create Release
       id: create-release
@@ -39,7 +41,8 @@ jobs:
       with:
         tag_name: ${{ github.ref }}
         release_name: v${{ github.ref }}
-        body: ${{ steps.build-release.outputs.changelog }}
+        body: |
+          ${{ steps.build-release.outputs.changelog }}
         draft: true
         prerelease: false
     - name: Upload Release Asset
