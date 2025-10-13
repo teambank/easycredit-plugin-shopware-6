@@ -5,6 +5,10 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
+        <service id="Netzkollektiv\EasyCredit\Content\Category\CategoryRouteDecorator" decorates="Shopware\Core\Content\Category\SalesChannel\CategoryRoute">
+            <argument type="service" id="Netzkollektiv\EasyCredit\Content\Category\CategoryRouteDecorator.inner" />
+            <argument type="service" id="event_dispatcher" />
+        </service>
         <service id="Netzkollektiv\EasyCredit\Payment\Handler\InstallmentPaymentHandler">
             <argument type="service" id="order_transaction.repository"/>
             <argument type="service" id="Netzkollektiv\EasyCredit\Payment\StateHandler"/>

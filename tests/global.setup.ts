@@ -1,5 +1,38 @@
 import { request, type FullConfig } from "@playwright/test";
 
+async function ensureHomeCategory(req: any, headers: Record<string, string>, salesChannelId: string): Promise<string | undefined> {
+  // Try to find existing "Home" category
+  let response = await req.get("/api/category", {
+    headers: headers,
+  });
+  let homeCategoryId = await response.json().then((data: any) => {
+    const found = data.data.find((e: any) => e.name === "Home");
+    return found ? found.id : undefined;
+  });
+
+  if (homeCategoryId) {
+    return homeCategoryId;
+  }
+
+  // Create the Home category if it does not exist yet
+  const createCategoryResponse = await req.post("/api/category", {
+    headers: headers,
+    data: {
+      name: "Home",
+      type: "page",
+      productAssignmentType: "product",
+      displayNestedProducts: true,
+      navigationSalesChannels: [
+        {
+          id: salesChannelId,
+        },
+      ],
+    },
+  });
+  const created = await createCategoryResponse.json();
+  return created.data ? created.data.id : created.id;
+}
+
 async function globalSetup(config: FullConfig) {
   console.log("[prepareData] preparing test data in store");
 
@@ -33,6 +66,9 @@ async function globalSetup(config: FullConfig) {
     return data.data.find((e) => e.name === "Storefront");
   });
 
+  // Resolve a single existing category (or create it) to avoid duplicates
+  const homeCategoryId = await ensureHomeCategory(req, headers, salesChannel.id);
+
   response = await req.get("/api/tax", {
     headers: headers,
   });
@@ -49,19 +85,8 @@ async function globalSetup(config: FullConfig) {
         visibility: 30,
       },
     ],
-    categories: [
-      {
-        displayNestedProducts: true,
-        type: "page",
-        productAssignmentType: "product",
-        name: "Home",
-        navigationSalesChannels: [
-          {
-            id: salesChannel.id,
-          },
-        ],
-      },
-    ],
+    // Assign all products to the same existing category (if found)
+    ...(homeCategoryId ? { categories: [{ id: homeCategoryId }] } : {}),
   };
 
   const productsData = [
@@ -128,6 +153,20 @@ async function globalSetup(config: FullConfig) {
       }],
     },
   ];
+
+  // Add many more products to enable scrolling tests
+  for (let i = 1; i <= 60; i++) {
+    productsData.push({
+      name: `Scroll Product ${i}`,
+      productNumber: `scroll-${i}`,
+      price: [{
+        currencyId: salesChannel.currencyId,
+        gross: 100 + i,
+        net: 100 + i,
+        linked: false,
+      }],
+    });
+  }
 
   for (const productData of productsData) {
     var response = await req.post("/api/product", {

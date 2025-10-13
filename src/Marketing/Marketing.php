@@ -16,12 +16,12 @@ use Shopware\Storefront\Page\Checkout\Cart\CheckoutCartPageLoadedEvent;
 use Shopware\Storefront\Page\Checkout\Offcanvas\OffcanvasCartPageLoadedEvent;
 use Shopware\Storefront\Page\Product\ProductPageLoadedEvent;
 use Shopware\Storefront\Page\Navigation\NavigationPageLoadedEvent;
+use Netzkollektiv\EasyCredit\Content\Category\Event\CategoryCmsPageLoadedEvent;
 use Shopware\Storefront\Page\GenericPageLoadedEvent;
 use Shopware\Storefront\Page\Search\SearchPageLoadedEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Netzkollektiv\EasyCredit\Service\FlexpriceService;
 use Netzkollektiv\EasyCredit\Service\PaymentAvailability;
-
 use Shopware\Core\Framework\Struct\ArrayEntity;
 
 class Marketing implements EventSubscriberInterface
@@ -58,6 +58,7 @@ class Marketing implements EventSubscriberInterface
             OffcanvasCartPageLoadedEvent::class => 'onOffcanvasCartPageLoaded',
             GenericPageLoadedEvent::class => 'onPageLoaded',
             NavigationPageLoadedEvent::class => 'onNavigationPageLoaded',
+            CategoryCmsPageLoadedEvent::class => 'onCategoryCmsPageLoaded',
             SearchPageLoadedEvent::class => 'onSearchPageLoaded',
         ];
     }
@@ -157,6 +158,25 @@ class Marketing implements EventSubscriberInterface
     }
 
     public function onNavigationPageLoaded(NavigationPageLoadedEvent $event): void
+    {
+        $context = $event->getSalesChannelContext();
+
+        $settings = $this->getSettings($context);
+        if (!$settings) {
+            return;
+        }
+
+        $this->addVariables($event, [
+            'apiKey' => $settings->getWebshopId(),
+            'widgetEnabled' => $settings->getWidgetEnabled(),
+            'widgetSelector' => $settings->getWidgetSelectorProductListing(),
+            'card' => $settings->getCardEnabled(),
+            'cardSettingsPosition' => $settings->getCardSettingsPosition(),
+            'cardSettingsMedia' => $settings->getCardSettingsMedia(),
+        ]);
+    }
+
+    public function onCategoryCmsPageLoaded(CategoryCmsPageLoadedEvent $event): void
     {
         $context = $event->getSalesChannelContext();
 
