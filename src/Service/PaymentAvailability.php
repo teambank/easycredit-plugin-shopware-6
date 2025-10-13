@@ -73,8 +73,9 @@ class PaymentAvailability
             $rule = $this->getAvailabilityRules($salesChannelContext->getContext())
                 ->filter(fn($rule) => $rule->getId() === $paymentMethod->getAvailabilityRuleId())->first();
 
+            $paymentType = $this->paymentHelper->getHandlerByPaymentMethod($paymentMethod)->getPaymentType();
             if ($rule === null) {
-                return false;
+                return $paymentType;
             }
 
             $available = $this->ruleEvaluator->evaluateRule(
@@ -83,7 +84,7 @@ class PaymentAvailability
                 $salesChannelContext
             );
 
-            return $available ? $this->paymentHelper->getHandlerByPaymentMethod($paymentMethod)->getPaymentType() : null;
+            return $available ? $paymentType : null;
         }));
 
         return $this->cachedPaymentTypes[$cacheKey];
@@ -114,7 +115,14 @@ class PaymentAvailability
     private function getAvailabilityRules($context)
     {
         if ($this->availabilityRules === null) {
-            $ids = $this->paymentHelper->getEasyCreditMethods($context)->map(fn($method) => $method->getAvailabilityRuleId());
+            $ids = $this->paymentHelper->getEasyCreditMethods($context)
+                ->filter(fn($method) => $method->getAvailabilityRuleId() !== null)
+                ->map(fn($method) => $method->getAvailabilityRuleId());
+
+            if (count($ids) === 0) {
+                $ids = null;
+            }
+
             $this->availabilityRules = $this->ruleRepository->search(
                 new Criteria($ids),
                 $context
