@@ -57,6 +57,22 @@ let projects: Project[] = [
   });
 });
 
+if (!process.env.BASE_URL) {
+    config = {
+        ...config,
+        ...{
+            webServer: {
+                command: 'PHP_CLI_SERVER_WORKERS=8 php -S localhost:80 -t /opt/shopware/public 2>&1',
+                url: 'http://localhost/',
+                reuseExistingServer: !process.env.CI,
+                stdout: 'ignore',
+                stderr: 'pipe',
+                timeout: 10 * 1000,
+            },
+        },
+    };
+}
+
 config.projects = projects
 
 export default defineConfig(config);

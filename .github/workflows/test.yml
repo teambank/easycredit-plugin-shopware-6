@@ -76,6 +76,19 @@ jobs:
                   composer -V
                   env
                   node -v
+            - name: Initialize cache
+              uses: actions/cache@v3
+              with:
+                path: |
+                  ~/.cache/yarn
+                  ~/.config/yarn
+                  ~/.cache/ms-playwright
+                  ~/.cache/composer
+                  ~/.npm
+                  node_modules
+                key: yarn-cache-${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
+                restore-keys: |
+                  yarn-cache-${{ runner.os }}-
             - name: Start mysql server
               run: start-mysql
             - name: Link plugin with shopware installation and install composer deps
@@ -84,8 +97,7 @@ jobs:
                   cd $PLUGIN_DIR
                   composer remove shopware/core frosh/shopware-rector
                   composer install -n --no-dev
-
-            - name: Prepare Shopware & run webserver
+            - name: Prepare Shopware
               run: |
                   cd $SW_DIR
                   ./bin/console sales-channel:create:storefront --url http://localhost
@@ -101,9 +113,6 @@ jobs:
                   php bin/console user:create --admin --email=john@doe.com --firstName="John" --lastName="Doe" --password=shopware --no-interaction admin
 
                   echo 'APP_ENV="prod"' >> .env
-
-                  cd public
-                  php -S localhost:80 &
             - name: Static Analyze
               run: |
                   cd $PLUGIN_DIR
@@ -123,9 +132,6 @@ jobs:
                   php bin/console system:config:set EasyCreditRatenkauf.config.apiPassword ${{ secrets.EASYCREDITAPIPASSWORD }}
                   php bin/console system:config:set EasyCreditRatenkauf.config.apiSignature ${{ secrets.EASYCREDITAPISIGNATURE }}
                   php bin/console system:config:set EasyCreditRatenkauf.config.debug 1
-
-                  # add payment methods to sales channel
-                  mysql -u root -proot shopware -e 'INSERT IGNORE INTO sales_channel_payment_method SELECT s.id, p.id FROM payment_method p INNER JOIN sales_channel s WHERE handler_identifier LIKE "Netzkollektiv%";'
 
                   # only productNumber should be searchable for e2e tests
                   mysql -u root -proot shopware -e "update product_search_config_field set searchable = 0 WHERE field != 'productNumber';"

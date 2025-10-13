@@ -66,8 +66,22 @@ async function globalSetup(config: FullConfig) {
     return data.data.find((e) => e.name === "Storefront");
   });
 
+  response = await req.get('/api/payment-method', { headers });
+  const allPaymentMethods = (await response.json()).data;
+  const allPaymentMethodIds = allPaymentMethods.map((pm: any) => ({ id: pm.id }));
+
+  response = await req.patch(`/api/sales-channel/${salesChannel.id}`, {
+      headers,
+      data: {
+          id: salesChannel.id,
+          paymentMethods: allPaymentMethodIds,
+      },
+  });
+  console.log('[prepareData] added payment methods to sales channel', salesChannel, allPaymentMethodIds);
+
   // Resolve a single existing category (or create it) to avoid duplicates
   const homeCategoryId = await ensureHomeCategory(req, headers, salesChannel.id);
+  console.log('[prepareData] using home category', homeCategoryId);
 
   response = await req.get("/api/tax", {
     headers: headers,
@@ -75,6 +89,7 @@ async function globalSetup(config: FullConfig) {
   const taxId = await response.json().then((data) => {
     return data.data.find((e) => e.taxRate === 19).id;
   });
+  console.log('[prepareData] using tax', taxId);
 
   const baseProductData = {
     stock: 99999,

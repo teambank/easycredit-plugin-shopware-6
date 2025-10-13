@@ -61,18 +61,16 @@ test.describe('Widget should be visible on homepage listing next page @listing',
     test('widgetHomepageListingNextPage', async ({ page }) => {
         await test.step('Go to homepage', async () => {
             await page.goto('/');
+            await page.waitForURL('/', { timeout: 5 * 1000 });
         });
 
         const listing = page.locator('.cms-element-product-listing');
         await expect(listing).toBeVisible();
 
         await test.step('Click next page to trigger AJAX reload', async () => {
-            const pagination = page.locator('[data-listing-pagination]');
-            await expect(pagination).toBeVisible();
-
             // Click page 2 in pagination (Shopware updates URL via pushState on AJAX)
-            await pagination.locator('a.page-link[data-page="2"]').first().click();
-            await page.waitForURL('**/?p=2*');
+            await page.locator('.pagination').getByText('2').first().click();
+            await page.waitForURL('**/*p=2*', { timeout: 5 * 1000 });
         });
 
         // After AJAX reload, the widget should be present in the listing again
