@@ -141,6 +141,7 @@ jobs:
               run: |
                   npm install --global yarn
                   yarn install --frozen-lockfile
+                  curl -sS https://get.symfony.com/cli/installer | bash
             - name: Setup Playwright
               run: yarn playwright install --with-deps chromium
             - name: Playwright E2E Tests

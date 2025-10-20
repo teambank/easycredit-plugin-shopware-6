@@ -62,7 +62,7 @@ if (!process.env.BASE_URL) {
         ...config,
         ...{
             webServer: {
-                command: 'PHP_CLI_SERVER_WORKERS=8 php -S localhost:80 -t /opt/shopware/public 2>&1',
+                command: '~/.symfony5/bin/symfony server:start --dir=/opt/shopware/public --port=80',
                 url: 'http://localhost/',
                 reuseExistingServer: !process.env.CI,
                 stdout: 'ignore',
