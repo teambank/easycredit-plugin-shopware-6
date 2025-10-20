@@ -21,10 +21,16 @@ jobs:
           exit 1
         fi
 
+        version="${GITHUB_REF#refs/tags/}"  # Extract tag name (e.g. '1.2.3' from 'refs/tags/1.2.3')
+        base=$(basename "$zipfile" .zip)
+        newfile="${base}-${version}.zip"
+
+        mv "$zipfile" "$newfile"
+
         filename=$(basename "$zipfile")
 
-        echo "filepath=$zipfile" >> $GITHUB_OUTPUT
-        echo "filename=$filename" >> $GITHUB_OUTPUT
+        echo "filepath=$newfile" >> "$GITHUB_OUTPUT"
+        echo "filename=$(basename "$newfile")" >> "$GITHUB_OUTPUT"
 
         t=$(cat docs/source/changelog.rst  | php -r 'preg_match_all("#([v\d\.]+)\n[-]+\n(.+?)\n\n#s", file_get_contents("php://stdin"), $matches); echo trim($matches[2][0]);')
 
