@@ -99,7 +99,7 @@ export const paymentProceed = async ({
     }
     if (paymentType === PaymentTypes.BILL) {
       await page
-        .getByRole("button", { name: "Weiter zu easyCredit-Rechnung" })
+        .getByRole("button", { name: "auf Rechnung zahlen" })
         .click();
       return;
     }
@@ -132,7 +132,7 @@ export const startExpress = async ({
       await page.getByText("Akzeptieren", { exact: true }).click();
     }
     if (paymentType === PaymentTypes.BILL) {
-      await page.locator("button").filter({ hasText: "heute bestellen" }).click();
+      await page.locator("button").filter({ hasText: "auf Rechnung zahlen" }).click();
       await page.getByText("Akzeptieren", { exact: true }).click();
     }
   });
