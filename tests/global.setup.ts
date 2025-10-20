@@ -194,6 +194,14 @@ async function globalSetup(config: FullConfig) {
     console.log(await response.text());
     console.log(`[prepareData] added product ${productData.productNumber}`);
   }
+
+  response = await req.delete("/api/_action/cache", {
+    headers: headers,
+    data: {},
+  });
+
+  const result = await response.text();
+  console.log(result);
 }
 
 export default globalSetup;
