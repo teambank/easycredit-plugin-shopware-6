@@ -1,3 +1,9 @@
+# 3.1.8
+
+* das Widget in der Listenansicht wird nun auch auf Seiten angezeigt, die per Ajax nachgeladen werden (Pagination)
+* behebt einen Fehler in der Regelauswertung, wenn keine Verfügbarkeitsregel gesetzt ist
+* die package.json wird nicht mehr mitgeliefert, weil nicht benötigt (fehlende package-lock.json verhinderte JS-Build)
+
 # 3.1.7
 
 * die Zahlart-Verfügbarkeitsregeln werden nun vollständig bei Installation / Neuinstallation angelegt und  nicht mehr per Migration angepasst
