@@ -7,19 +7,12 @@
 
 namespace Netzkollektiv\EasyCredit\Service;
 
-use Shopware\Core\Framework\Rule\Collector\RuleConditionRegistry;
-use Shopware\Core\Framework\Rule\Container\AndRule;
-use Shopware\Core\Checkout\Cart\Rule\CartRuleScope;
-
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\ContainsFilter;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
-use Shopware\Core\Checkout\Cart\CartService;
 use Shopware\Core\Checkout\Cart\Cart;
-use Shopware\Core\Checkout\Cart\LineItem\LineItem;
-use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\Content\Product\SalesChannel\SalesChannelProductEntity;
 use Netzkollektiv\EasyCredit\Service\RuleEvaluator;
 use Netzkollektiv\EasyCredit\Service\WebshopInfoService;

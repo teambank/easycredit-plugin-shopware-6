@@ -14,7 +14,8 @@
         {% set paymentTypes = easyCreditAvailablePaymentTypes(context, product) %}
         <script class="easycredit-config" type="application/json">{{ {
             'amount': price.unitPrice,
-            'payment-types': paymentTypes
+            'payment-types': paymentTypes,
+            'disable-flexprice': easyCreditShouldDisableFlexprice(context, product)
         }|json_encode|raw }}</script>
     {% endif %}
 {% endblock %}

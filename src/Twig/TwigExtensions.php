@@ -12,21 +12,24 @@ namespace Netzkollektiv\EasyCredit\Twig;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
-use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Netzkollektiv\EasyCredit\Helper\Payment as PaymentHelper;
 use Netzkollektiv\EasyCredit\Service\PaymentAvailability;
+use Netzkollektiv\EasyCredit\Service\FlexpriceService;
 
 class TwigExtensions extends AbstractExtension
 {
     private PaymentAvailability $paymentAvailabilityService;
     private PaymentHelper $paymentHelper;
+    private FlexpriceService $flexpriceService;
 
     public function __construct(
         PaymentHelper $paymentHelper,
-        PaymentAvailability $paymentAvailabilityService
+        PaymentAvailability $paymentAvailabilityService,
+        FlexpriceService $flexpriceService
     ) {
         $this->paymentHelper = $paymentHelper;
         $this->paymentAvailabilityService = $paymentAvailabilityService;
+        $this->flexpriceService = $flexpriceService;
     }
 
     public function getFunctions()
@@ -34,6 +37,7 @@ class TwigExtensions extends AbstractExtension
         return [
             new TwigFunction('easyCreditPaymentType', [$this, 'getPaymentType']),
             new TwigFunction('easyCreditAvailablePaymentTypes', [$this, 'getAvailablePaymentTypes']),
+            new TwigFunction('easyCreditShouldDisableFlexprice', [$this, 'shouldDisableFlexprice']),
         ];
     }
 
@@ -47,5 +51,9 @@ class TwigExtensions extends AbstractExtension
     public function getAvailablePaymentTypes($salesChannelContext, $product = null) {
         $paymentTypes = $this->paymentAvailabilityService->getAvailablePaymentTypes($salesChannelContext, $product);
         return $paymentTypes;
+    }
+
+    public function shouldDisableFlexprice($salesChannelContext, $product = null) {
+        return $this->flexpriceService->shouldDisableFlexpriceForProduct($salesChannelContext, $product);
     }
 }

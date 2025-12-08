@@ -87,7 +87,7 @@ export default class EasyCreditRatenkaufWidget extends Plugin {
         widget.setAttribute('amount', amount);
         widget.setAttribute('payment-types', this.getMeta('payment-types', element));
 
-        if (this.getMeta('disable-flexprice')) {
+        if (this.getMeta('disable-flexprice', element)) {
             widget.setAttribute('disable-flexprice', 'true');
         } else {
             widget.removeAttribute('disable-flexprice');

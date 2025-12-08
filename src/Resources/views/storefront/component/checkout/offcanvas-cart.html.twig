@@ -8,7 +8,8 @@
     {% if easyCreditAvailablePaymentTypes(context) and easycredit.widgetEnabled %}
     <script class="easycredit-config" type="application/json">{{ {
         'widget-selector': easycredit.widgetSelector,
-        'amount': easycredit.amount
+        'amount': easycredit.amount,
+        'disable-flexprice': easycredit.disableFlexprice
     }|json_encode|raw }}</script>
     {% endif %}
 
@@ -27,7 +28,7 @@
     {% if paymentTypes %}
 
         <div class="d-block" style="margin: 10px 0;">
-            {% sw_include '@EasyCreditRatenkauf/storefront/component/express-button.html.twig' with {fullWidth: true, paymentTypes: paymentTypes} %}
+            {% sw_include '@EasyCreditRatenkauf/storefront/component/express-button.html.twig' with {fullWidth: true, paymentTypes: paymentTypes, amount: easycredit.amount} %}
         </div>
     {% endif %}
     {% endif %}

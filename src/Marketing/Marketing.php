@@ -101,6 +101,7 @@ class Marketing implements EventSubscriberInterface
 
         $this->addVariables($event, [
             'widgetSelector' => $settings->getWidgetSelectorCart(),
+            'disableFlexprice' => $this->flexpriceService->shouldDisableFlexprice($context, $cart),
             'amount' => $cart->getPrice()->getTotalPrice(),
         ]);
     }
@@ -122,6 +123,7 @@ class Marketing implements EventSubscriberInterface
 
         $this->addVariables($event, [
             'widgetSelector' => $settings->getWidgetSelectorOffCanvasCart(),
+            'disableFlexprice' => $this->flexpriceService->shouldDisableFlexprice($context, $cart),
             'amount' => $cart->getPrice()->getTotalPrice(),
         ]);
     }
