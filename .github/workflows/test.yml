@@ -53,10 +53,12 @@ jobs:
                     - 'v6.6.7'
                     #- 'v6.6.8' # version is buggy
                     - 'v6.6.9'
-                    - 'v6.6.10'
+                    #- 'v6.6.10' # Compile Error: Access level to Squirrel\TwigPhpSyntax\TokenParser\ForeachTokenParser::parseAssignmentExpression() must be protected (as in class Twig\TokenParser\AbstractTokenParser) or weaker
                     - 'v6.7.0'
                     # - 'v6.7.1' # Shopware error: An exception has been thrown during the rendering of a template ("Call to undefined method Twig\Parser::parseExpression()"). with these parameters: {"headerParameters":[],"footerParameters":[],"themeIconConfig":[]}" at index.html.twig line 2
                     - 'v6.7.2'
+                    - 'v6.7.3'
+                    - 'v6.7.4'
 
         name: Shopware ${{ matrix.shopware-version }}
 
