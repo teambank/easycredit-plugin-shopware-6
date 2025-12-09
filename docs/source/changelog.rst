@@ -1,6 +1,13 @@
 Changelog
 =========
 
+3.1.9
+-----
+
+* im Widget wird die Zins-Flexibilisierung nun auch im Warenkorb und im Offcanvas-Warenkorb berücksichtigt
+* der Betrag für den Express-Button im Offcanvas-Warenkorb wird nun korrekt übergeben
+* der Express-Checkout wurde überarbeitet, um bereits angemeldete Kunden korrekt zu behandeln
+
 3.1.8
 -----
 
