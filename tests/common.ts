@@ -62,6 +62,32 @@ export const fillCheckout = async (page) => {
   });
 };
 
+export const registerAndLoginCustomer = async (page) => {
+  const email = `customer+${Date.now()}@example.com`;
+  const password = "Shopware!123";
+
+  await test.step("Register and log in customer", async () => {
+    await page.goto("/account/login");
+
+    const personalForm = page.locator(".register-personal");
+    await personalForm.getByLabel(/Salutation/).selectOption({ index: 1 });
+    await personalForm.getByRole("textbox", { name: "First name" }).fill(randomize("Ralf"));
+    await personalForm.getByRole("textbox", { name: "Last name" }).fill("Ratenkauf");
+    await personalForm.getByLabel("Email address").fill(email);
+    await personalForm.getByLabel("Password").fill(password);
+
+    const billingForm = page.locator(".register-billing");
+    await billingForm.getByRole("textbox", { name: "Street address" }).fill("Beuthener Str. 25");
+    await billingForm.getByRole("textbox", { name: "Postal code" }).fill("90402");
+    await billingForm.getByRole("textbox", { name: "City" }).fill("Nürnberg");
+    await billingForm.getByLabel("Country").selectOption({ label: "Germany" });
+
+    await page.getByRole("button", { name: /Register|Continue/ }).click();
+    await expect(page).toHaveURL(/\/account/);
+    await expect(page.getByText(email)).toBeVisible();
+  });
+};
+
 export const paymentSelect = async ({
   page,
   paymentType,

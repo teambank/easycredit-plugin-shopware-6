@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { scaleDown, takeScreenshot, delay, greaterOrEqualsThan } from "./utils";
+import { scaleDown, takeScreenshot, delay } from "./utils";
 import {
   goToProduct,
   addCurrentProductToCart,
@@ -12,7 +12,8 @@ import {
   checkAmountInvalidation,
   openEditShippingAddressModal,
   saveShippingAddressModal,
-  paymentSelect
+  paymentSelect,
+  registerAndLoginCustomer,
 } from "./common";
 import { PaymentTypes } from "./types";
 
@@ -38,6 +39,25 @@ test.describe("go through standard @installment", () => {
     await goThroughPaymentPage({
       page: page,
       paymentType: PaymentTypes.INSTALLMENT,
+    });
+    await confirmOrder({
+      page: page,
+      paymentType: PaymentTypes.INSTALLMENT,
+    });
+  });
+});
+
+test.describe("go through @express as logged in customer @installment", () => {
+  test("expressCheckoutLoggedIn", async ({ page }) => {
+    await registerAndLoginCustomer(page);
+    await goToProduct(page);
+
+    await startExpress({ page, paymentType: PaymentTypes.INSTALLMENT });
+
+    await goThroughPaymentPage({
+      page: page,
+      paymentType: PaymentTypes.INSTALLMENT,
+      express: false,
     });
     await confirmOrder({
       page: page,
