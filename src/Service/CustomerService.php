@@ -11,6 +11,7 @@ namespace Netzkollektiv\EasyCredit\Service;
 
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Checkout\Customer\SalesChannel\AbstractRegisterRoute;
+use Shopware\Core\Checkout\Customer\SalesChannel\CustomerResponse;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Routing\Exception\MissingRequestParameterException;
@@ -21,15 +22,10 @@ use Shopware\Core\Framework\Struct\ArrayStruct;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Shopware\Core\PlatformRequest;
-use Shopware\Core\System\SalesChannel\Context\AbstractSalesChannelContextFactory;
-use Shopware\Core\Checkout\Cart\SalesChannel\CartService;
 use Shopware\Core\Content\Newsletter\Exception\SalesChannelDomainNotFoundException;
 use Shopware\Core\System\SalesChannel\Context\SalesChannelContextServiceInterface;
 use Shopware\Core\System\SalesChannel\Context\SalesChannelContextServiceParameters;
-
 use Teambank\EasyCreditApiV3\Model\TransactionInformation as EasyCreditTransaction;
-use Netzkollektiv\EasyCredit\Helper\Payment as PaymentHelper;
-
 
 class CustomerService
 {
@@ -37,6 +33,7 @@ class CustomerService
     public const EXPRESS_ACTIVE = 'easyCreditExpressActive';
 
     private AbstractRegisterRoute $registerRoute;
+
 
     private EntityRepository $countryRepository;
 
@@ -46,22 +43,44 @@ class CustomerService
 
     private  SalesChannelContextServiceInterface $contextService;
 
-    private CartService $cartService;
-
     public function __construct(
         AbstractRegisterRoute $registerRoute,
         SalesChannelContextServiceInterface $contextService,
         EntityRepository $countryRepository,
         EntityRepository $salutationRepository,
-        SystemConfigService $systemConfigService,
-        CartService $cartService
+        SystemConfigService $systemConfigService
     ) {
         $this->registerRoute = $registerRoute;
         $this->contextService = $contextService;
         $this->countryRepository = $countryRepository;
         $this->salutationRepository = $salutationRepository;
         $this->systemConfigService = $systemConfigService;
-        $this->cartService = $cartService;
+    }
+
+    public function handleExpress(EasyCreditTransaction $transaction, SalesChannelContext $context): SalesChannelContext
+    {
+        $context->getContext()->addExtension(self::EXPRESS_ACTIVE, new ArrayStruct());
+
+        if ($context->getCustomer() === null) {
+            $response = $this->registerCustomer($transaction, $context);
+            $customerId = $response->getCustomer()->getId();
+            $token = $response->headers->get(PlatformRequest::HEADER_CONTEXT_TOKEN);
+        } else {
+            $customerId = $context->getCustomer()->getId();
+            $token = $context->getToken();
+        }
+
+        return $this->reinitializeContext($token, $customerId, $context);
+    }
+
+    private function registerCustomer(EasyCreditTransaction $transaction, SalesChannelContext $context): CustomerResponse
+    {
+        $context->getContext()->addExtension(self::EXPRESS_ACTIVE, new ArrayStruct());
+        $customerDataBag = $this->getRegisterCustomerDataBag($transaction, $context);
+        $response = $this->registerRoute->register($customerDataBag, $context, false);
+        $context->getContext()->removeExtension(self::EXPRESS_ACTIVE);
+
+        return $response;
     }
 
     private function getRegisterCustomerDataBag(EasyCreditTransaction $transaction, SalesChannelContext $salesChannelContext): RequestDataBag
@@ -72,9 +91,6 @@ class CustomerService
         $contact = $customer->getContact();
         $address = $transaction->getTransaction()->getOrderDetails()->getShippingAddress();
 
-        $countryId = $this->getCountryId($address->getCountry(), $salesChannelContext->getContext());
-
-
         return new RequestDataBag([
             'guest' => true,
             'storefrontUrl' => $this->getStorefrontUrl($salesChannelContext),
@@ -82,7 +98,7 @@ class CustomerService
             'email' => $contact->getEmail(),
             'firstName' => $address->getFirstName(),
             'lastName' => $address->getLastName(),
-            'billingAddress' => $this->getBillingAddress($transaction, $salesChannelContext->getContext(), $salutationId),
+            'billingAddress' => $this->getBillingAddressFromTransaction($transaction, $salesChannelContext->getContext(), $salutationId),
             'acceptedDataProtection' => true
         ]);
     }
@@ -90,7 +106,7 @@ class CustomerService
     /**
      * @return array<string, string|null>
      */
-    private function getBillingAddress(EasyCreditTransaction $transaction, Context $context, ?string $salutationId = null): array
+    private function getBillingAddressFromTransaction(EasyCreditTransaction $transaction, Context $context, ?string $salutationId = null): array
     {
         $address = $transaction->getTransaction()->getOrderDetails()->getShippingAddress();
         $countryId = $this->getCountryId($address->getCountry(), $context);
@@ -106,52 +122,6 @@ class CustomerService
             'city' => $address->getCity()
         ];
     }
-
-    public function handleExpress(EasyCreditTransaction $transaction, SalesChannelContext $context): SalesChannelContext
-    {
-        $newContext = $this->registerCustomer($transaction, $context);
-
-        $cart = $this->cartService->getCart($newContext->getToken(), $newContext);
-        $this->cartService->recalculate($cart, $newContext);
-
-        return $newContext;
-    }
-
-    private function registerCustomer(EasyCreditTransaction $transaction, SalesChannelContext $context): SalesChannelContext
-    {
-        $context->getContext()->addExtension(self::EXPRESS_ACTIVE, new ArrayStruct());
-        $customerDataBag = $this->getRegisterCustomerDataBag($transaction, $context);
-        $response = $this->registerRoute->register($customerDataBag, $context, false);
-        $context->getContext()->removeExtension(self::EXPRESS_ACTIVE);
-
-        $newToken = $response->headers->get(PlatformRequest::HEADER_CONTEXT_TOKEN);
-
-        if ($newToken === null || $newToken === '') {
-            if (\class_exists(RoutingException::class)) {
-                throw RoutingException::missingRequestParameter(PlatformRequest::HEADER_CONTEXT_TOKEN);
-            }
-            if (\class_exists(MissingRequestParameterException::class)) {
-                throw new MissingRequestParameterException(PlatformRequest::HEADER_CONTEXT_TOKEN);
-            }
-        }
-
-        $newContext = $this->contextService->get(
-            /** @phpstan-ignore-next-line */
-            new SalesChannelContextServiceParameters(
-                $context->getSalesChannel()->getId(),
-                $newToken,
-                $context->getContext()->getLanguageId(),
-                $context->getCurrencyId(),
-                $context->getDomainId(),
-                $context->getContext(),
-                $response->getCustomer()->getId()
-            )
-        );
-        $newContext->addState(...$context->getStates());
-
-        return $newContext;
-    }
-
 
     private function getCountryId(string $code, Context $context): ?string
     {
@@ -202,5 +172,33 @@ class CustomerService
         }
 
         return $domain->getUrl();
+    }
+
+    private function reinitializeContext(string $newToken, string $customerId, SalesChannelContext $context): SalesChannelContext
+    {
+        if ($newToken === null || $newToken === '') {
+            if (\class_exists(RoutingException::class)) {
+                throw RoutingException::missingRequestParameter(PlatformRequest::HEADER_CONTEXT_TOKEN);
+            }
+            if (\class_exists(MissingRequestParameterException::class)) {
+                throw new MissingRequestParameterException(PlatformRequest::HEADER_CONTEXT_TOKEN);
+            }
+        }
+
+        $newContext = $this->contextService->get(
+            /** @phpstan-ignore-next-line */
+            new SalesChannelContextServiceParameters(
+                $context->getSalesChannel()->getId(),
+                $newToken,
+                $context->getContext()->getLanguageId(),
+                $context->getCurrencyId(),
+                $context->getDomainId(),
+                $context->getContext(),
+                $customerId
+            )
+        );
+        $newContext->addState(...$context->getStates());
+
+        return $newContext;
     }
 }

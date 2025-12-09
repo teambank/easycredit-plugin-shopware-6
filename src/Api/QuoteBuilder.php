@@ -23,8 +23,6 @@ use Netzkollektiv\EasyCredit\Api\Quote\CustomerBuilder;
 use Netzkollektiv\EasyCredit\Cart\Processor;
 use Netzkollektiv\EasyCredit\Service\FlexpriceService;
 use Netzkollektiv\EasyCredit\Helper\Payment as PaymentHelper;
-use Netzkollektiv\EasyCredit\Payment\Handler\AbstractHandler;
-use Netzkollektiv\EasyCredit\Payment\Handler\AbstractSynchronousHandler;
 use Teambank\EasyCreditApiV3\Model\Transaction;
 use Teambank\EasyCreditApiV3\Model\ShippingAddress;
 use Teambank\EasyCreditApiV3\Model\InvoiceAddress;
@@ -226,7 +224,7 @@ class QuoteBuilder
 
     protected function isExpress()
     {
-        return $this->storage->get('express');
+        return $this->storage->get('express') && !$this->customer;
     }
 
     public function build($cart, SalesChannelContext $salesChannelContext): Transaction

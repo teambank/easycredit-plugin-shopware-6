@@ -59,7 +59,6 @@
             <argument type="service" id="country.repository"/>
             <argument type="service" id="salutation.repository"/>
             <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService"/>
-            <argument type="service" id="Shopware\Core\Checkout\Cart\SalesChannel\CartService" />
         </service>
 
         <service id="Netzkollektiv\EasyCredit\Service\CheckoutService">
