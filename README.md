@@ -62,6 +62,7 @@ git clone git@github.com:teambank/easycredit-plugin-shopware-6.git EasyCreditRat
 
 This extension aims to be as compatible as possible with current, future versions of Shopware 6. This version is tested with:
 
+* 6.7.x
 * 6.6.x
 * 6.5.x
 * 6.4.x
