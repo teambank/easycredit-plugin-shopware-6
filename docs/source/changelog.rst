@@ -1,6 +1,14 @@
 Changelog
 =========
 
+3.1.10
+------
+
+* die Timeouts für API-Anfragen wurden zur Verbesserung der Zuverlässigkeit optimiert
+* die Händler-Informationen werden jetzt asynchron geladen, um Ladezeiten zu reduzieren
+* der Warenkorb wird bei Initialisierung des Express-Checkouts von der Produktdetailseite wieder zuverlässig geleert
+* die API-Library wurde aktualisiert, um die Kompatibilität mit PHP 8.5  sicher zu stellen
+
 3.1.9
 -----
 
