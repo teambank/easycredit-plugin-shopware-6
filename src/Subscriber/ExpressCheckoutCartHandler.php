@@ -53,10 +53,13 @@ class ExpressCheckoutCartHandler implements EventSubscriberInterface
         }
         $cart = $arguments[0] ?? null;
 
+        $isExpressCheckout = $request->get('redirectTo') === 'frontend.easycredit.express'
+            || $request->get('easycredit');
+
         if (
             !$controller instanceof CartLineItemController ||
             $cart === null ||
-            !$request->get('easycredit')
+            !$isExpressCheckout
         ) {
             return;
         }

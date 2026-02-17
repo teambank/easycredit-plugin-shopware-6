@@ -116,6 +116,26 @@ test.describe("go through @express @installment", () => {
   });
 });
 
+test("@express checkout clears cart @installment", async ({
+  page,
+}) => {
+  await test.step("Start express for first product (Regular, €200)", async () => {
+    await goToProduct(page);
+    await startExpress({ page, paymentType: PaymentTypes.INSTALLMENT });
+  });
+  await expect(page).toHaveURL(/ratenkauf\.easycredit\.de/i);
+  await expect(page.locator(".calculation-element").first()).toHaveText(/200/);
+
+  await test.step("Return to shop and start express for second product (Above5000, €6000)", async () => {
+    await test.step(`Go to product (sku: above5000)`, async () => {
+        await page.goto('/Above-5000/above5000');
+    });
+    await startExpress({ page, paymentType: PaymentTypes.INSTALLMENT });
+  });
+  await expect(page).toHaveURL(/ratenkauf\.easycredit\.de/i);
+  await expect(page.locator(".calculation-element").first()).toHaveText(/6[.\s]?000/);
+});
+
 test.describe("go through @express @bill", () => {
   test("expressCheckout", async ({ page }) => {
     await goToProduct(page);
