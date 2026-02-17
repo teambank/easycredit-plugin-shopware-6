@@ -271,10 +271,17 @@
 
             <tag name="kernel.event_subscriber"/>
         </service>
-        <service id="Netzkollektiv\EasyCredit\Service\WebshopInfoService">
+        <service id="Netzkollektiv\EasyCredit\Message\FetchWebshopInfoHandler">
             <argument type="service" id="Netzkollektiv\EasyCredit\Api\IntegrationFactory"/>
-            <argument type="service" id="cache.object"/>
+            <argument type="service" id="cache.app"/>
             <argument type="service" id="monolog.logger.easycredit"/>
+            <tag name="messenger.message_handler"/>
+        </service>
+        <service id="Netzkollektiv\EasyCredit\Service\WebshopInfoService">
+            <argument type="service" id="cache.app"/>
+            <argument type="service" id="monolog.logger.easycredit"/>
+            <argument type="service" id="messenger.default_bus"/>
+            <argument type="service" id="Doctrine\DBAL\Connection"/>
         </service>
         <service id="Netzkollektiv\EasyCredit\Subscriber\CheckoutOrderPlacedSubscriber">
             <argument type="service" id="order_transaction.repository"/>

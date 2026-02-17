@@ -1,0 +1,10 @@
+# Route webshop info fetch to async transport so it is queued (optional).
+# If not merged by your Shopware setup, add this to your project's config/packages/messenger.yaml:
+#   framework:
+#     messenger:
+#       routing:
+#         'Netzkollektiv\EasyCredit\Message\FetchWebshopInfoMessage': async
+#framework:
+#    messenger:
+#        routing:
+#            'Netzkollektiv\EasyCredit\Message\FetchWebshopInfoMessage': async
