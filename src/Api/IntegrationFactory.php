@@ -48,7 +48,9 @@ class IntegrationFactory
         );
         return new Client([
             'debug' => false,
-            'handler' => $stack
+            'handler' => $stack,
+            'connect_timeout' => (float) 5,
+            'timeout' => (float) 10,
         ]);
     }
 
