@@ -65,7 +65,7 @@ Um *Click & Collect* für eine Versandart zu aktivieren, kann diese als *Click &
 .. image:: ./_static/config-clickandcollect.png
            :scale: 50%
 
-Marketing: Modellrechner-Widget
+Marketing: Ratenrechner-Widget
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Um easyCredit-Ratenkauf bei Ihren Kunden zu bewerben, blendet die Extension ein Widget auf der Produktdetailseite und unterhalb des Warenkorbs ein. Das Widget kann über die CSS-Selektoren entsprechend des verwendeten Templates positioniert werden oder deaktiviert werden.
@@ -73,6 +73,35 @@ Um easyCredit-Ratenkauf bei Ihren Kunden zu bewerben, blendet die Extension ein 
 .. note:: Das Widget wird nur für Artikel angezeigt, deren Preis innerhalb der Betragsgrenzen von easyCredit-Ratenkauf liegen.
 
 .. image:: ./_static/config-marketing.png
+
+Widget-Einstellungen
+~~~~~~~~~~~~~~~~~~~~~
+
+Im Bereich *Widget-Einstellungen* können die CSS-Selektoren für die Positionierung des Widgets auf den Seiten *Produktdetailseite*, *Produktübersichtsseite*, *Warenkorb* und *Offcanvas-Warenkorb* eingestellt werden.
+
+.. _configuration-widget-availability-rule:
+Kopplung des Widgets mit der Verfügbarkeitsregel
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Die Zahlart-Verfügbarkeitsregel bestimmt, ob das Widget (und der Express-Button) auf der jeweiligen Seite angezeigt werden.
+
+.. image:: ./_static/config-widget-availability-rule.png
+
+Für die Anzeige des Widgets muss die Verfügbarkeitsregel der Zahlungsart erfüllt sein. Dies ermöglicht es, das Widget und den Express-Button nur bei den Produkten anzuzeigen, die auch mit der Zahlart bezahlt werden können. Standardmäßig sind die Regeln daher so definiert, dass sie die verschiedenen Fälle abdecken:
+
+Beispiel 1
+***********
+
+* die Rechnungsadressse des Kunden ist "eine von" Deutschland
+* oder, die Rechnungsadresse ist nicht gesetzt (sprich: der Kunde hat noch keine Adresse angegeben)
+
+Beispiel 2
+***********
+
+* alle Produkte im Warenkorb sind physische Produkte
+* oder, der Warenkorb ist leer
+
+Werden weitere Bedingungen eingestellt, so ist darauf zu achten, dass die Regel immer auch den Fall abdeckt, dass z.B. der Warenkorb noch nicht gefüllt ist oder der Kunde noch nicht angemeldet ist.
 
 Zahlungsart Einstellungen
 -------------------------
@@ -103,13 +132,13 @@ Die Zins-Flexibilisierung bietet dem Händler die Möglichkeit seinen Kunden ein
 Definition von Ausnahmen über den Rule-Builder
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Die Ausnahmen von der Zins-Flexibilisierung können über den Rule-Builder definiert werden. Um die Funktionalität zu aktivieren, muss die Kennung mittels Klick auf "Zugangsdaten testen & Kennung synchronsieren" synchronisiert werden.
+Die Ausnahmen von der Zins-Flexibilisierung können über den Rule-Builder definiert werden.
 
 .. image:: ./_static/config-flexprice-sync.png
 
 .. warning:: Für die Nutzung der Funktion ist eine Vereinbarung mit easyCredit-Ratenkauf notwendig. Bitte kontaktieren Sie uns, wenn Sie die Funktion nutzen möchten.
 
-Ist die Kennung synchronisiert und das Merkmal für die Zins-Flexibilisierung freigeschaltet, erscheint im RuleBuilder ein neuer Regel-Typ "easyCredit: Zins-Flex Ausnahme". Über diesen Regel-Typ können flexible Ausnahmen für Produkte definiert werden. Für die Verarbeitung auf Produktebene werden die Produkte als Warenkorb-Positionen behandelt. Sollen zum Beispiel alle Produkte aus der Kategorie "Food" ausgeschlossen werden, so kann die Regel "Position in Kategorie" verwendet werden.
+Im RuleBuilder wählen Sie den Regel-Typ "easyCredit: Zins-Flex Ausnahme". Über diesen Regel-Typ können flexible Ausnahmen für Produkte definiert werden. Für die Verarbeitung auf Produktebene werden die Produkte als Warenkorb-Positionen behandelt. Sollen zum Beispiel alle Produkte aus der Kategorie "Food" ausgeschlossen werden, so kann die Regel "Position in Kategorie" verwendet werden.
 
 .. image:: ./_static/config-flexprice-rulebuilder.png
 

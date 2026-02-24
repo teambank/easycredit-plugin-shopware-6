@@ -6,6 +6,21 @@
 # full list see the documentation:
 # http://www.sphinx-doc.org/en/stable/config
 
+import os
+
+# Fix Sphinx 9.0 deprecation: use .filename when CSS/JS assets are used as strings.
+# This patches the source of the warning so Sphinx/Jinja2 code gets a path string.
+def _patch_sphinx_asset_str():
+    try:
+        from sphinx.builders.html import _assets
+        def _str_filename(self):
+            return os.fspath(self.filename)
+        _assets._CascadingStyleSheet.__str__ = _str_filename
+        _assets._JavaScript.__str__ = _str_filename
+    except Exception:
+        pass
+_patch_sphinx_asset_str()
+
 # -- Path setup --------------------------------------------------------------
 
 # If extensions (or modules to document with autodoc) are in another directory,

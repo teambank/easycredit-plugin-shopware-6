@@ -25,7 +25,7 @@ easyCredit-Rechnung und easyCredit-Ratenkauf wird als Zahlungsmethode im Bezahlv
 Überprüfung der Bestellung
 --------------------------
 
-Nach Rückleitung vom Zahlungsterminal gelangt der Nutzer auf eine Bestätigungsseite (/checkout/confirm) auf der er seine gesamte Bestellung nochmal überprüfen kann. Hier werden ihm inbesondere der aktualisierte Gesamtbetrag und die anfallenden Zinsen transparent angezeigt. Auch hat er nochmal einen Überblick über die gewählten Raten. Nach Bestätigung der Bestellung erhält der Kunde die vom System erstellte Bestellbestätigungsemail (sofern eingestellt).
+Nach Rückleitung vom Zahlungsterminal gelangt der Nutzer auf eine Bestätigungsseite (`/checkout/confirm`) auf der er seine gesamte Bestellung nochmal überprüfen kann. Hier werden ihm inbesondere der aktualisierte Gesamtbetrag und die anfallenden Zinsen transparent angezeigt. Auch hat er nochmal einen Überblick über die gewählten Raten. Nach Bestätigung der Bestellung erhält der Kunde die vom System erstellte Bestellbestätigungsemail (sofern eingestellt).
 
-.. image:: ./_static/usage-customer-review.png
+.. image:: ./_static/usage-customer-payment-methods-review.png
            :scale: 25%
