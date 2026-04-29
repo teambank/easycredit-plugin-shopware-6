@@ -9,7 +9,13 @@
 {% block administration_favicons %}
     {{ parent() }}
 
-    <script nonce="{{ cspNonce }}" type="module" src="https://ratenkauf.easycredit.de/api/resource/webcomponents/v3/easycredit-components/easycredit-components.esm.js"></script>
+    <script
+      type="module"
+      src="https://ratenkauf.easycredit.de/api/resource/webcomponents/v3/easycredit-components/easycredit-components.esm.js"
+      fetchpriority="low"
+      defer
+      nonce="{{ cspNonce }}"
+    ></script>
 
     {# The following global variable was introduced in Webpack configuration of sw 6.5 - fixes webpack build for ealier sw versions #}
     <script nonce="{{ cspNonce }}" type="text/javascript">
