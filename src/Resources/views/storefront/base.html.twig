@@ -39,7 +39,12 @@
     {{ parent() }}
 
     {% if page.extensions.easycredit %}
-    <script type="module" src="https://ratenkauf.easycredit.de/api/resource/webcomponents/v3/easycredit-components/easycredit-components.esm.js" defer></script>
+    <script
+        type="module"
+        src="https://ratenkauf.easycredit.de/api/resource/webcomponents/v3/easycredit-components/easycredit-components.esm.js"
+        fetchpriority="low"
+        defer
+    ></script>
     {% endif %}
 
 {% endblock %}
