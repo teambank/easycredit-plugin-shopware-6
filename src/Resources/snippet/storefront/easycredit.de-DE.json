@@ -13,5 +13,9 @@
         "EASYCREDIT_INSTALLMENTS_MUST_BE_RECALCULATED": "easyCredit: Ihre Bestellung hat sich verändert, bitte führen Sie die Ratenberechnung erneut durch.",
         "EASYCREDIT_INIT_ERROR": "easyCredit: Bitte korrigieren Sie Ihre Bestellung und klicken Sie 'Raten neu berechnen'",
         "EASYCREDIT_TRANSATION_NOT_APRROVED": "Um die Bestellung mit dieser Zahlart abschliessen zu können, gehen Sie bitte zu easyCredit weiter."
+    },
+    "cookie": {
+        "easycreditComponents": "easyCredit Web-Komponenten",
+        "easycreditComponentsDescription": "Lädt die Web-Komponenten für die easyCredit-Zahlarten."
     }
 }

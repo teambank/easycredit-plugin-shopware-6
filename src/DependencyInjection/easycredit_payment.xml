@@ -308,6 +308,10 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
+        <service id="Netzkollektiv\EasyCredit\Listener\CookieListener">
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
         <service id="Netzkollektiv\EasyCredit\Payment\PaymentRoute" public="true">
             <argument type="service" id="Shopware\Core\System\SalesChannel\SalesChannel\ContextSwitchRoute" />
             <argument type="service" id="Netzkollektiv\EasyCredit\Api\Storage" />

@@ -137,6 +137,7 @@ jobs:
                   php bin/console system:config:set EasyCreditRatenkauf.config.apiPassword ${{ secrets.EASYCREDITAPIPASSWORD }}
                   php bin/console system:config:set EasyCreditRatenkauf.config.apiSignature ${{ secrets.EASYCREDITAPISIGNATURE }}
                   php bin/console system:config:set EasyCreditRatenkauf.config.debug 1
+                  php bin/console system:config:set core.basicInformation.useDefaultCookieConsent 0
 
                   # only productNumber should be searchable for e2e tests
                   mysql -u root -proot shopware -e "update product_search_config_field set searchable = 0 WHERE field != 'productNumber';"

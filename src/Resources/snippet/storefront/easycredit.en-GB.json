@@ -13,5 +13,9 @@
         "EASYCREDIT_INSTALLMENTS_MUST_BE_RECALCULATED": "easyCredit: Your order was changed, please recalculate installments.",
         "EASYCREDIT_INIT_ERROR": "easyCredit: Please correct your order and click 'Recalculate installments'",
         "EASYCREDIT_TRANSATION_NOT_APRROVED": "To complete your order using this payment method, please proceed to easyCredit."
+    },
+    "cookie": {
+        "easycreditComponents": "easyCredit Web Components",
+        "easycreditComponentsDescription": "Loads the web components for easyCredit payments."
     }
 }

@@ -45,9 +45,20 @@
 {# >= SW 6.5 #}
 {% block layout_head_javascript_hmr_mode %}
     {{ parent() }}
+    {% set useDefaultCookieConsent = config('core.basicInformation.useDefaultCookieConsent') == true %}
 
     {% if page.extensions.easycredit %}
-    <script type="module" src="https://ratenkauf.easycredit.de/api/resource/webcomponents/v3/easycredit-components/easycredit-components.esm.js" defer></script>
+    <script
+        {% if useDefaultCookieConsent %}
+        type="text/plain"
+        data-cookie-consent="cookie.groupRequired"
+        data-easycredit-cookie-script="true"
+        {% else %}
+        type="module"
+        {% endif %}
+        src="https://ratenkauf.easycredit.de/api/resource/webcomponents/v3/easycredit-components/easycredit-components.esm.js"
+        defer
+    ></script>
     {% endif %}
 
 {% endblock %}
