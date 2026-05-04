@@ -1,5 +1,10 @@
 import { test, expect } from "@playwright/test";
-import { delay, randomize, greaterOrEqualsThan, clickWithRetry } from "./utils";
+import {
+  delay,
+  randomize,
+  greaterOrEqualsThan,
+  doWithRetry,
+} from "./utils";
 import { PaymentTypes } from "./types";
 
 export const goToProduct = async (page, sku = "regular") => {
@@ -197,7 +202,30 @@ export const goThroughPaymentPage = async ({
       await switchButton.click({ force: true });
     }
 
-    await page.getByRole("button", { name: "Dateneingabe" }).click();
+    await page
+      .getByRole("button", { name: /Weiter|Dateneingabe/ })
+      .first()
+      .click();
+
+    await page
+      .locator("#mobilfunknummer")
+      .getByRole("textbox")
+      .fill("1703404848");
+
+    await delay(500);
+
+    await doWithRetry(async () => {
+      // click twice, sometimes does not react
+      await page.getByRole("button", { name: /SMS-TAN senden/ }).click({ force: true });
+      await delay(500);
+      await page.getByRole("button", { name: /SMS-TAN senden/ }).click({ force: true });
+    });
+
+    await page.locator("#mTAN").getByRole("textbox").fill("123456");
+
+    await doWithRetry(async () => {
+      await page.getByRole("button", { name: "Zur Dateneingabe" }).click();
+    });
 
     if (express) {
       await page.locator("#firstName").fill(randomize("Ralf"));
@@ -213,10 +241,6 @@ export const goThroughPaymentPage = async ({
         .fill("ralf.ratenkauf@teambank.de");
     }
 
-    await page
-      .locator("#mobilfunknummer")
-      .getByRole("textbox")
-      .fill("1703404848");
     await page
       .locator("app-ratenkauf-iban-input-dumb")
       .getByRole("textbox")
@@ -235,9 +259,9 @@ export const goThroughPaymentPage = async ({
     await page.locator("#next-btn").click();
 
     await delay(500);
-    await clickWithRetry(
-      page.getByRole("button", { name: "Zahlung übernehmen" })
-    );
+    await doWithRetry(async () => {
+      await page.getByRole("button", { name: "Zahlung übernehmen" }).click();
+    });
   });
 };
 
