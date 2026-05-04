@@ -134,12 +134,11 @@ Definition von Ausnahmen über den Rule-Builder
 
 Die Ausnahmen von der Zins-Flexibilisierung können über den Rule-Builder definiert werden.
 
-.. image:: ./_static/config-flexprice-sync.png
+.. image:: ./_static/config-flexprice-rulebuilder.png
 
 .. warning:: Für die Nutzung der Funktion ist eine Vereinbarung mit easyCredit-Ratenkauf notwendig. Bitte kontaktieren Sie uns, wenn Sie die Funktion nutzen möchten.
 
 Im RuleBuilder wählen Sie den Regel-Typ "easyCredit: Zins-Flex Ausnahme". Über diesen Regel-Typ können flexible Ausnahmen für Produkte definiert werden. Für die Verarbeitung auf Produktebene werden die Produkte als Warenkorb-Positionen behandelt. Sollen zum Beispiel alle Produkte aus der Kategorie "Food" ausgeschlossen werden, so kann die Regel "Position in Kategorie" verwendet werden.
 
-.. image:: ./_static/config-flexprice-rulebuilder.png
 
 .. image:: ./_static/config-flexprice-rulebuilder-rule.png
