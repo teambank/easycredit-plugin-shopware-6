@@ -27,7 +27,7 @@ class Redirector implements EventSubscriberInterface
 {
     private ContainerInterface $container;
 
-    private Request $request;
+    private RequestStack $requestStack;
 
     private PaymentHelper $paymentHelper;
 
@@ -46,7 +46,7 @@ class Redirector implements EventSubscriberInterface
         Storage $storage
     ) {
         $this->container = $container;
-        $this->request = $requestStack->getCurrentRequest();
+        $this->requestStack = $requestStack;
         $this->paymentHelper = $paymentHelper;
         $this->quoteHelper = $quoteHelper;
         $this->checkoutService = $checkoutService;
@@ -64,9 +64,14 @@ class Redirector implements EventSubscriberInterface
 
     public function onSalesChannelContextSwitch(SalesChannelContextSwitchEvent $event): void
     {
+        $request = $this->requestStack->getCurrentRequest();
+        if ($request === null) {
+            return;
+        }
+
         $salesChannelContext = $event->getSalesChannelContext();
 
-        if (!$this->isRoute('frontend.checkout.configure', $this->request)) {
+        if (!$this->isRoute('frontend.checkout.configure', $request)) {
             return;
         }
 
@@ -111,9 +116,11 @@ class Redirector implements EventSubscriberInterface
 
     public function onKernelResponse(ResponseEvent $event): void
     {
+        $request = $event->getRequest();
+
         if (
-            !$this->request->hasSession() ||
-            $this->request->attributes->get('_routeScope') === ['store-api']
+            !$request->hasSession() ||
+            $request->attributes->get('_routeScope') === ['store-api']
         ) {
             return; // do not run in CLI & API
         }
@@ -124,7 +131,7 @@ class Redirector implements EventSubscriberInterface
         }
     }
 
-    protected function isRoute($route, $request)
+    protected function isRoute(string $route, Request $request): bool
     {
         $attributes = (isset($request->attributes)) ? $request->attributes : null;
 
