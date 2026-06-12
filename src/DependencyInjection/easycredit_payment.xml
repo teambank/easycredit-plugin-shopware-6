@@ -286,6 +286,7 @@
         <service id="Netzkollektiv\EasyCredit\Subscriber\CheckoutOrderPlacedSubscriber">
             <argument type="service" id="order_transaction.repository"/>
             <argument type="service" id="Netzkollektiv\EasyCredit\Api\Storage" />
+            <argument type="service" id="request_stack"/>
 
             <tag name="kernel.event_subscriber"/>
         </service>

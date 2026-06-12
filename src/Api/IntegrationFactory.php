@@ -65,6 +65,15 @@ class IntegrationFactory
             ->setAccessToken($settings->getApiSignature());
     }
 
+    public function tryCreateCheckout(?string $salesChannelId = null): ?Api\Integration\Checkout
+    {
+        try {
+            return $this->createCheckout($salesChannelId);
+        } catch (\Throwable) {
+            return null;
+        }
+    }
+
     public function createCheckout(?string $salesChannelId = null): Api\Integration\Checkout
     {
         $client = $this->getClient();
