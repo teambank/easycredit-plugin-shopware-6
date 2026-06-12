@@ -227,19 +227,29 @@ class QuoteBuilder
         return $this->storage->get('express') && !$this->customer;
     }
 
+    public function supportsCart(Cart $cart, SalesChannelContext $salesChannelContext): bool
+    {
+        if ($this->storage->get('express') && !$salesChannelContext->getCustomer()) {
+            return true;
+        }
+
+        if ($cart->getDeliveries()->getAddresses()->first() === null) {
+            return false;
+        }
+
+        $customer = $salesChannelContext->getCustomer();
+
+        return $customer !== null && $customer->getActiveBillingAddress() !== null;
+    }
+
     public function build($cart, SalesChannelContext $salesChannelContext): Transaction
     {
         $this->cart = $cart;
         $this->salesChannelContext = $salesChannelContext;
         $this->customer = $salesChannelContext->getCustomer();
 
-        if (!$this->isExpress()) {
-            if ($cart instanceof Cart && $cart->getDeliveries()->getAddresses()->first() === null) {
-                throw new QuoteInvalidException();
-            }
-            if (!$this->customer) {
-                throw new QuoteInvalidException();
-            }
+        if ($cart instanceof Cart && !$this->supportsCart($cart, $salesChannelContext)) {
+            throw new QuoteInvalidException();
         }
 
         return new Transaction([

@@ -16,6 +16,7 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEnti
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Netzkollektiv\EasyCredit\EasyCreditRatenkauf;
 use Netzkollektiv\EasyCredit\Api\Storage;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class CheckoutOrderPlacedSubscriber implements EventSubscriberInterface
 {
@@ -23,19 +24,36 @@ class CheckoutOrderPlacedSubscriber implements EventSubscriberInterface
 
     private Storage $storage;
 
+    private RequestStack $requestStack;
+
     public function __construct(
         EntityRepository $orderTransactionRepository,
-        Storage $storage
+        Storage $storage,
+        RequestStack $requestStack
     ) {
         $this->orderTransactionRepository = $orderTransactionRepository;
         $this->storage = $storage;
+        $this->requestStack = $requestStack;
     }
 
     public static function getSubscribedEvents(): array
     {
         return [
-            CheckoutOrderPlacedEvent::class => 'addPaymentStateData',
+            CheckoutOrderPlacedEvent::class => [
+                ['markCheckoutOrderPlaced', 100],
+                ['addPaymentStateData', 0],
+            ],
         ];
+    }
+
+    public function markCheckoutOrderPlaced(CheckoutOrderPlacedEvent $event): void
+    {
+        $request = $this->requestStack->getCurrentRequest();
+        if ($request === null) {
+            return;
+        }
+
+        $request->attributes->set(EasyCreditRatenkauf::CHECKOUT_ORDER_PLACED_REQUEST_ATTR, true);
     }
 
     public function addPaymentStateData(CheckoutOrderPlacedEvent $event)

@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Netzkollektiv\EasyCredit\Helper;
 
 use Shopware\Core\Checkout\Cart\Cart;
+use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Core\Checkout\Cart\SalesChannel\CartService;
 use Teambank\EasyCreditApiV3\Model\Transaction;
@@ -34,9 +35,14 @@ class Quote
         $this->cartService = $cartService;
     }
 
+    public function supportsCart(Cart $cart, SalesChannelContext $salesChannelContext): bool
+    {
+        return $this->quoteBuilder->supportsCart($cart, $salesChannelContext);
+    }
+
     /**
      * @param SalesChannelContext $salesChannelContext
-     * @param Cart|\Shopware\Core\Checkout\Order\OrderEntity|null $cart
+     * @param Cart|OrderEntity|null $cart
      */
     public function getQuote(SalesChannelContext $salesChannelContext, $cart = null): Transaction
     {
