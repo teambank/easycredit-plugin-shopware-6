@@ -3,61 +3,46 @@ name: Release
 on:
   push:
     tags:
-    - '*'
+      - '*'
+
+permissions:
+  contents: write
 
 jobs:
   release:
     runs-on: ubuntu-22.04
     steps:
-    - uses: actions/checkout@v2
-    - name: Run script file
-      id: build-release
-      run: |
-        docker run --rm -e NODE_VERSION=16 -v $(pwd):/ext  -w /ext shopware/shopware-cli extension zip --disable-git /ext
+      - uses: actions/checkout@v6
+      - name: Build release artifact
+        id: build-release
+        run: |
+          docker run --rm -e NODE_VERSION=16 -v $(pwd):/ext -w /ext shopware/shopware-cli extension zip --disable-git /ext
 
-        zipfile=$(find "$(pwd)" -maxdepth 1 -name "*.zip" | head -n 1)
-        if [[ -z "$zipfile" ]]; then
-          echo "No zip file found!"
-          exit 1
-        fi
+          zipfile=$(find "$(pwd)" -maxdepth 1 -name "*.zip" | head -n 1)
+          if [[ -z "$zipfile" ]]; then
+            echo "No zip file found!"
+            exit 1
+          fi
 
-        version="${GITHUB_REF#refs/tags/}"  # Extract tag name (e.g. '1.2.3' from 'refs/tags/1.2.3')
-        base=$(basename "$zipfile" .zip)
-        newfile="${base}-${version}.zip"
+          version="${GITHUB_REF#refs/tags/}"
+          base=$(basename "$zipfile" .zip)
+          newfile="${base}-${version}.zip"
 
-        mv "$zipfile" "$newfile"
+          mv "$zipfile" "$newfile"
 
-        filename=$(basename "$zipfile")
+          t=$(cat docs/source/changelog.rst | php -r 'preg_match_all("#([v\d\.]+)\n[-]+\n(.+?)\n\n#s", file_get_contents("php://stdin"), $matches); echo trim($matches[2][0]);')
+          printf '%s\n' "$t" > release-notes.md
 
-        echo "filepath=$newfile" >> "$GITHUB_OUTPUT"
-        echo "filename=$(basename "$newfile")" >> "$GITHUB_OUTPUT"
-
-        t=$(cat docs/source/changelog.rst  | php -r 'preg_match_all("#([v\d\.]+)\n[-]+\n(.+?)\n\n#s", file_get_contents("php://stdin"), $matches); echo trim($matches[2][0]);')
-
-        # Use the multiline syntax for GitHub Actions output
-        echo "changelog<<EOF" >> $GITHUB_OUTPUT
-        echo "$t" >> $GITHUB_OUTPUT
-        echo "EOF" >> $GITHUB_OUTPUT
-      shell: bash
-    - name: Create Release
-      id: create-release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ github.ref }}
-        release_name: v${{ github.ref }}
-        body: |
-          ${{ steps.build-release.outputs.changelog }}
-        draft: true
-        prerelease: false
-    - name: Upload Release Asset
-      id: upload-release-asset
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create-release.outputs.upload_url }}
-        asset_path: ${{ steps.build-release.outputs.filepath }}
-        asset_name: ${{ steps.build-release.outputs.filename }}
-        asset_content_type: application/zip
+          echo "filepath=$newfile" >> "$GITHUB_OUTPUT"
+          echo "filename=$(basename "$newfile")" >> "$GITHUB_OUTPUT"
+          echo "notes_file=release-notes.md" >> "$GITHUB_OUTPUT"
+        shell: bash
+      - name: Create draft release
+        run: |
+          gh release create "${{ github.ref_name }}" \
+            --draft \
+            --title "v${{ github.ref_name }}" \
+            --notes-file "${{ steps.build-release.outputs.notes_file }}" \
+            "${{ steps.build-release.outputs.filepath }}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

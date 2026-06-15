@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
-import { takeScreenshot, scaleDown } from './utils';
-import { goToProduct, addCurrentProductToCart, goToCart } from './common.ts';
+import { takeScreenshot, scaleDown } from '../helpers/utils';
+import { goToProduct, addCurrentProductToCart, goToCart } from '../helpers/common';
 
 test.beforeEach(scaleDown);
 test.afterEach(takeScreenshot);

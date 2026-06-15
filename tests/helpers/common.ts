@@ -5,6 +5,11 @@ import {
   greaterOrEqualsThan,
   doWithRetry,
 } from "./utils";
+import {
+  goThroughPaymentPageViaApi,
+  resolvePaymentPageMode,
+  PAYMENT_SANDBOX,
+} from "../api/payment-api";
 import { PaymentTypes } from "./types";
 
 export const goToProduct = async (page, sku = "regular") => {
@@ -173,14 +178,23 @@ export const goThroughPaymentPage = async ({
   page,
   paymentType,
   express = false,
-  switchPaymentType = false,
+  viaApi,
 }: {
   page: any;
   paymentType: PaymentTypes;
   express?: boolean;
-  switchPaymentType?: boolean;
+  /** Use payment-page API instead of hosted UI. Defaults to EASYCREDIT_PAYMENT_API env. */
+  viaApi?: boolean;
 }) => {
-  await test.step(`easyCredit Payment (${paymentType})`, async () => {
+  const mode = resolvePaymentPageMode(viaApi);
+
+  if (mode === "api") {
+    return test.step(`easyCredit Payment via API (${paymentType})`, async () => {
+      await goThroughPaymentPageViaApi({ page, paymentType, express });
+    });
+  }
+
+  return test.step(`easyCredit Payment (${paymentType})`, async () => {
     await page.getByTestId("uc-deny-all-button").click();
 
     /*
@@ -190,10 +204,9 @@ export const goThroughPaymentPage = async ({
     } else {
       await expect(switcher.getByLabel('Rechnung')).toBeChecked();
     }
-    */
 
     if (switchPaymentType) {
-      const switchButton  = await page
+      const switchButton = await page
         .locator(".paymentoptions")
         .getByText(
           paymentType === PaymentTypes.INSTALLMENT ? "Rechnung" : "Ratenkauf"
@@ -201,6 +214,7 @@ export const goThroughPaymentPage = async ({
       await expect(switchButton).toBeVisible();
       await switchButton.click({ force: true });
     }
+    */
 
     await page
       .getByRole("button", { name: /Weiter|Dateneingabe/ })
@@ -210,18 +224,15 @@ export const goThroughPaymentPage = async ({
     await page
       .locator("#mobilfunknummer")
       .getByRole("textbox")
-      .fill("1703404848");
+      .fill(PAYMENT_SANDBOX.phone);
 
     await delay(500);
 
     await doWithRetry(async () => {
-      // click twice, sometimes does not react
-      await page.getByRole("button", { name: /SMS-TAN senden/ }).click({ force: true });
-      await delay(500);
       await page.getByRole("button", { name: /SMS-TAN senden/ }).click({ force: true });
     });
 
-    await page.locator("#mTAN").getByRole("textbox").fill("123456");
+    await page.locator("#mTAN").getByRole("textbox").fill("000000");
 
     await doWithRetry(async () => {
       await page.getByRole("button", { name: "Zur Dateneingabe" }).click();

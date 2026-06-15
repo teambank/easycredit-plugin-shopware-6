@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { scaleDown, takeScreenshot, delay } from "./utils";
+import { scaleDown, takeScreenshot, delay } from "../helpers/utils";
 import {
   goToProduct,
   addCurrentProductToCart,
@@ -14,8 +14,11 @@ import {
   saveShippingAddressModal,
   paymentSelect,
   registerAndLoginCustomer,
-} from "./common";
-import { PaymentTypes } from "./types";
+} from "../helpers/common";
+import { PaymentTypes } from "../helpers/types";
+import { setProductStock } from "../api/shopware-api";
+
+const LAST_STOCK_SKU = "laststock";
 
 test.beforeEach(scaleDown);
 test.afterEach(takeScreenshot);
@@ -153,40 +156,6 @@ test.describe("go through @express @bill", () => {
     });
   });
 });
-
-/*test.describe("go through standard @installment and switch to @bill", () => {
-  test("standardCheckoutInstallmentSwitchToBill", async ({ page }) => {
-    await goToProduct(page);
-
-    await page
-      .getByRole("button", { name: "Add to shopping cart" })
-      .first()
-      .click();
-    await page.locator(".offcanvas .begin-checkout");
-    await expect(
-      page
-        .locator(".offcanvas")
-        .getByRole("link", { name: /Product/ })
-        .first()
-    ).toBeVisible();
-
-    await fillCheckout(page);
-
-    // Confirm Page
-    await selectAndProceed({ page, paymentType: PaymentTypes.INSTALLMENT });
-
-    await goThroughPaymentPage({
-      page: page,
-      paymentType: PaymentTypes.INSTALLMENT,
-      switchPaymentType: true
-    });
-    await confirmOrder({
-      page: page,
-      paymentType: PaymentTypes.BILL,
-    });
-  });
-});
-*/
 
 test.describe("company should not be able to pay @bill @installment", () => {
   test("companyBlocked", async ({ page }) => {
@@ -348,6 +317,43 @@ test.describe("product above amount constraint should not be buyable @bill @inst
         await page.locator(`easycredit-checkout[payment-type=${paymentType}]`)
       ).toContainText("liegt außerhalb der zulässigen Beträge");
     }
+  });
+});
+
+test.describe("last stock product is sold out after checkout @installment", () => {
+  test.beforeEach(async ({ request }) => {
+    await setProductStock(request, LAST_STOCK_SKU, 1);
+  });
+
+  test("lastStockSoldOutAfterCheckout", async ({ page }) => {
+    await goToProduct(page, LAST_STOCK_SKU);
+
+    const addToCart = page
+      .getByRole("button", { name: "Add to shopping cart" })
+      .first();
+    await expect(addToCart).toBeVisible();
+
+    await addToCart.click();
+    await page.locator(".offcanvas .begin-checkout");
+    await expect(
+      page.locator(".offcanvas").getByRole("link", { name: /Product/ }).first()
+    ).toBeVisible();
+
+    await fillCheckout(page);
+    await selectAndProceed({ page, paymentType: PaymentTypes.INSTALLMENT });
+    await goThroughPaymentPage({
+      page,
+      paymentType: PaymentTypes.INSTALLMENT,
+    });
+    await confirmOrder({
+      page,
+      paymentType: PaymentTypes.INSTALLMENT,
+    });
+
+    await goToProduct(page, LAST_STOCK_SKU);
+    await expect(
+      page.getByRole("button", { name: "Add to shopping cart" })
+    ).toHaveCount(0);
   });
 });
 
