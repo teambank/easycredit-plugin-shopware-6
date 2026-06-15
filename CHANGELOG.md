@@ -1,3 +1,9 @@
+# 3.1.11
+
+* Performance-Optimierungen für Web Components (reduzierte Layout-Verschiebung)
+* behebt einen Fehler, durch den der easyCredit-Zahlungsstatus nach Bestellabschluss zurückgesetzt wurde (Shopware 6.7.3+)
+* Redirector-Fehler bei Aufruf aus der Console behoben
+
 # 3.1.10
 
 * die Timeouts für API-Anfragen wurden zur Verbesserung der Zuverlässigkeit optimiert
