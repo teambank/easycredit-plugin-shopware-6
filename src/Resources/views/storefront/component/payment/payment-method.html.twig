@@ -9,7 +9,7 @@
     {% if easycredit and payment.id in easycredit.paymentMethodIds %}
         {% if not payment.media %}
             <easycredit-checkout-label 
-                label="{{payment.name}}"
+                label="{{ payment.translated.name ?? payment.name }}"
                 payment-type="{{ easyCreditPaymentType(payment, context) }}"
             ></easycredit-checkout-label>
         {% else %}

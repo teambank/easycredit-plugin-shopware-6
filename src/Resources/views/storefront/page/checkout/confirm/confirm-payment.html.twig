@@ -7,7 +7,7 @@
     {% set easycredit = page.extensions.easycredit %}
 
     {% if easycredit and easycredit.isSelected %}
-        <easycredit-checkout-label paymentType="{{ easyCreditPaymentType(selectedPaymentMethod) }}"></easycredit-checkout-label>
+        <easycredit-checkout-label label="{{ selectedPaymentMethod.translated.name ?? selectedPaymentMethod.name }}" paymentType="{{ easyCreditPaymentType(selectedPaymentMethod) }}"></easycredit-checkout-label>
         {% if easycredit.paymentPlan %}
             <easycredit-checkout paymentType="{{ easyCreditPaymentType(selectedPaymentMethod) }}" payment-plan="{{ easycredit.paymentPlan }}"></easycredit-checkout>
         {% elseif not easycredit.error %}
