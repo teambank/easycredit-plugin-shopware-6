@@ -357,27 +357,48 @@ test.describe("last stock product is sold out after checkout @installment", () =
   });
 });
 
+async function prepareUnauthorizedOrderConfirmPage(page) {
+  await goToProduct(page);
+  await addCurrentProductToCart(page);
+
+  await page.goto("checkout/confirm");
+  await fillCheckout(page);
+
+  await paymentSelect({ page, paymentType: PaymentTypes.INSTALLMENT });
+
+  await expect(page.getByText("I have read")).toBeVisible({ timeout: 10000 });
+  await page.evaluate(() => {
+    // workaround: checking checkboxes results in "Target closed" on CI
+    document.getElementById("tos").checked = true;
+  });
+}
+
 test.describe("order without authorization should not be possible", () => {
   test("orderWithoutAuthorizationRestricted", async ({ page }) => {
-    await goToProduct(page);
-    await addCurrentProductToCart(page);
+    await prepareUnauthorizedOrderConfirmPage(page);
 
-    await page.goto("checkout/confirm");
-    await fillCheckout(page);
+    await page.getByRole("button", { name: "Submit order" }).click();
 
-    await paymentSelect({ page, paymentType: PaymentTypes.INSTALLMENT })
+    /* Client-side checkout plugin redirects to easyCredit instead of placing the order */
+    await expect(page).toHaveURL(/ratenkauf\.easycredit\.de/i, { timeout: 90000 });
+    await expect(page.getByText("Thank you for your order")).not.toBeVisible();
+  });
 
-    /* Confirm Page */
-    await expect(page.getByText("I have read")).toBeVisible({ timeout: 10000 });
-    await page.evaluate(async () => {
-      // workaround: checking checkboxes results in "Target closed" on CI
-      document.getElementById("tos").checked = true;
-    });
+  test("orderWithoutAuthorizationRestrictedServerSide", async ({ page }) => {
+    await page.route(/easy-credit-ratenkauf\/easy-credit-ratenkauf\.js/, (route) =>
+      route.abort()
+    );
 
-    await page.getByRole('button', { name: 'Submit order' }).click();
+    await prepareUnauthorizedOrderConfirmPage(page);
 
+    await page.getByRole("button", { name: "Submit order" }).click();
+
+    /* Server-side validation rejects the order when the checkout plugin is unavailable */
     await expect(
-      await page.getByText('To complete your order using this payment method, please proceed to easyCredit.')
+      page.getByText(
+        "To complete your order using this payment method, please proceed to easyCredit."
+      )
     ).toBeVisible();
+    await expect(page.getByText("Thank you for your order")).not.toBeVisible();
   });
 });
