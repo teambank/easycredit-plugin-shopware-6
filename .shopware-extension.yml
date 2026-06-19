@@ -16,8 +16,8 @@ build:
     pack:
       excludes:
         paths:
-          - conf
           - bin
+          - scripts
           - docs
           - .shopware-extension.yml
           - .vscode

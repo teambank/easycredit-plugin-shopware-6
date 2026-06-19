@@ -23,7 +23,7 @@ let config: PlaywrightTestConfig = {
 };
 
 let projects: Project[] = [
-  // Disabled: admin auth setup + backend.spec.ts need Shopware admin UI maintenance.
+  // Disabled: admin auth setup needs Shopware admin UI maintenance.
   // { name: `backend-auth`, testMatch: "specs/backend-auth.spec.ts" },
 ];
 
@@ -54,7 +54,7 @@ let projects: Project[] = [
       storageState: "playwright/.auth/user.json",
     },
     dependencies: [`backend-auth`, name as string],
-    testMatch: "specs/backend.spec.ts",
+    testMatch: "specs/backend.spec.ts", // add spec when re-enabling
   });
 });
 */

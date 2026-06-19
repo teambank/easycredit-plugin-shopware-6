@@ -1,5 +1,6 @@
 .idea/
 .phpunit.result.cache
+.phpunit.cache
 .php-cs-fixer.php
 .tmp
 
@@ -11,3 +12,8 @@ node_modules
 
 /dist
 /vendor
+
+.DS_Store
+.env
+playwright-report/
+test-results/

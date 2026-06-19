@@ -2,7 +2,7 @@ import { test as setup, expect } from "@playwright/test";
 
 const authFile = "playwright/.auth/user.json";
 
-// Disabled in playwright.config.ts — re-enable when backend.spec.ts is maintained again.
+// Disabled in playwright.config.ts — re-enable when admin backend tests are maintained again.
 setup.skip("authenticate", async ({ page }) => {
   await page.goto("/admin/");
   await page.getByLabel("Benutzername oder E-Mail-Adresse").fill("admin");
