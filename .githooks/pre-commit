@@ -1,23 +1,31 @@
-#!/bin/sh
+#!/usr/bin/env bash
+set -euo pipefail
 
-echo "🔍 Running ECS checks before commit..."
+ROOT="$(git rev-parse --show-toplevel)"
+cd "${ROOT}"
 
-# Run ECS on staged PHP files
-STAGED_FILES=$(git diff --cached --name-only --diff-filter=d | grep '\.php$')
+ADMIN_SRC_PREFIX="src/Resources/app/administration/src/"
+STOREFRONT_SRC_PREFIX="src/Resources/app/storefront/src/"
+ADMIN_OUTPUT_DIR="src/Resources/public/administration"
+STOREFRONT_OUTPUT_DIR="src/Resources/app/storefront/dist"
 
-if [ -z "$STAGED_FILES" ]; then
-    echo "✅ No PHP files changed. Skipping ECS check."
-    exit 0
-fi
+STAGED_FILES="$(git diff --cached --name-only --diff-filter=ACMR)"
 
-# Run ECS check (without fixing)
-vendor/bin/ecs check $STAGED_FILES
-ECS_STATUS=$?
+rebuild_assets() {
+  if ! echo "${STAGED_FILES}" | grep -qE "^(${ADMIN_SRC_PREFIX}|${STOREFRONT_SRC_PREFIX})"; then
+    return 0
+  fi
 
-if [ $ECS_STATUS -ne 0 ]; then
-    echo "❌ ECS found errors. Please fix them before committing."
-    exit 1
-fi
+  echo "JS source changes detected — building assets (admin 6.7 + 6.6, storefront once)..."
+  "${ROOT}/scripts/build-assets.sh"
 
-echo "✅ ECS check passed. Proceeding with commit."
-exit 0
+  git add "${ADMIN_OUTPUT_DIR}" "${STOREFRONT_OUTPUT_DIR}"
+
+  if git diff --cached --quiet -- "${ADMIN_OUTPUT_DIR}" "${STOREFRONT_OUTPUT_DIR}"; then
+    echo "Compiled assets unchanged after build."
+  else
+    echo "Rebuilt assets staged for commit."
+  fi
+}
+
+rebuild_assets
