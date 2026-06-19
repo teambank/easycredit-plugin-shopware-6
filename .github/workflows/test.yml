@@ -20,6 +20,28 @@ on:
                 default: reduced
 
 jobs:
+    unit-tests:
+        runs-on: ubuntu-latest
+        name: Unit Tests (v6.7.10)
+
+        container:
+            image: ghcr.io/friendsofshopware/platform-plugin-dev:v6.7.10-debian
+        env:
+            PLUGIN_DIR: /plugins/EasyCreditRatenkauf
+
+        steps:
+            - uses: actions/checkout@v6
+            - name: Link plugin and install dependencies
+              run: |
+                  ln -s $GITHUB_WORKSPACE $PLUGIN_DIR
+                  cd $PLUGIN_DIR
+                  composer remove shopware/core frosh/shopware-rector
+                  composer install -n
+            - name: Unit Tests
+              run: |
+                  cd $PLUGIN_DIR
+                  bash bin/phpunit.sh
+
     resolve-matrix:
         runs-on: ubuntu-latest
         outputs:
