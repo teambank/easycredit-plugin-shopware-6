@@ -17,6 +17,7 @@ use Netzkollektiv\EasyCredit\Payment\StateHandler;
 use Shopware\Core\Checkout\Payment\Cart\PaymentHandler\SynchronousPaymentHandlerInterface;
 use Shopware\Core\Checkout\Payment\Cart\SyncPaymentTransactionStruct;
 use Shopware\Core\Checkout\Payment\Exception\SyncPaymentProcessException;
+use Shopware\Core\Checkout\Payment\PaymentException;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
@@ -60,7 +61,16 @@ abstract class AbstractSynchronousHandler implements SynchronousPaymentHandlerIn
             $orderTransaction = $transaction->getOrderTransaction();
             $orderTransaction->setOrder($order); // to access the salesChannelId in handleTransactionState
 
-            $token = $orderTransaction->getCustomFields()[EasyCreditRatenkauf::ORDER_TRANSACTION_CUSTOM_FIELDS_EASYCREDIT_TECHNICAL_TRANSACTION_ID];
+            $customFields = $orderTransaction->getCustomFields() ?? [];
+            $token = $customFields[EasyCreditRatenkauf::ORDER_TRANSACTION_CUSTOM_FIELDS_EASYCREDIT_TECHNICAL_TRANSACTION_ID] ?? null;
+
+            if ($token === null) {
+                $this->handlePaymentException(
+                    $transaction,
+                    'Missing EasyCredit transaction token.'
+                );
+            }
+
             $this->storage->set('token', $token);
 
             $tx = $checkout->loadTransaction();
@@ -92,10 +102,10 @@ abstract class AbstractSynchronousHandler implements SynchronousPaymentHandlerIn
                 );
             }
         } catch (\Throwable $e) {
-            $this->logger->error($e->getMessage());
+            $this->logger->error($e->getMessage(), ['exception' => $e]);
             $this->handlePaymentException(
                 $transaction,
-                'Could not complete transaction: ' . $e->getMessage()
+                'Could not complete transaction.'
             );
         }
     }
@@ -118,5 +128,7 @@ abstract class AbstractSynchronousHandler implements SynchronousPaymentHandlerIn
                 $message
             );
         }
+
+        throw new \RuntimeException($message);
     }
 }

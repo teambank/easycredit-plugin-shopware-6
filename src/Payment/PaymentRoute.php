@@ -24,6 +24,7 @@ use Netzkollektiv\EasyCredit\Api\Storage;
 use Netzkollektiv\EasyCredit\Service\CheckoutService;
 use Netzkollektiv\EasyCredit\Service\CustomerService;
 use Netzkollektiv\EasyCredit\Api\IntegrationFactory;
+use Netzkollektiv\EasyCredit\Util\RedirectUrlValidator;
 
 class PaymentRoute extends AbstractPaymentRoute
 {
@@ -87,7 +88,7 @@ class PaymentRoute extends AbstractPaymentRoute
         }
 
         if (!isset($params['paymentType'])) {
-            throw new \Exception('paymentType must be set, available: ' . \print_r([...$request->query->all(), ...$request->request->all()], true));
+            throw new \InvalidArgumentException('paymentType must be set.');
         }
 
         $this->storage
@@ -101,7 +102,10 @@ class PaymentRoute extends AbstractPaymentRoute
         $quote = $this->quoteHelper->getQuote($salesChannelContext, $cart);
         $this->storage->set('cartToken', $cart->getToken());
 
-        if (isset($params['returnUrl'])) {
+        if (
+            isset($params['returnUrl'])
+            && RedirectUrlValidator::isAllowedShopReturnUrl((string) $params['returnUrl'], $salesChannelContext)
+        ) {
             $quote->getRedirectLinks()->setUrlSuccess($params['returnUrl'])
                 ->setUrlCancellation($params['returnUrl'])
                 ->setUrlDenial($params['returnUrl']);

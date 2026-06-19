@@ -12,44 +12,26 @@ namespace Netzkollektiv\EasyCredit\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Annotation\Route;
 use Netzkollektiv\EasyCredit\Setting\Service\ApiCredentialServiceInterface;
-use Netzkollektiv\EasyCredit\Api\IntegrationFactory;
-use Netzkollektiv\EasyCredit\Setting\Service\SettingsServiceInterface;
 
 class SettingsController extends AbstractController
 {
     private ApiCredentialServiceInterface $apiCredentialTestService;
 
-    private SettingsServiceInterface $settings;
-
-    private IntegrationFactory $integrationFactory;
-
     public function __construct(
-        ApiCredentialServiceInterface $apiService,
-        SettingsServiceInterface $settingsService,
-        IntegrationFactory $integrationFactory
+        ApiCredentialServiceInterface $apiService
     ) {
         $this->apiCredentialTestService = $apiService;
-        $this->settings = $settingsService;
-        $this->integrationFactory = $integrationFactory;
     }
 
     public function validateApiCredentials(Request $request): JsonResponse
     {
-        $webshopId = $request->query->get('webshopId') ?? '';
-        $apiPassword = $request->query->get('apiPassword') ?? '';
-        $apiSignature = $request->query->get('apiSignature') ?? '';
+        $payload = $request->toArray();
+        $webshopId = (string) ($payload['webshopId'] ?? '');
+        $apiPassword = (string) ($payload['apiPassword'] ?? '');
+        $apiSignature = (string) ($payload['apiSignature'] ?? '');
 
         $credentialsValid = $this->apiCredentialTestService->testApiCredentials($webshopId, $apiPassword, $apiSignature);
-
-        if ($credentialsValid) {
-            $this->settings->updateSettings([
-                'webshopId' => $webshopId,
-                'apiPassword' => $apiPassword,
-                'apiSignature' => $apiSignature
-            ]);
-        }
 
         return new JsonResponse(['credentialsValid' => $credentialsValid]);
     }

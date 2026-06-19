@@ -8,7 +8,7 @@
             </list>
         </default>
     </route>
-    <route path="/easycredit/express" id="frontend.easycredit.express" controller="Netzkollektiv\EasyCredit\Controller\PaymentController::express" methods="GET">
+    <route path="/easycredit/express" id="frontend.easycredit.express" controller="Netzkollektiv\EasyCredit\Controller\PaymentController::express" methods="GET|POST">
         <default key="_routeScope">
             <list>
                 <string>storefront</string>
@@ -23,13 +23,6 @@
         </default>
     </route>
     <route path="/easycredit/reject" id="frontend.easycredit.reject" controller="Netzkollektiv\EasyCredit\Controller\PaymentController::reject" methods="GET">
-        <default key="_routeScope">
-            <list>
-                <string>storefront</string>
-            </list>
-        </default>
-    </route>
-    <route path="/easycredit/authorize/{secToken}/" id="frontend.easycredit.authorize" controller="Netzkollektiv\EasyCredit\Controller\PaymentController::authorize" methods="GET">
         <default key="_routeScope">
             <list>
                 <string>storefront</string>
@@ -57,7 +50,7 @@
             </list>
         </default>
     </route>
-    <route path="/api/_action/easycredit/validate-api-credentials" id="api.action.easycredit.validate.api.credentials" controller="Netzkollektiv\EasyCredit\Controller\SettingsController::validateApiCredentials" methods="GET">
+    <route path="/api/_action/easycredit/validate-api-credentials" id="api.action.easycredit.validate.api.credentials" controller="Netzkollektiv\EasyCredit\Controller\SettingsController::validateApiCredentials" methods="POST">
         <default key="_routeScope">
             <list>
                 <string>api</string>

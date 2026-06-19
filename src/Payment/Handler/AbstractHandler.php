@@ -82,7 +82,16 @@ abstract class AbstractHandler extends AbstractPaymentHandler
                 $order->getSalesChannelId()
             );
 
-            $token = $orderTransaction->getCustomFields()[EasyCreditRatenkauf::ORDER_TRANSACTION_CUSTOM_FIELDS_EASYCREDIT_TECHNICAL_TRANSACTION_ID];
+            $customFields = $orderTransaction->getCustomFields() ?? [];
+            $token = $customFields[EasyCreditRatenkauf::ORDER_TRANSACTION_CUSTOM_FIELDS_EASYCREDIT_TECHNICAL_TRANSACTION_ID] ?? null;
+
+            if ($token === null) {
+                $this->handlePaymentException(
+                    $transaction,
+                    'Missing EasyCredit transaction token.'
+                );
+            }
+
             $this->storage->set('token', $token);
 
             $tx = $checkout->loadTransaction();
@@ -114,10 +123,10 @@ abstract class AbstractHandler extends AbstractPaymentHandler
                 );
             }
         } catch (\Throwable $e) {
-            $this->logger->error($e->getMessage());
+            $this->logger->error($e->getMessage(), ['exception' => $e]);
             $this->handlePaymentException(
                 $transaction,
-                'Could not complete transaction: ' . $e->getMessage()
+                'Could not complete transaction.'
             );
         }
         return null;

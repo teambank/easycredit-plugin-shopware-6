@@ -19,6 +19,7 @@ use Netzkollektiv\EasyCredit\Cart\InterestError;
 use Netzkollektiv\EasyCredit\Service\FlexpriceService;
 use Netzkollektiv\EasyCredit\Payment\Handler\BillPaymentHandler;
 use Netzkollektiv\EasyCredit\Payment\Handler\InstallmentPaymentHandler;
+use Netzkollektiv\EasyCredit\EasyCreditRatenkauf;
 use Shopware\Core\Framework\DataAbstractionLayer\Exception\InconsistentCriteriaIdsException;
 use Shopware\Storefront\Page\Checkout\Confirm\CheckoutConfirmPageLoadedEvent;
 use Symfony\Component\Cache\Adapter\TagAwareAdapterInterface;
@@ -128,7 +129,8 @@ class Checkout implements EventSubscriberInterface
                 try {
                     $quote = $this->quoteHelper->getQuote($salesChannelContext, $cart);
                 } catch (\Throwable $e) {
-                    $error = $e->getMessage();
+                    $this->logger->error('Quote build failed', ['exception' => $e]);
+                    $error = EasyCreditRatenkauf::GENERIC_STOREFRONT_ERROR_MESSAGE;
                 }
             }
         }

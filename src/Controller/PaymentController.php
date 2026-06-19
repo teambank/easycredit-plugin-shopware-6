@@ -9,13 +9,14 @@ declare(strict_types=1);
 
 namespace Netzkollektiv\EasyCredit\Controller;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Storefront\Controller\StorefrontController;
-use Shopware\Core\Framework\Validation\Exception\ConstraintViolationException;;
-
+use Shopware\Core\Framework\Validation\Exception\ConstraintViolationException;
 use Netzkollektiv\EasyCredit\Api\Storage;
+use Netzkollektiv\EasyCredit\EasyCreditRatenkauf;
 use Netzkollektiv\EasyCredit\Payment\PaymentRoute;
 
 class PaymentController extends StorefrontController
@@ -24,12 +25,16 @@ class PaymentController extends StorefrontController
 
     private PaymentRoute $paymentRoute;
 
+    private LoggerInterface $logger;
+
     public function __construct(
         Storage $storage,
-        PaymentRoute $paymentRoute
+        PaymentRoute $paymentRoute,
+        LoggerInterface $logger
     ) {
         $this->storage = $storage;
         $this->paymentRoute = $paymentRoute;
+        $this->logger = $logger;
     }
 
     public function cancel(SalesChannelContext $salesChannelContext): RedirectResponse
@@ -40,14 +45,15 @@ class PaymentController extends StorefrontController
     public function express(Request $request, SalesChannelContext $salesChannelContext): RedirectResponse
     {
         try {
-            $request->query->set('express', true);
+            if (!$request->request->get('express') && !$request->query->get('express')) {
+                $request->request->set('express', true);
+            }
             $this->paymentRoute->initPayment($request, $salesChannelContext);
         } catch (ConstraintViolationException $violations) {
-            $errors = [];
-            foreach ($violations->getViolations() as $violation) {
-                $errors[] = $violation->getMessage();
-            }
-            $this->storage->set('express', false)->set('error', \implode(',', $errors))->persist();
+            $this->storage
+                ->set('express', false)
+                ->set('error', EasyCreditRatenkauf::GENERIC_STOREFRONT_ERROR_MESSAGE)
+                ->persist();
         }
 
         if ($this->storage->get('error')) {
@@ -62,7 +68,8 @@ class PaymentController extends StorefrontController
             $this->paymentRoute->returnFromPaymentPage($request, $salesChannelContext);
             return $this->redirectToRoute('frontend.checkout.confirm.page');
         } catch (\Throwable $e) {
-            $this->storage->set('error', $e->getMessage())->persist();
+            $this->logger->error('EasyCredit return failed', ['exception' => $e]);
+            $this->storage->set('error', EasyCreditRatenkauf::GENERIC_STOREFRONT_ERROR_MESSAGE)->persist();
             return $this->redirectToRoute('frontend.checkout.cart.page');
         }
     }

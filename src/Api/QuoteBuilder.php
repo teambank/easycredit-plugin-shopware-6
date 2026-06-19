@@ -128,7 +128,7 @@ class QuoteBuilder
         $method = $this->salesChannelContext->getPaymentMethod();
 
         $request = $this->requestStack->getCurrentRequest();
-        if ($request->get('easycredit') && isset($request->get('easycredit')['paymentType'])) {
+        if ($request !== null && $request->get('easycredit') && isset($request->get('easycredit')['paymentType'])) {
             $method = $this->paymentHelper->getPaymentMethodByPaymentType(
                 $request->get('easycredit')['paymentType'],
                 $this->salesChannelContext->getContext()

@@ -80,7 +80,7 @@ class TransactionsController extends AbstractController
                 ->createTransactionApi()
                 ->apiMerchantV3TransactionTransactionIdRefundPost(
                     $transactionId,
-                    new RefundRequest(['value' => $params['value']])
+                    new RefundRequest(['value' => $params['value'] ?? null])
                 );
 
                 return new JsonResponse();

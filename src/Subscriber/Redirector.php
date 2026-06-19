@@ -22,6 +22,7 @@ use Netzkollektiv\EasyCredit\Api\Storage;
 use Netzkollektiv\EasyCredit\Helper\Payment as PaymentHelper;
 use Netzkollektiv\EasyCredit\Service\CheckoutService;
 use Netzkollektiv\EasyCredit\Helper\Quote as QuoteHelper;
+use Netzkollektiv\EasyCredit\Util\RedirectUrlValidator;
 
 class Redirector implements EventSubscriberInterface
 {
@@ -118,17 +119,35 @@ class Redirector implements EventSubscriberInterface
     {
         $request = $event->getRequest();
 
-        if (
-            !$request->hasSession() ||
-            $request->attributes->get('_routeScope') === ['store-api']
-        ) {
+        if (!$request->hasSession() || $this->isStoreApiRequest($request)) {
             return; // do not run in CLI & API
         }
 
         if ($redirectUrl = $this->storage->get('redirect_url')) {
+            if (!RedirectUrlValidator::isEasyCreditHost($redirectUrl)) {
+                $this->storage->set('redirect_url', null)->persist();
+
+                return;
+            }
+
             $event->setResponse(new RedirectResponse($redirectUrl));
             $this->storage->set('redirect_url', null)->persist();
         }
+    }
+
+    private function isStoreApiRequest(Request $request): bool
+    {
+        $routeScope = $request->attributes->get('_routeScope');
+
+        if (\is_array($routeScope)) {
+            return \in_array('store-api', $routeScope, true);
+        }
+
+        if (\is_object($routeScope) && \method_exists($routeScope, 'getScopes')) {
+            return \in_array('store-api', $routeScope->getScopes(), true);
+        }
+
+        return false;
     }
 
     protected function isRoute(string $route, Request $request): bool

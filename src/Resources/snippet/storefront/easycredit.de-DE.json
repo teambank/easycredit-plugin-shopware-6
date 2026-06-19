@@ -6,8 +6,7 @@
         "interest-line-item" : "Zinsen für Ratenzahlung"
     },
     "checkout": {
-        "EASYCREDIT_INSTALLMENTS_MUST_BE_RECALCULATED": "Um mit easyCredit-Ratenkauf zu bezahlen, klicken Sie auf \"Weiter zum Ratenkauf\" in der Zahlartenauswahl.",
-        "EASYCREDIT_INIT_ERROR": "%name%"
+        "EASYCREDIT_INSTALLMENTS_MUST_BE_RECALCULATED": "Um mit easyCredit-Ratenkauf zu bezahlen, klicken Sie auf \"Weiter zum Ratenkauf\" in der Zahlartenauswahl."
     },
     "error": {
         "EASYCREDIT_INSTALLMENTS_MUST_BE_RECALCULATED": "easyCredit: Ihre Bestellung hat sich verändert, bitte führen Sie die Ratenberechnung erneut durch.",

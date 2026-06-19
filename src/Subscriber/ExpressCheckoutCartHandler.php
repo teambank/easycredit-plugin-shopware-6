@@ -76,7 +76,7 @@ class ExpressCheckoutCartHandler implements EventSubscriberInterface
         if ($errorMessage = $this->storage->get('error')) {
             $this->storage->set('error', null)->persist();
 
-            $error = new InitError($errorMessage);
+            $error = new InitError();
             $event->getPage()->getCart()->getErrors()->add($error);
         }
     }

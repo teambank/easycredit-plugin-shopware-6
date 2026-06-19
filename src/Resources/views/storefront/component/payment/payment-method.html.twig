@@ -22,7 +22,7 @@
             webshop-id="{{ easycredit.webshopId }}"
             is-active="{{ easycredit.selectedPaymentMethod is same as (payment.id) ? 'true' : 'false' }}"
             {% if easycredit.paymentPlan %}payment-plan="{{ easycredit.paymentPlan | e }}"{% endif %}
-            {% if easycredit.error %}alert="{{easycredit.error}}"{% endif %}
+            {% if easycredit.error %}alert="{{ easycredit.error|e('html_attr') }}"{% endif %}
             {% if easycredit.disableFlexprice %}disable-flexprice="true"{% endif %}
         ></easycredit-checkout>
 

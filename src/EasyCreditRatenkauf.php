@@ -44,6 +44,8 @@ class EasyCreditRatenkauf extends Plugin
 
     public const CHECKOUT_ORDER_PLACED_REQUEST_ATTR = 'easycredit.checkout_order_placed';
 
+    public const GENERIC_STOREFRONT_ERROR_MESSAGE = 'Es ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.';
+
     /**
      * @var ActivateDeactivate
      */

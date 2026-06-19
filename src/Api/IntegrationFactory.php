@@ -37,15 +37,25 @@ class IntegrationFactory
         $this->storage = $storage;
     }
 
-    protected function getClient()
+    protected function getClient(?string $salesChannelId = null)
     {
         $stack = HandlerStack::create();
-        $stack->push(
-            Middleware::log(
-                $this->logger,
-                new MessageFormatter(MessageFormatter::DEBUG),
-            )
-        );
+
+        try {
+            $debug = $this->settings->getSettings($salesChannelId, false)->getDebug();
+        } catch (\Throwable $e) {
+            $debug = false;
+        }
+
+        if ($debug) {
+            $stack->push(
+                Middleware::log(
+                    $this->logger,
+                    new MessageFormatter(MessageFormatter::DEBUG)
+                )
+            );
+        }
+
         return new Client([
             'debug' => false,
             'handler' => $stack,
@@ -76,7 +86,7 @@ class IntegrationFactory
 
     public function createCheckout(?string $salesChannelId = null): Api\Integration\Checkout
     {
-        $client = $this->getClient();
+        $client = $this->getClient($salesChannelId);
         $config = $this->getConfig($salesChannelId);
 
         $webshopApi = new Api\Service\WebshopApi(
@@ -103,9 +113,9 @@ class IntegrationFactory
         );
     }
 
-    public function createTransactionApi(): Api\Service\TransactionApi
+    public function createTransactionApi(?string $salesChannelId = null): Api\Service\TransactionApi
     {
-        $client = $this->getClient();
+        $client = $this->getClient($salesChannelId);
         $config = $this->getConfig()
             ->setHost('https://partner.easycredit-ratenkauf.de');
 

@@ -1,5 +1,5 @@
 import Plugin from "src/plugin-system/plugin.class";
-import { getCsrfToken } from "../util.js";
+import { getCsrfToken, createHiddenField } from "../util.js";
 
 export default class EasyCreditRatenkaufExpressCheckout extends Plugin {
   init() {
@@ -14,9 +14,22 @@ export default class EasyCreditRatenkaufExpressCheckout extends Plugin {
         document.querySelector(".is-ctl-checkout.is-act-cartpage") ||
         component.closest(".cart-offcanvas")
       ) {
-        const params = new URLSearchParams(easyCreditParams).toString();
-        const baseUrl = window.router['frontend.easycredit.express'] ?? '/easycredit/express';
-        window.location.href = [baseUrl, params].join('?');
+        const form = document.createElement("form");
+        form.method = "POST";
+        form.action = window.router['frontend.easycredit.express'] ?? '/easycredit/express';
+        form.style.display = "none";
+
+        const token = await getCsrfToken();
+        if (token) {
+          form.appendChild(createHiddenField("_csrf_token", token));
+        }
+
+        for (const [key, value] of Object.entries(easyCreditParams)) {
+          form.appendChild(createHiddenField(key, value));
+        }
+
+        document.body.appendChild(form);
+        form.submit();
         return;
       }
 

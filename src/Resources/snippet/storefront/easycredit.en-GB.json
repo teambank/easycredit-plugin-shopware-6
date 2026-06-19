@@ -6,8 +6,7 @@
         "interest-line-item" : "Interest for installments payment"
     },
     "checkout": {
-        "EASYCREDIT_INSTALLMENTS_MUST_BE_RECALCULATED": "To pay with easyCredit click \"Go to Installments payment\" after selecting the payment method.",
-        "EASYCREDIT_INIT_ERROR": "%name%"
+        "EASYCREDIT_INSTALLMENTS_MUST_BE_RECALCULATED": "To pay with easyCredit click \"Go to Installments payment\" after selecting the payment method."
     },
     "error": {
         "EASYCREDIT_INSTALLMENTS_MUST_BE_RECALCULATED": "easyCredit: Your order was changed, please recalculate installments.",
