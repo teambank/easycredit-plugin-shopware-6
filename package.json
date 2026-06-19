@@ -10,6 +10,7 @@
     "docs:build:html": "sudo docker run --rm -v ${PWD}/docs:/docs -v /opt/sphinx_rtd_theme/sphinx_rtd_theme:/docs/source/_themes/sphinx_rtd_theme sphinxdoc/sphinx make html",
     "docs:build:pdf": "sudo docker run --rm -v ${PWD}/docs:/docs -v /opt/sphinx_rtd_theme/sphinx_rtd_theme:/docs/source/_themes/sphinx_rtd_theme sphinxdoc/sphinx-latexpdf make latexpdf",
     "docs:deploy": "export $(cat .env | xargs) && rsync -avz --delete ${PWD}/docs/build/html/ ${DOCS_DEPLOY_DST}",
-    "docs": "yarn docs:build:html; yarn docs:deploy"
+    "docs": "npm run docs:build:html && npm run docs:deploy",
+    "test:e2e": "playwright test -c tests/"
   }
 }

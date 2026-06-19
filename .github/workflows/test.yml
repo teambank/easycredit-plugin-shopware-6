@@ -4,67 +4,65 @@ on:
     push:
         branches:
             - 'main'
-            - 'sw67'
+        tags:
+            - '*'
+    pull_request:
+        branches:
+            - 'main'
+    workflow_dispatch:
+        inputs:
+            matrix:
+                description: 'Shopware version matrix'
+                type: choice
+                options:
+                    - reduced
+                    - full
+                default: reduced
 
 jobs:
+    resolve-matrix:
+        runs-on: ubuntu-latest
+        outputs:
+            shopware-version: ${{ steps.matrix.outputs.versions }}
+            fail-fast: ${{ steps.matrix.outputs.fail-fast }}
+        steps:
+            - id: matrix
+              run: |
+                  FULL_VERSIONS='[
+                    "v6.4.5","v6.4.6","v6.4.7","v6.4.8","v6.4.9","v6.4.10",
+                    "v6.4.11","v6.4.12","v6.4.13","v6.4.14","v6.4.15","v6.4.16",
+                    "v6.4.17","v6.4.18","v6.4.19","v6.4.20",
+                    "v6.5.0","v6.5.1","v6.5.2","v6.5.3","v6.5.4","v6.5.5",
+                    "v6.5.6","v6.5.7","v6.5.8",
+                    "v6.6.0","v6.6.1","v6.6.2","v6.6.3","v6.6.4","v6.6.5",
+                    "v6.6.6","v6.6.7","v6.6.9",
+                    "v6.7.0","v6.7.2","v6.7.3","v6.7.4","v6.7.5","v6.7.6",
+                    "v6.7.7","v6.7.8","v6.7.9","v6.7.10"
+                  ]'
+                  REDUCED_VERSIONS='["v6.4.20","v6.5.8","v6.6.9","v6.7.10"]'
+
+                  if [ "${{ github.event_name }}" = "push" ] && [[ "${{ github.ref }}" == refs/tags/* ]]; then
+                    VERSIONS="$FULL_VERSIONS"
+                    FAIL_FAST=false
+                  elif [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.matrix }}" = "full" ]; then
+                    VERSIONS="$FULL_VERSIONS"
+                    FAIL_FAST=false
+                  else
+                    VERSIONS="$REDUCED_VERSIONS"
+                    FAIL_FAST=true
+                  fi
+
+                  echo "versions=$(echo "$VERSIONS" | jq -c .)" >> "$GITHUB_OUTPUT"
+                  echo "fail-fast=$FAIL_FAST" >> "$GITHUB_OUTPUT"
+
     ci-current:
+        needs: resolve-matrix
         runs-on: ubuntu-latest
         strategy:
             max-parallel: 20
-            fail-fast: false
+            fail-fast: ${{ needs.resolve-matrix.outputs.fail-fast == 'true' }}
             matrix:
-                shopware-version:
-                    #- 'v6.4.1' # incompatible: several errors in early versions, wontfix
-                    #- 'v6.4.2' # incompatible: several errors in early versions, wontfix
-                    #- 'v6.4.3' # incompatibilities, wontfix
-                    #- 'v6.4.4' # incompatibilities, wontfix
-                    - 'v6.4.5'
-                    - 'v6.4.6'
-                    - 'v6.4.7'
-                    - 'v6.4.8'
-                    - 'v6.4.9'
-                    - 'v6.4.10'
-                    - 'v6.4.11'
-                    - 'v6.4.12'
-                    - 'v6.4.13'
-                    - 'v6.4.14'
-                    - 'v6.4.15'
-                    - 'v6.4.16'
-                    - 'v6.4.17'
-                    - 'v6.4.18'
-                    - 'v6.4.19'
-                    - 'v6.4.20'
-                    - 'v6.5.0'
-                    - 'v6.5.1'
-                    - 'v6.5.2'
-                    - 'v6.5.3'
-                    - 'v6.5.4'
-                    - 'v6.5.5'
-                    - 'v6.5.6'
-                    - 'v6.5.7'
-                    - 'v6.5.8'
-                    - 'v6.6.0'
-                    - 'v6.6.1'
-                    - 'v6.6.2'
-                    - 'v6.6.3'
-                    - 'v6.6.4'
-                    - 'v6.6.5'
-                    - 'v6.6.6'
-                    - 'v6.6.7'
-                    #- 'v6.6.8' # version is buggy
-                    - 'v6.6.9'
-                    #- 'v6.6.10' # Compile Error: Access level to Squirrel\TwigPhpSyntax\TokenParser\ForeachTokenParser::parseAssignmentExpression() must be protected (as in class Twig\TokenParser\AbstractTokenParser) or weaker
-                    - 'v6.7.0'
-                    # - 'v6.7.1' # Shopware error: An exception has been thrown during the rendering of a template ("Call to undefined method Twig\Parser::parseExpression()"). with these parameters: {"headerParameters":[],"footerParameters":[],"themeIconConfig":[]}" at index.html.twig line 2
-                    - 'v6.7.2'
-                    - 'v6.7.3'
-                    - 'v6.7.4'
-                    - 'v6.7.5'
-                    - 'v6.7.6'
-                    - 'v6.7.7'
-                    - 'v6.7.8'
-                    - 'v6.7.9'
-                    - 'v6.7.10'
+                shopware-version: ${{ fromJson(needs.resolve-matrix.outputs.shopware-version) }}
         name: Shopware ${{ matrix.shopware-version }}
 
         container:
@@ -88,15 +86,13 @@ jobs:
               uses: actions/cache@v5
               with:
                 path: |
-                  ~/.cache/yarn
-                  ~/.config/yarn
                   ~/.cache/ms-playwright
                   ~/.cache/composer
                   ~/.npm
                   node_modules
-                key: yarn-cache-${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
+                key: npm-cache-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
                 restore-keys: |
-                  yarn-cache-${{ runner.os }}-
+                  npm-cache-${{ runner.os }}-
             - name: Start mysql server
               run: start-mysql
             - name: Link plugin with shopware installation and install composer deps
@@ -148,15 +144,14 @@ jobs:
                   php bin/console cache:clear
             - name: Install Dependencies
               run: |
-                  npm install --global yarn
-                  yarn install --frozen-lockfile
+                  npm ci
                   curl -sS https://get.symfony.com/cli/installer | bash
             - name: Setup Playwright
-              run: yarn playwright install --with-deps chromium
+              run: npx playwright install --with-deps chromium
             - name: Playwright E2E Tests
               run: |
                   cd $PLUGIN_DIR
-                  VERSION=${{ matrix.shopware-version }} yarn playwright test -c tests/
+                  VERSION=${{ matrix.shopware-version }} npm run test:e2e
             - name: Save Shopware Logs for Debugging
               if: always()
               run: |
@@ -184,7 +179,7 @@ jobs:
 
     deploy-report:
         name: Deploy Playwright reports
-        needs: ci-current
+        needs: [resolve-matrix, ci-current]
         if: ${{ always() && needs.ci-current.result != 'cancelled' }}
         runs-on: ubuntu-latest
         steps:
