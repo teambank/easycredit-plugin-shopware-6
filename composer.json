@@ -14,12 +14,17 @@
         "netzkollektiv/easycredit-api-v3-php": "^2.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "^11.0",
         "phpstan/phpstan": "^2.0",
         "phpstan/phpstan-symfony": "^2.0",
         "phpstan/phpstan-doctrine": "^2.0",
         "phpstan/phpstan-strict-rules": "^2.0",
+<<<<<<< HEAD
         "phpstan/phpstan-deprecation-rules": "^2.0"
+=======
+        "phpstan/phpstan-deprecation-rules": "^2.0",
+        "rector/rector": "^2.0",
+        "phpunit/phpunit": "^11.0"
+>>>>>>> a113b59 (Install PHPUnit only in the unit-tests CI job.)
     },
     "extra": {
         "shopware-plugin-class": "Netzkollektiv\\EasyCredit\\EasyCreditRatenkauf",
