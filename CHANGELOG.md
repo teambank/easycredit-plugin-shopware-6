@@ -1,3 +1,19 @@
+# 3.1.12
+
+* Web Components werden im Cookie-Manager als technisch erforderliche Cookies registriert
+* beim Absenden der Bestellung ohne vorherige easyCredit-Autorisierung wird der Checkout nun direkt gestartet (statt Validierungsfehler)
+* der Zahlungsart-Name im easycredit-checkout-label wird nun korrekt übersetzt angezeigt
+* ungenutzte SVG-Dateien entfernt (Kompatibilität mit Shopware Plugin-Analyse)
+* Rückkehr-URLs im Headless-Checkout werden auf Domains des Verkaufskanals beschränkt
+* Weiterleitungen zur easyCredit-Zahlungsseite nur auf easyCredit-Domains (Open-Redirect-Schutz)
+* Storefront-Fehlermeldungen geben keine internen API-Details preis
+* API-Zugangsdaten in der Administration werden per POST übermittelt
+* Express-Checkout nutzt POST mit CSRF-Schutz
+* Zahlungsplan und Fehlermeldungen in Checkout-Templates werden escaped ausgegeben
+* Debug-Logging von HTTP-Anfragen nur bei aktiviertem Plugin-Debug-Modus
+* PHPUnit-Unit-Tests für Regeln, Einstellungen und URL-Validierung
+* gebündelte Vendor-Abhängigkeiten werden per PSR-4 am Projekt-Autoloader registriert (behebt Frosh-Tools-Warnung „2 autoloaders registered“)
+
 # 3.1.11
 
 * Performance-Optimierungen für Web Components (reduzierte Layout-Verschiebung)
