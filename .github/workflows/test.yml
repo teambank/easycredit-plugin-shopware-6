@@ -176,7 +176,7 @@ jobs:
             - name: Save Shopware Logs for Debugging
               if: always()
               run: |
-                  LOG_DIR=playwright-report/logs
+                  LOG_DIR=$PLUGIN_DIR/playwright-report/logs
                   mkdir -p $LOG_DIR
                   cp -r $SW_DIR/var/log/* $LOG_DIR/
                   for i in $LOG_DIR/*; do
@@ -188,7 +188,7 @@ jobs:
               uses: actions/upload-artifact@v4
               with:
                   name: playwright-report-${{ matrix.shopware-version }}
-                  path: playwright-report/
+                  path: ${{ env.PLUGIN_DIR }}/playwright-report/
                   if-no-files-found: warn
             - name: Deactivate & uninstall Plugin
               if: always()
@@ -211,7 +211,6 @@ jobs:
               with:
                   pattern: playwright-report-*
                   path: artifacts
-                  merge-multiple: true
             - name: Build combined report site
               id: build-site
               run: |
@@ -224,11 +223,12 @@ jobs:
                   fi
 
                   for report_dir in artifacts/playwright-report-*; do
+                    [ -d "$report_dir" ] || continue
                     version="${report_dir#artifacts/playwright-report-}"
                     cp -R "$report_dir" "site/$version"
                   done
 
-                  if [ ! "$(ls -A site)" ]; then
+                  if [ ! "$(ls -A site 2>/dev/null)" ]; then
                     echo "No Playwright reports found to deploy."
                     exit 0
                   fi

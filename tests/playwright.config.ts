@@ -4,10 +4,13 @@ import {
   defineConfig,
   devices,
 } from "@playwright/test";
+import * as path from "path";
 import { seconds } from "./helpers/utils";
 
+const reportDir = path.resolve(__dirname, "..", "playwright-report");
+
 let config: PlaywrightTestConfig = {
-  outputDir: "../test-results/" + process.env.VERSION + "/",
+  outputDir: path.resolve(__dirname, "..", "test-results", process.env.VERSION ?? "local"),
   use: {
     baseURL: process.env.BASE_URL ?? "http://localhost",
     trace: "retain-on-failure",
@@ -18,7 +21,10 @@ let config: PlaywrightTestConfig = {
   expect: {
     timeout: 10 * 1000,
   },
-  reporter: [["list", { printSteps: true }], ["html"]],
+  reporter: [
+    ["list", { printSteps: true }],
+    ["html", { outputFolder: reportDir, open: "never" }],
+  ],
   globalSetup: require.resolve("./setup/global.setup"),
 };
 
