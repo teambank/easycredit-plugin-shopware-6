@@ -1,7 +1,7 @@
 {
     "name": "easycredit/ratenkauf",
     "description": "easyCredit-Rechnung & Ratenkauf für Shopware 6",
-    "version": "3.1.11",
+    "version": "3.1.12",
     "type": "shopware-platform-plugin",
     "license": "MIT",
     "authors": [
