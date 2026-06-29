@@ -6,3 +6,4 @@ monolog:
             path: "%kernel.logs_dir%/netzkollektiv_easycredit.log"
             level: error
             channels: [ 'easycredit' ]
+            bubble: false

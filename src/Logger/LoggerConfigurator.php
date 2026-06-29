@@ -36,7 +36,7 @@ class LoggerConfigurator implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            KernelEvents::CONTROLLER => [
+            KernelEvents::REQUEST => [
                 ['configureLoglevel', 0],
             ],
         ];
@@ -44,15 +44,16 @@ class LoggerConfigurator implements EventSubscriberInterface
 
     public function configureLoglevel(): void
     {
-
         $request = $this->requestStack->getCurrentRequest();
         $salesChannelId = null;
         if ($request && $request->attributes->get(PlatformRequest::ATTRIBUTE_SALES_CHANNEL_ID)) {
             $salesChannelId = $request->attributes->get(PlatformRequest::ATTRIBUTE_SALES_CHANNEL_ID);
         }
 
-        if ($this->settings->getSettings($salesChannelId, false)->getDebug()) {
-            $this->handler->setLevel(LogLevel::DEBUG);
-        }
+        $this->handler->setLevel(
+            $this->settings->getSettings($salesChannelId, false)->getDebug()
+                ? LogLevel::DEBUG
+                : LogLevel::ERROR
+        );
     }
 }
