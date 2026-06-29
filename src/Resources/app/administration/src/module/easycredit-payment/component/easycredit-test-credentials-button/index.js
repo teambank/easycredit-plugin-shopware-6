@@ -64,19 +64,20 @@ Shopware.Component.register('easycredit-test-credentials-button', {
                     this.isTestSuccessful = true;
                 }
             }).catch((errorResponse) => {
-                if (errorResponse.response.data && errorResponse.response.data.errors) {
-                    let message = `${this.$tc('easycredit.settingForm.messageTestError')}<br><ul>`;
-                    errorResponse.response.data.errors.forEach((error) => {
-                        message = `${message}<li><strong>${error.detail}</strong></li>`;
-                    });
-                    message += '</li>';
-                    this.createNotificationError({
-                        title: this.$tc('easycredit.settingForm.titleSaveError'),
-                        message: message
-                    });
-                    this.isTesting = false;
-                    this.isTestSuccessful = false;
-                }
+                this.isTesting = false;
+                this.isTestSuccessful = false;
+
+                const errors = errorResponse?.response?.data?.errors ?? [];
+                const notActive = errors.some((error) => error.code === 'NETZKOLLEKTIV_EASYCREDIT__API_CREDENTIALS_NOT_ACTIVE');
+
+                this.createNotificationError({
+                    title: this.$tc('easycredit.settingForm.titleSaveError'),
+                    message: this.$tc(
+                        notActive
+                            ? 'easycredit.settingForm.messageTestErrorNotActive'
+                            : 'easycredit.settingForm.messageTestError'
+                    )
+                });
             });
         }
     }

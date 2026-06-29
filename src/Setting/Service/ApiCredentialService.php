@@ -10,9 +10,11 @@ declare(strict_types=1);
 namespace Netzkollektiv\EasyCredit\Setting\Service;
 
 use Netzkollektiv\EasyCredit\Api\IntegrationFactory;
+use Netzkollektiv\EasyCredit\Setting\Exception\ApiCredentialsInvalidException;
+use Netzkollektiv\EasyCredit\Setting\Exception\ApiCredentialsNotActiveException;
 use Teambank\EasyCreditApiV3\ApiException;
-use Teambank\EasyCreditApiV3\Integration\ApiCredentialsInvalidException;
-use Teambank\EasyCreditApiV3\Integration\ApiCredentialsNotActiveException;
+use Teambank\EasyCreditApiV3\Integration\ApiCredentialsInvalidException as IntegrationApiCredentialsInvalidException;
+use Teambank\EasyCreditApiV3\Integration\ApiCredentialsNotActiveException as IntegrationApiCredentialsNotActiveException;
 
 class ApiCredentialService implements ApiCredentialServiceInterface
 {
@@ -26,6 +28,7 @@ class ApiCredentialService implements ApiCredentialServiceInterface
 
     /**
      * @throws ApiCredentialsInvalidException
+     * @throws ApiCredentialsNotActiveException
      */
     public function testApiCredentials(string $webshopId, string $apiPassword, string $apiSignature = null): bool
     {
@@ -33,8 +36,16 @@ class ApiCredentialService implements ApiCredentialServiceInterface
             throw new ApiCredentialsInvalidException();
         }
 
-        $checkout = $this->integrationFactory->createCheckout();
-        $checkout->verifyCredentials($webshopId, $apiPassword, $apiSignature);
+        try {
+            $checkout = $this->integrationFactory->createCheckout(null, false);
+            $checkout->verifyCredentials($webshopId, $apiPassword, $apiSignature);
+        } catch (IntegrationApiCredentialsInvalidException $e) {
+            throw new ApiCredentialsInvalidException();
+        } catch (IntegrationApiCredentialsNotActiveException $e) {
+            throw new ApiCredentialsNotActiveException();
+        } catch (ApiException $e) {
+            throw new ApiCredentialsInvalidException();
+        }
 
         return true;
     }

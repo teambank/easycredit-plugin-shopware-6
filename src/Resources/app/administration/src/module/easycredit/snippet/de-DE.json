@@ -14,7 +14,8 @@
             "titleSaveError": "easyCredit Einstellungen Fehler",
             "messageSaveSuccess": "Die Einstellungen für easyCredit wurden erfolgreich gespeichert.",
             "messageTestSuccess": "Die API Zugangsdaten wurden erfolgreich validiert.",
-            "messageTestError": "Die API Zugangsdaten konnten nicht validiert werden."
+            "messageTestError": "Die API Zugangsdaten konnten nicht validiert werden.",
+            "messageTestErrorNotActive": "Die API Zugangsdaten sind gültig, aber noch nicht aktiv. Bitte wenden Sie sich an easyCredit."
         },
         "rule": {
             "cartAmountRule": "Gesamtsumme, exkl. Zinsen (kompatibel mit easyCredit)",

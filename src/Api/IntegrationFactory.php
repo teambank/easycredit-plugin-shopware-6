@@ -14,6 +14,7 @@ use Netzkollektiv\EasyCredit\Setting\Service\SettingsServiceInterface;
 use Teambank\EasyCreditApiV3 as Api;
 
 use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\MessageFormatter;
@@ -21,6 +22,11 @@ use Netzkollektiv\EasyCredit\Api\Storage;
 
 class IntegrationFactory
 {
+    /**
+     * HTTP log format without headers (avoids leaking Basic Auth / API tokens).
+     */
+    private const HTTP_LOG_FORMAT = ">>>>>>>>\n{method} {target}\n{req_body}\n<<<<<<<<\n{code} {phrase}\n{res_body}\n--------\n{error}";
+
     protected $settings;
 
     protected $logger;
@@ -51,7 +57,8 @@ class IntegrationFactory
             $stack->push(
                 Middleware::log(
                     $this->logger,
-                    new MessageFormatter(MessageFormatter::DEBUG)
+                    new MessageFormatter(self::HTTP_LOG_FORMAT),
+                    LogLevel::DEBUG
                 )
             );
         }
@@ -84,10 +91,10 @@ class IntegrationFactory
         }
     }
 
-    public function createCheckout(?string $salesChannelId = null): Api\Integration\Checkout
+    public function createCheckout(?string $salesChannelId = null, bool $validateSettings = true): Api\Integration\Checkout
     {
         $client = $this->getClient($salesChannelId);
-        $config = $this->getConfig($salesChannelId);
+        $config = $this->getConfig($salesChannelId, $validateSettings);
 
         $webshopApi = new Api\Service\WebshopApi(
             $client,
