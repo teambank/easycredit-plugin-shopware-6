@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Netzkollektiv\EasyCredit\Cart;
 
-use Monolog\Logger;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Cart\Order\OrderConverter;
@@ -22,6 +21,7 @@ use Netzkollektiv\EasyCredit\Api\Storage;
 use Netzkollektiv\EasyCredit\EasyCreditRatenkauf;
 use Netzkollektiv\EasyCredit\Helper\Payment as PaymentHelper;
 use Netzkollektiv\EasyCredit\Helper\Quote as QuoteHelper;
+use Netzkollektiv\EasyCredit\Logger\DebugLogger;
 use Teambank\EasyCreditApiV3\Integration\Checkout;
 use Teambank\EasyCreditApiV3\Model\Transaction;
 
@@ -35,7 +35,7 @@ class Validator implements CartValidatorInterface
 
     protected $storage;
 
-    protected $logger;
+    protected $debugLogger;
 
     protected $requestStack;
 
@@ -44,14 +44,14 @@ class Validator implements CartValidatorInterface
         QuoteHelper $quoteHelper,
         PaymentHelper $paymentHelper,
         Storage $storage,
-        Logger $logger,
+        DebugLogger $debugLogger,
         RequestStack $requestStack
     ) {
         $this->integrationFactory = $integrationFactory;
         $this->quoteHelper = $quoteHelper;
         $this->paymentHelper = $paymentHelper;
         $this->storage = $storage;
-        $this->logger = $logger;
+        $this->debugLogger = $debugLogger;
         $this->requestStack = $requestStack;
     }
 
@@ -60,18 +60,18 @@ class Validator implements CartValidatorInterface
         ErrorCollection $errors,
         SalesChannelContext $salesChannelContext
     ): void {
-        if (!$this->shouldValidate($cart)) {
+        if (!$this->shouldValidate($cart, $salesChannelContext)) {
             return;
         }
 
         if (!$this->paymentHelper->isSelected($salesChannelContext)) {
-            $this->resetPaymentState();
+            $this->resetPaymentState('payment not selected', $salesChannelContext);
 
             return;
         }
 
         if (!$this->quoteHelper->supportsCart($cart, $salesChannelContext)) {
-            $this->resetPaymentState();
+            $this->resetPaymentState('cart not supported', $salesChannelContext);
 
             return;
         }
@@ -80,17 +80,17 @@ class Validator implements CartValidatorInterface
             $salesChannelContext->getSalesChannel()->getId()
         );
         if ($checkout === null) {
-            $this->resetPaymentState();
+            $this->resetPaymentState('checkout unavailable', $salesChannelContext);
 
             return;
         }
 
         $quote = $this->quoteHelper->getQuote($salesChannelContext, $cart);
 
-        $this->validateActiveTransaction($checkout, $quote, $errors);
+        $this->validateActiveTransaction($checkout, $quote, $errors, $salesChannelContext);
     }
 
-    private function shouldValidate(Cart $cart): bool
+    private function shouldValidate(Cart $cart, SalesChannelContext $salesChannelContext): bool
     {
         $request = $this->requestStack->getCurrentRequest();
         if ($request === null) {
@@ -113,15 +113,28 @@ class Validator implements CartValidatorInterface
             return false;
         }
 
-        if ($cart->getToken() !== $this->storage->get('cartToken')) {
+        $storedCartToken = $this->storage->get('cartToken');
+        if ($cart->getToken() !== $storedCartToken) {
+            if ($storedCartToken !== null) {
+                $this->logValidatorSkip(
+                    'cartToken mismatch',
+                    $salesChannelContext,
+                    \sprintf('cart=%s stored=%s', $cart->getToken(), $storedCartToken)
+                );
+            }
+
             return false;
         }
 
         if ($this->storage->get('express')) {
+            $this->logValidatorSkip('express checkout active', $salesChannelContext);
+
             return false;
         }
 
         if ($this->isAfterCheckoutOrderPlaced()) {
+            $this->logValidatorSkip('after order placed', $salesChannelContext);
+
             return false;
         }
 
@@ -131,22 +144,26 @@ class Validator implements CartValidatorInterface
     private function validateActiveTransaction(
         Checkout $checkout,
         Transaction $quote,
-        ErrorCollection $errors
+        ErrorCollection $errors,
+        SalesChannelContext $salesChannelContext
     ): void {
         if ($this->storage->get('payment_type') !== $quote->getPaymentType()) {
-            $this->resetPaymentState();
+            $this->resetPaymentState('payment_type mismatch', $salesChannelContext);
 
             return;
         }
 
         if (!$checkout->isAmountValid($quote)) {
-            $this->syncQuoteAmount($checkout, $quote, $errors);
+            $this->syncQuoteAmount($checkout, $quote, $errors, $salesChannelContext);
 
             return;
         }
 
         if (!$checkout->verifyAddress($quote)) {
-            $this->logger->debug('InterestError: address changed');
+            $this->debugLogger->debug(
+                'validator::invalidate address changed',
+                $salesChannelContext->getSalesChannelId()
+            );
             $errors->add(new InterestError());
         }
     }
@@ -154,21 +171,42 @@ class Validator implements CartValidatorInterface
     private function syncQuoteAmount(
         Checkout $checkout,
         Transaction $quote,
-        ErrorCollection $errors
+        ErrorCollection $errors,
+        SalesChannelContext $salesChannelContext
     ): void {
         try {
             $checkout->update($quote);
             $this->storage->persist();
         } catch (\Throwable $e) {
-            $this->logger->debug('InterestError: amount not valid' . $e->getMessage());
-            $this->resetPaymentState();
+            $this->debugLogger->debug(
+                'validator::invalidate amount sync failed: ' . $e->getMessage(),
+                $salesChannelContext->getSalesChannelId()
+            );
+            $this->resetPaymentState('amount sync failed', $salesChannelContext);
             $errors->add(new InterestError());
         }
     }
 
-    private function resetPaymentState(): void
+    private function resetPaymentState(string $reason, SalesChannelContext $salesChannelContext): void
     {
+        $this->debugLogger->debug(
+            'validator::reset ' . $reason,
+            $salesChannelContext->getSalesChannelId()
+        );
         $this->storage->clear();
+    }
+
+    private function logValidatorSkip(
+        string $reason,
+        SalesChannelContext $salesChannelContext,
+        string $detail = ''
+    ): void {
+        $message = 'validator::skip ' . $reason;
+        if ($detail !== '') {
+            $message .= ' (' . $detail . ')';
+        }
+
+        $this->debugLogger->debug($message, $salesChannelContext->getSalesChannelId());
     }
 
     private function isAfterCheckoutOrderPlaced(): bool

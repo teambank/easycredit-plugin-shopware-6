@@ -25,6 +25,7 @@ use Netzkollektiv\EasyCredit\Service\CheckoutService;
 use Netzkollektiv\EasyCredit\Service\CustomerService;
 use Netzkollektiv\EasyCredit\Api\IntegrationFactory;
 use Netzkollektiv\EasyCredit\Util\RedirectUrlValidator;
+use Netzkollektiv\EasyCredit\Logger\DebugLogger;
 
 class PaymentRoute extends AbstractPaymentRoute
 {
@@ -44,6 +45,8 @@ class PaymentRoute extends AbstractPaymentRoute
 
     private IntegrationFactory $integrationFactory;
 
+    private DebugLogger $debugLogger;
+
     public function __construct(
         ContextSwitchRoute $contextSwitchRoute,
         Storage $storage,
@@ -52,7 +55,8 @@ class PaymentRoute extends AbstractPaymentRoute
         CheckoutService $checkoutService,
         CustomerService $customerService,
         CartService $cartService,
-        IntegrationFactory $integrationFactory
+        IntegrationFactory $integrationFactory,
+        DebugLogger $debugLogger
     ) {
         $this->contextSwitchRoute = $contextSwitchRoute;
         $this->storage = $storage;
@@ -62,6 +66,7 @@ class PaymentRoute extends AbstractPaymentRoute
         $this->customerService = $customerService;
         $this->cartService = $cartService;
         $this->integrationFactory = $integrationFactory;
+        $this->debugLogger = $debugLogger;
     }
 
     public function getDecorated(): AbstractPaymentRoute
@@ -91,9 +96,18 @@ class PaymentRoute extends AbstractPaymentRoute
             throw new \InvalidArgumentException('paymentType must be set.');
         }
 
+        $salesChannelId = $salesChannelContext->getSalesChannel()->getId();
+        $express = (bool) ($params['express'] ?? false);
+
+        $this->debugLogger->debug(\sprintf(
+            'payment::init start paymentType=%s express=%s',
+            $params['paymentType'],
+            $express ? 'true' : 'false'
+        ), $salesChannelId);
+
         $this->storage
             ->set('duration', isset($params['numberOfInstallments']) ? (string) $params['numberOfInstallments'] : null)
-            ->set('express', $params['express'] ?? false);
+            ->set('express', $express);
 
         $paymentMethod = $this->paymentHelper->getPaymentMethodByPaymentType($params['paymentType'], $salesChannelContext->getContext());
         $this->updatePaymentMethod($paymentMethod, $salesChannelContext);
@@ -112,6 +126,12 @@ class PaymentRoute extends AbstractPaymentRoute
         }
 
         $this->checkoutService->startCheckout($salesChannelContext, $quote);
+
+        $this->debugLogger->debug(\sprintf(
+            'payment::init complete redirect_url=%s error=%s',
+            $this->storage->get('redirect_url') ? 'set' : 'null',
+            $this->storage->get('error') ? 'set' : 'null'
+        ), $salesChannelId);
 
         return new PaymentRouteResponse(new ArrayStruct([
             'redirectUrl' => $this->storage->get('redirect_url'),
@@ -143,7 +163,10 @@ class PaymentRoute extends AbstractPaymentRoute
     // see routes.xml
     public function returnFromPaymentPage(Request $request, SalesChannelContext $salesChannelContext): PaymentRouteResponse
     {
-        $checkout = $this->integrationFactory->createCheckout($salesChannelContext->getSalesChannel()->getId());
+        $salesChannelId = $salesChannelContext->getSalesChannel()->getId();
+        $this->debugLogger->debug('payment::return start', $salesChannelId);
+
+        $checkout = $this->integrationFactory->createCheckout($salesChannelId);
 
         if (!$checkout->isInitialized()) {
             throw new \Exception(
@@ -154,6 +177,8 @@ class PaymentRoute extends AbstractPaymentRoute
         $transaction = $checkout->loadTransaction();
 
         if ($this->storage->get('express')) {
+            $this->debugLogger->debug('payment::return express finalize', $salesChannelId);
+
             $newContext = $this->customerService->handleExpress($transaction, $salesChannelContext);
 
             $this->storage
@@ -173,6 +198,11 @@ class PaymentRoute extends AbstractPaymentRoute
         $this->updatePaymentMethod($paymentMethod, $salesChannelContext);
 
         $this->storage->persist();
+
+        $this->debugLogger->debug(\sprintf(
+            'payment::return complete summary=%s',
+            $this->storage->get('summary') ? 'set' : 'null'
+        ), $salesChannelId);
 
         return new PaymentRouteResponse(new ArrayStruct([
             'summary' => $this->storage->get('summary'),

@@ -23,6 +23,7 @@ use Netzkollektiv\EasyCredit\Helper\Payment as PaymentHelper;
 use Netzkollektiv\EasyCredit\Service\CheckoutService;
 use Netzkollektiv\EasyCredit\Helper\Quote as QuoteHelper;
 use Netzkollektiv\EasyCredit\Util\RedirectUrlValidator;
+use Netzkollektiv\EasyCredit\Logger\DebugLogger;
 
 class Redirector implements EventSubscriberInterface
 {
@@ -38,13 +39,16 @@ class Redirector implements EventSubscriberInterface
 
     private Storage $storage;
 
+    private DebugLogger $debugLogger;
+
     public function __construct(
         ContainerInterface $container,
         RequestStack $requestStack,
         PaymentHelper $paymentHelper,
         QuoteHelper $quoteHelper,
         CheckoutService $checkoutService,
-        Storage $storage
+        Storage $storage,
+        DebugLogger $debugLogger
     ) {
         $this->container = $container;
         $this->requestStack = $requestStack;
@@ -52,6 +56,7 @@ class Redirector implements EventSubscriberInterface
         $this->quoteHelper = $quoteHelper;
         $this->checkoutService = $checkoutService;
         $this->storage = $storage;
+        $this->debugLogger = $debugLogger;
     }
 
     public static function getSubscribedEvents(): array
@@ -90,6 +95,9 @@ class Redirector implements EventSubscriberInterface
             return;
         }
 
+        $salesChannelId = $salesChannelContext->getSalesChannel()->getId();
+        $this->debugLogger->debug('payment::configure init=true', $salesChannelId);
+
         $this->storage
             ->set('express', false)
             ->set('duration', $event->getRequestDataBag()->get('easycredit')->get('number-of-installments'))
@@ -105,6 +113,12 @@ class Redirector implements EventSubscriberInterface
 
         $salesChannelContext = $event->getSalesChannelContext();
         $cart = $event->getPage()->getCart();
+        $salesChannelId = $salesChannelContext->getSalesChannel()->getId();
+
+        $this->debugLogger->debug(
+            'payment::confirm startCheckout cartToken=' . $cart->getToken(),
+            $salesChannelId
+        );
 
         $this->storage->set('init', false);
         $this->storage->set('cartToken', $cart->getToken());
@@ -129,6 +143,9 @@ class Redirector implements EventSubscriberInterface
 
                 return;
             }
+
+            $salesChannelId = $request->attributes->get('sw-sales-channel-id');
+            $this->debugLogger->debug('payment::redirect to easyCredit', \is_string($salesChannelId) ? $salesChannelId : null);
 
             $event->setResponse(new RedirectResponse($redirectUrl));
             $this->storage->set('redirect_url', null)->persist();

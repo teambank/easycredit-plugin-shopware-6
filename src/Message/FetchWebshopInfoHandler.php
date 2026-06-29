@@ -12,6 +12,8 @@ namespace Netzkollektiv\EasyCredit\Message;
 use Netzkollektiv\EasyCredit\Api\IntegrationFactory;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
+use Netzkollektiv\EasyCredit\Logger\DebugLogger;
+
 class FetchWebshopInfoHandler
 {
     private const CACHE_KEY_PREFIX = 'easycredit-webshop-details-';
@@ -23,14 +25,18 @@ class FetchWebshopInfoHandler
 
     private LoggerInterface $logger;
 
+    private DebugLogger $debugLogger;
+
     public function __construct(
         IntegrationFactory $integrationFactory,
         CacheItemPoolInterface $cache,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        DebugLogger $debugLogger
     ) {
         $this->integrationFactory = $integrationFactory;
         $this->cache = $cache;
         $this->logger = $logger;
+        $this->debugLogger = $debugLogger;
     }
 
     public function __invoke(FetchWebshopInfoMessage $message): void
@@ -48,7 +54,7 @@ class FetchWebshopInfoHandler
             $item->expiresAfter(self::CACHE_TTL);
             $this->cache->save($item);
 
-            $this->logger->debug('EasyCredit webshop details fetched and cached by queue', [
+            $this->debugLogger->debug('queue::webshop details fetched and stored', $salesChannelId, [
                 'salesChannelId' => $salesChannelId,
             ]);
         } catch (\Throwable $e) {

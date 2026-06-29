@@ -7,7 +7,6 @@
 
 namespace Netzkollektiv\EasyCredit\Service;
 
-use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Shopware\Core\Framework\Rule\Collector\RuleConditionRegistry;
 use Shopware\Core\Framework\Rule\Container\AndRule;
@@ -25,7 +24,7 @@ use Shopware\Core\Content\Product\SalesChannel\SalesChannelProductEntity;
 use Shopware\Core\Checkout\Cart\SalesChannel\CartResponse;
 use Shopware\Core\Checkout\Cart\CartCalculator;
 use Shopware\Core\Checkout\Cart\LineItem\CartDataCollection;
-use Netzkollektiv\EasyCredit\Setting\Service\SettingsServiceInterface;
+use Netzkollektiv\EasyCredit\Logger\DebugLogger;
 
 class RuleEvaluator {
 
@@ -33,18 +32,18 @@ class RuleEvaluator {
 
     private CartCalculator $cartCalculator;
 
-    private LoggerInterface $logger;
+    private DebugLogger $debugLogger;
 
     private ?Cart $cart = null;
 
     public function __construct(
         ContainerInterface $container,
         CartCalculator $cartCalculator,
-        LoggerInterface $logger
+        DebugLogger $debugLogger
     ) {
         $this->container = $container;
         $this->cartCalculator = $cartCalculator;
-        $this->logger = $logger;
+        $this->debugLogger = $debugLogger;
     }
 
     public function evaluateRule($rule, Cart $cart, SalesChannelContext $salesChannelContext): bool
@@ -54,14 +53,16 @@ class RuleEvaluator {
         }
 
         if ($rule === null) {
-            $this->logger->debug('There is no rule to be evaluated.');
             return true;
         }
 
         $scope = new CartRuleScope($cart, $salesChannelContext);
 
         $evaluated = $rule->getPayload()->match($scope);
-        $this->logger->debug('Rule "' . $rule->getName() . '" evaluated: '.($evaluated ? 'true' : 'false'));
+        $this->debugLogger->debug(
+            'rule::evaluated "' . $rule->getName() . '": ' . ($evaluated ? 'true' : 'false'),
+            $salesChannelContext->getSalesChannelId()
+        );
         return $evaluated;
     }
 
