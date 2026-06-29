@@ -9,9 +9,9 @@ declare(strict_types=1);
 
 namespace Netzkollektiv\EasyCredit;
 
-if (\file_exists(__DIR__ . '/../vendor/autoload.php')) {
-    require_once __DIR__ . '/../vendor/autoload.php';
-}
+use Netzkollektiv\EasyCredit\Util\VendorAutoloader;
+
+VendorAutoloader::register(\dirname(__DIR__));
 
 use Netzkollektiv\EasyCredit\Util\Lifecycle\ActivateDeactivate;
 use Netzkollektiv\EasyCredit\Util\Lifecycle\InstallUninstall;
