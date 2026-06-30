@@ -13,8 +13,10 @@ use Netzkollektiv\EasyCredit\Util\VendorAutoloader;
 
 VendorAutoloader::register(\dirname(__DIR__));
 
+use Doctrine\DBAL\Connection;
 use Netzkollektiv\EasyCredit\Util\Lifecycle\ActivateDeactivate;
 use Netzkollektiv\EasyCredit\Util\Lifecycle\InstallUninstall;
+use Netzkollektiv\EasyCredit\Util\Migrator\ProductStatesRuleMigrator;
 use Shopware\Core\Framework\Plugin;
 use Shopware\Core\Framework\Plugin\Context\ActivateContext;
 use Shopware\Core\Framework\Plugin\Context\DeactivateContext;
@@ -112,9 +114,20 @@ class EasyCreditRatenkauf extends Plugin
 
     public function update(UpdateContext $updateContext): void
     {
+        $this->migrateProductStatesRule();
+
         $this->createInstallUninstall()->update($updateContext);
 
         parent::update($updateContext);
+    }
+
+    private function migrateProductStatesRule(): void
+    {
+        if ($this->container === null || !$this->container->has(Connection::class)) {
+            return;
+        }
+
+        (new ProductStatesRuleMigrator())->migrate($this->container->get(Connection::class));
     }
 
     private function createInstallUninstall(): InstallUninstall
@@ -143,6 +156,8 @@ class EasyCreditRatenkauf extends Plugin
     public function activate(ActivateContext $activateContext): void
     {
         parent::activate($activateContext);
+
+        $this->migrateProductStatesRule();
 
         $this->activateDeactivate->activate($activateContext->getContext());
     }

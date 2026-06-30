@@ -19,10 +19,12 @@ use Shopware\Core\Framework\Plugin\Context\InstallContext;
 use Shopware\Core\Framework\Plugin\Context\UninstallContext;
 use Shopware\Core\System\SystemConfig\SystemConfigService;
 use Shopware\Core\Framework\Rule\Rule;
+use Shopware\Core\Content\Product\ProductDefinition;
 use Shopware\Core\Content\Product\State;
 use Shopware\Core\Framework\Rule\Container\MatchAllLineItemsRule;
 use Shopware\Core\Checkout\Customer\Rule\BillingCountryRule;
 use Shopware\Core\Checkout\Cart\Rule\LineItemProductStatesRule;
+use Shopware\Core\Checkout\Cart\Rule\LineItemProductTypeRule;
 use Shopware\Core\Checkout\Cart\Rule\LineItemGoodsTotalRule;
 use Shopware\Core\Framework\Rule\Container\AndRule;
 use Shopware\Core\Framework\Rule\Container\OrRule;
@@ -154,22 +156,33 @@ class InstallUninstall
             ],
         ];
 
-        if (\class_exists(LineItemProductStatesRule::class)) {
-            $lineItemProductStates = [
+        $lineItemProductCondition = null;
+        if (\class_exists(LineItemProductTypeRule::class)) {
+            $lineItemProductCondition = [
+                'type' => (new LineItemProductTypeRule())->getName(),
+                'value' => [
+                    'operator' => Rule::OPERATOR_EQ,
+                    'productType' => ProductDefinition::TYPE_PHYSICAL,
+                ],
+            ];
+        } elseif (\class_exists(LineItemProductStatesRule::class)) {
+            $lineItemProductCondition = [
+                'type' => (new LineItemProductStatesRule())->getName(),
+                'value' => [
+                    'operator' => Rule::OPERATOR_EQ,
+                    'productState' => State::IS_PHYSICAL,
+                ],
+            ];
+        }
+
+        if ($lineItemProductCondition !== null) {
+            $lineItemProductRule = [
                 'type' => (new OrRule())->getName(),
                 'children' => [
                     [
                         'type' => (new MatchAllLineItemsRule())->getName(),
                         'value' => [ 'types' => [ 'product' ] ],
-                        'children' => [
-                            [
-                                'type' => (new LineItemProductStatesRule())->getName(),
-                                'value' => [
-                                    'operator' => Rule::OPERATOR_EQ,
-                                    'productState' => State::IS_PHYSICAL,
-                                ],
-                            ],
-                        ],
+                        'children' => [ $lineItemProductCondition ],
                     ],
                     [
                         'type' => (new LineItemGoodsTotalRule())->getName(),
@@ -182,10 +195,9 @@ class InstallUninstall
             ];
 
             if (\version_compare($this->shopwareVersion, '6.7.2.0', '<')) {
-                $lineItemProductStates['children'][0]['value'] = [ 'type' => 'product' ];
+                $lineItemProductRule['children'][0]['value'] = [ 'type' => 'product' ];
             }
-            $andChildren[] = $lineItemProductStates;
-
+            $andChildren[] = $lineItemProductRule;
         }
 
         return [
