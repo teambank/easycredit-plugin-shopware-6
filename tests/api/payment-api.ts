@@ -69,7 +69,69 @@ type PageApiResult = {
   text: string;
   href: string;
   json: Record<string, any>;
+  headers: Record<string, string>;
 };
+
+const TRACE_HEADER_NAMES = [
+  "x-request-id",
+  "x-correlation-id",
+  "correlation-id",
+  "request-id",
+  "x-trace-id",
+  "traceparent",
+  "tracestate",
+  "x-b3-traceid",
+  "x-b3-spanid",
+  "x-amzn-trace-id",
+  "cf-ray",
+  "x-served-by",
+  "x-tb-request-id",
+  "x-transaction-id",
+  "x-vcap-request-id",
+];
+
+function pickTraceHeaders(headers: Record<string, string>): Record<string, string> {
+  const picked: Record<string, string> = {};
+  for (const [name, value] of Object.entries(headers)) {
+    if (TRACE_HEADER_NAMES.includes(name.toLowerCase())) {
+      picked[name] = value;
+    }
+  }
+  return picked;
+}
+
+function logPaymentHttp(
+  method: string,
+  url: string,
+  status: number,
+  headers: Record<string, string>
+) {
+  const trace = pickTraceHeaders(headers);
+  console.log(
+    `[payment-api] ${method} ${url} => ${status} trace=${JSON.stringify(trace)} headers=${JSON.stringify(headers)}`
+  );
+}
+
+function attachPaymentApiLogger(page: any) {
+  page.on("response", (response: any) => {
+    const url = response.url();
+    if (!url.includes("ratenkauf.easycredit.de/api/")) {
+      return;
+    }
+    logPaymentHttp(
+      response.request().method(),
+      url,
+      response.status(),
+      response.headers()
+    );
+  });
+}
+
+async function logCookieNames(page: any, label: string) {
+  const cookies = await page.context().cookies("https://ratenkauf.easycredit.de");
+  const names = cookies.map((cookie: { name: string }) => cookie.name).join(",");
+  console.log(`[payment-api] ${label} cookies=${names || "(none)"}`);
+}
 
 async function pageApiPost(
   page: any,
@@ -84,19 +146,29 @@ async function pageApiPost(
         ok: boolean;
         text: string;
         href: string;
+        headers: Record<string, string>;
       }>((resolve, reject) => {
         const xhr = new XMLHttpRequest();
         xhr.open(method, path, true);
         xhr.withCredentials = true;
         xhr.setRequestHeader("Accept", "application/hal+json");
         xhr.setRequestHeader("Content-Type", "application/json");
-        xhr.onload = () =>
+        xhr.onload = () => {
+          const headers: Record<string, string> = {};
+          for (const line of xhr.getAllResponseHeaders().trim().split(/[\r\n]+/)) {
+            const idx = line.indexOf(":");
+            if (idx > 0) {
+              headers[line.slice(0, idx).trim().toLowerCase()] = line.slice(idx + 1).trim();
+            }
+          }
           resolve({
             status: xhr.status,
             ok: xhr.status >= 200 && xhr.status < 300,
             text: xhr.responseText,
             href: window.location.href,
+            headers,
           });
+        };
         xhr.onerror = () => reject(new Error(`XHR failed for ${path}`));
         xhr.send(JSON.stringify(data));
       });
@@ -104,7 +176,6 @@ async function pageApiPost(
     { path, data, method }
   );
   const json = parseBody(response.text);
-  console.log(`[payment-api] ${method} ${path} => ${response.status}`);
   return { ...response, json };
 }
 
@@ -115,24 +186,33 @@ async function pageApiGet(page: any, path: string): Promise<PageApiResult> {
       ok: boolean;
       text: string;
       href: string;
+      headers: Record<string, string>;
     }>((resolve, reject) => {
       const xhr = new XMLHttpRequest();
       xhr.open("GET", path, true);
       xhr.withCredentials = true;
       xhr.setRequestHeader("Accept", "application/hal+json");
-      xhr.onload = () =>
+      xhr.onload = () => {
+        const headers: Record<string, string> = {};
+        for (const line of xhr.getAllResponseHeaders().trim().split(/[\r\n]+/)) {
+          const idx = line.indexOf(":");
+          if (idx > 0) {
+            headers[line.slice(0, idx).trim().toLowerCase()] = line.slice(idx + 1).trim();
+          }
+        }
         resolve({
           status: xhr.status,
           ok: xhr.status >= 200 && xhr.status < 300,
           text: xhr.responseText,
           href: window.location.href,
+          headers,
         });
+      };
       xhr.onerror = () => reject(new Error(`XHR GET failed for ${path}`));
       xhr.send();
     });
   }, path);
   const json = parseBody(response.text);
-  console.log(`[payment-api] GET ${path} => ${response.status}`);
   return { ...response, json };
 }
 
@@ -224,6 +304,8 @@ export async function goThroughPaymentPageViaApi({
   paymentType: PaymentTypes;
   express?: boolean;
 }) {
+  attachPaymentApiLogger(page);
+
   const angularVorgangResponse = page.waitForResponse(
     (response) =>
       /\/api\/payment\/vorgang\/[^/?]+$/.test(response.url()) &&
@@ -279,7 +361,8 @@ export async function goThroughPaymentPageViaApi({
     ? await landingVorgangResponse.json()
     : await getVorgangFromPage(page, technicalTransactionId);
   const fachlicheVorgangskennung = vorgang.fachlicheVorgangskennung as string;
-  logVorgang("landing", vorgang, ` url=${page.url()} technical=${technicalTransactionId}`);
+  logVorgang("landing", vorgang, ` url=${page.url()} technical=${technicalTransactionId} fachlich=${fachlicheVorgangskennung}`);
+  await logCookieNames(page, "landing");
 
   const webshop = await angularWebshopResponse.catch(() => null);
   if (!webshop && vorgang.shopKennung) {
@@ -398,6 +481,7 @@ export async function goThroughPaymentPageViaApi({
 
   const vorgangAfter = await getVorgangFromPage(page, technicalTransactionId);
   logVorgang("after-bankdaten", vorgangAfter, ` url=${page.url()}`);
+  await logCookieNames(page, "before-entscheidung");
 
   const vorgangIdForEntscheidung =
     vorgangAfter.tbVorgangskennung ?? technicalTransactionId;
