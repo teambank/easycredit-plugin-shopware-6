@@ -1,6 +1,8 @@
 # 3.1.13
 
 * vor der finalen Autorisierung wird der Shopware-Bestellbetrag mit dem EasyCredit-Transaktionsbetrag abgeglichen (verhindert Abweichungen bei paralleler Warenkorbänderung auf der Bestellübersicht)
+* behebt einen Fehler bei der Initialisierung des Zahlungszustands, wenn kein Payload vorhanden ist
+* behebt einen Fehler in der Regelauswertung, wenn die Regel kein auswertbares Payload enthält
 
 # 3.1.12
 
