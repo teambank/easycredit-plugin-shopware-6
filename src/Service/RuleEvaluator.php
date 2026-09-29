@@ -10,6 +10,7 @@ namespace Netzkollektiv\EasyCredit\Service;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Shopware\Core\Framework\Rule\Collector\RuleConditionRegistry;
 use Shopware\Core\Framework\Rule\Container\AndRule;
+use Shopware\Core\Framework\Rule\Rule;
 use Shopware\Core\Checkout\Cart\Rule\CartRuleScope;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
@@ -56,9 +57,19 @@ class RuleEvaluator {
             return true;
         }
 
+        $payload = $rule->getPayload();
+        if (!$payload instanceof Rule) {
+            $this->debugLogger->debug(
+                'rule::evaluated "' . $rule->getName() . '": skipped (payload not a Rule)',
+                $salesChannelContext->getSalesChannelId()
+            );
+
+            return true;
+        }
+
         $scope = new CartRuleScope($cart, $salesChannelContext);
 
-        $evaluated = $rule->getPayload()->match($scope);
+        $evaluated = $payload->match($scope);
         $this->debugLogger->debug(
             'rule::evaluated "' . $rule->getName() . '": ' . ($evaluated ? 'true' : 'false'),
             $salesChannelContext->getSalesChannelId()

@@ -43,7 +43,7 @@ class Storage implements StorageInterface
 
         $this->logger->debug('storage::initialize: ' . $this->salesChannelContext->getToken());
         if ($stateData) {
-            $this->data = $stateData->getPayload();
+            $this->data = $stateData->getPayload() ?? [];
         }
 
         return $this;
