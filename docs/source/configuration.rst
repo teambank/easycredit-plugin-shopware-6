@@ -80,6 +80,7 @@ Widget-Einstellungen
 Im Bereich *Widget-Einstellungen* können die CSS-Selektoren für die Positionierung des Widgets auf den Seiten *Produktdetailseite*, *Produktübersichtsseite*, *Warenkorb* und *Offcanvas-Warenkorb* eingestellt werden.
 
 .. _configuration-widget-availability-rule:
+
 Kopplung des Widgets mit der Verfügbarkeitsregel
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
