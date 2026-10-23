@@ -1,7 +1,8 @@
 {
   "devDependencies": {
     "@playwright/test": "1.44.1",
-    "@types/node": "^22.0.0"
+    "@types/node": "^22.0.0",
+    "easycredit-playwright-payment": "github:netzkollektiv/easycredit-playwright-payment"
   },
   "scripts": {
     "sw-format": "docker run --rm -v $(pwd):/ext shopware/shopware-cli extension format /ext",

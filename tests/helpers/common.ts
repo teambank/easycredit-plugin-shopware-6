@@ -3,14 +3,14 @@ import {
   delay,
   randomize,
   greaterOrEqualsThan,
-  doWithRetry,
 } from "./utils";
-import {
-  goThroughPaymentPageViaApi,
-  resolvePaymentPageMode,
-  PAYMENT_SANDBOX,
-} from "../api/payment-api";
 import { PaymentTypes } from "./types";
+import { createEasyCreditPayment } from "easycredit-playwright-payment";
+
+export const { goThroughPaymentPage } = createEasyCreditPayment({
+  returnUrlPattern: /easycredit\/return|checkout\/confirm/i,
+  fallbackReturnUrl: "/easycredit/return",
+});
 
 export const goToProduct = async (page, sku = "regular") => {
   await test.step(`Go to product (sku: ${sku}}`, async () => {
@@ -173,107 +173,6 @@ export const startExpress = async ({
     }
   });
 }
-
-export const goThroughPaymentPage = async ({
-  page,
-  paymentType,
-  express = false,
-  viaApi,
-}: {
-  page: any;
-  paymentType: PaymentTypes;
-  express?: boolean;
-  /** Use payment-page API instead of hosted UI. Defaults to EASYCREDIT_PAYMENT_API env. */
-  viaApi?: boolean;
-}) => {
-  const mode = resolvePaymentPageMode(viaApi);
-
-  if (mode === "api") {
-    return test.step(`easyCredit Payment via API (${paymentType})`, async () => {
-      await goThroughPaymentPageViaApi({ page, paymentType, express });
-    });
-  }
-
-  return test.step(`easyCredit Payment (${paymentType})`, async () => {
-    await page.waitForURL(/ratenkauf\.easycredit\.de/i, { timeout: 90000 });
-    await page
-      .locator("#usercentrics-root")
-      .waitFor({ state: "attached", timeout: 15000 })
-      .catch(() => {});
-    await page.evaluate(() => {
-      document.getElementById("usercentrics-root")?.remove();
-    }).catch(() => {});
-
-    await page.locator("#next-btn").waitFor({ timeout: 20000 });
-    await delay(500);
-    await page.locator("#next-btn").click({ force: true });
-    await page.waitForFunction(
-      () => /mobileident|smstan/.test(window.location.href),
-      { timeout: 30000 }
-    );
-
-    await page
-      .locator("#mobilfunknummer")
-      .getByRole("textbox")
-      .fill(PAYMENT_SANDBOX.phone);
-
-    await delay(500);
-
-    await doWithRetry(async () => {
-      await page.getByRole("button", { name: /SMS-TAN senden/ }).click({ force: true });
-    });
-
-    await page.locator("#mTAN").getByRole("textbox").fill("000000");
-
-    await doWithRetry(async () => {
-      await page.getByRole("button", { name: "Zur Dateneingabe" }).click();
-    });
-
-    if (express) {
-      await page.locator("#firstName").fill(randomize("Ralf"));
-      await page.locator("#lastName").fill("Ratenkauf");
-    }
-
-    await page.locator("input#dateOfBirth").fill("05.04.1972");
-
-    if (express) {
-      await page
-        .locator("#email")
-        .getByRole("textbox")
-        .fill("ralf.ratenkauf@teambank.de");
-    }
-
-    await page
-      .locator("app-ratenkauf-iban-input-dumb")
-      .getByRole("textbox")
-      .fill("DE12500105170648489890");
-
-    if (express) {
-      await page.locator("#streetAndNumber").fill("Beuthener Str. 25");
-      await page.locator("#postalCode").fill("90402");
-      await page.locator("#city").fill("Nürnberg");
-    }
-
-    const sepa = page
-      .locator("#agreeSepa")
-      .or(page.locator("[data-bb='agreeSepa']"))
-      .or(page.getByRole("checkbox", { name: /SEPA|Lastschrift|Mandat/i }))
-      .or(page.locator("[formcontrolname='sepamandat']"));
-    await sepa.first().click({ force: true });
-
-    await delay(1000);
-
-    await page
-      .locator("tbk-button")
-      .filter({ hasText: "Zahlungswunsch prüfen" })
-      .click({ force: true });
-
-    await delay(500);
-    await doWithRetry(async () => {
-      await page.locator("tbk-button").filter({ hasText: "Zahlung übernehmen" }).click({ force: true });
-    });
-  });
-};
 
 export const confirmOrder = async ({
   page,
