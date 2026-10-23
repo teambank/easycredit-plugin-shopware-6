@@ -34,9 +34,11 @@ class TransactionService {
             return;
         }
 
+        $salesChannelId = $this->getSalesChannelId($event);
+
         try {
             $transaction = $this->integrationFactory
-                ->createTransactionApi()
+                ->createTransactionApi($salesChannelId)
                 ->apiMerchantV3TransactionTransactionIdGet($txId);
 
             if ($transaction->getStatus() !== TransactionResponse::STATUS_REPORT_CAPTURE) {
@@ -44,7 +46,7 @@ class TransactionService {
             }
 
             $this->integrationFactory
-                ->createTransactionApi()
+                ->createTransactionApi($salesChannelId)
                 ->apiMerchantV3TransactionTransactionIdCapturePost(
                     $txId,
                     new CaptureRequest(['trackingNumber' => ''])
@@ -60,13 +62,15 @@ class TransactionService {
             return;
         }
 
+        $salesChannelId = $this->getSalesChannelId($event);
+
         try {
             $transaction = $this->integrationFactory
-                ->createTransactionApi()
+                ->createTransactionApi($salesChannelId)
                 ->apiMerchantV3TransactionTransactionIdGet($txId);
 
             $this->integrationFactory
-                ->createTransactionApi()
+                ->createTransactionApi($salesChannelId)
                 ->apiMerchantV3TransactionTransactionIdRefundPost(
                     $txId,
                     new RefundRequest(['value' => $transaction->getOrderDetails()->getCurrentOrderValue()])
@@ -85,5 +89,12 @@ class TransactionService {
         }
 
         return $tx->getCustomFields()['easycredit_transaction_id'];
+    }
+
+    private function getSalesChannelId(OrderStateMachineStateChangeEvent $event): ?string
+    {
+        $salesChannelId = $event->getOrder()->getSalesChannelId();
+
+        return $salesChannelId !== '' ? $salesChannelId : null;
     }
 }

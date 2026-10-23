@@ -1,3 +1,7 @@
+# 3.1.14
+
+* „Lieferung melden“ und „Rückabwicklung melden“ verwenden die API-Zugangsdaten des Sales Channels der Bestellung. Fehlen kanalbezogene Zugangsdaten, gelten weiterhin die globalen Einstellungen.
+
 # 3.1.13
 
 * vor der finalen Autorisierung wird der Shopware-Bestellbetrag mit dem EasyCredit-Transaktionsbetrag abgeglichen (verhindert Abweichungen bei paralleler Warenkorbänderung auf der Bestellübersicht)

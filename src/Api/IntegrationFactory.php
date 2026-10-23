@@ -123,7 +123,7 @@ class IntegrationFactory
     public function createTransactionApi(?string $salesChannelId = null): Api\Service\TransactionApi
     {
         $client = $this->getClient($salesChannelId);
-        $config = $this->getConfig()
+        $config = $this->getConfig($salesChannelId)
             ->setHost('https://partner.easycredit-ratenkauf.de');
 
         return new Api\Service\TransactionApi(
